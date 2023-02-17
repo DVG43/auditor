@@ -37,7 +37,7 @@ core dev build:
 core dev deploy:
   stage: deploy review
   script:
-    - echo "Deploy review kinomanager-core"
+    - echo "Deploy review -core"
     - echo $CI_REGISTRY
     - echo $CI_REGISTRY_USER
     - echo $CI_REGISTRY_PASSWORD
@@ -46,13 +46,13 @@ core dev deploy:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
     - docker pull $CI_REGISTRY_IMAGE/core:$CI_COMMIT_SHA
     - docker-compose -f docker-compose-dev.yml up -d
-    - docker-compose -f docker-compose-dev.yml exec -T ppm-api sh -c "python src/manage.py showmigrations"
-    - docker-compose -f docker-compose-dev.yml exec -T ppm-api sh -c "python src/manage.py migrate --noinput"
-    - docker-compose -f docker-compose-dev.yml exec -T ppm-api sh -c "python src/manage.py collectstatic --noinput"
+    - docker-compose -f docker-compose-dev.yml exec -T auditor-v2-api sh -c "python src/manage.py showmigrations"
+    - docker-compose -f docker-compose-dev.yml exec -T auditor-v2-api sh -c "python src/manage.py migrate --noinput"
+    - docker-compose -f docker-compose-dev.yml exec -T auditor-v2-api sh -c "python src/manage.py collectstatic --noinput"
     - docker restart main_nginx
     - echo 'y' | docker system prune
   tags:
-    - kinomanager-shell 
+    - kinomanager-shell
   only:
     - develop
 
@@ -80,7 +80,7 @@ core prod build:
 core prod deploy:
   stage: deploy review
   script:
-    - echo "Deploy review kinomanager-core"
+    - echo "Deploy review auditor-v2-core"
     - echo $CI_REGISTRY
     - echo $CI_REGISTRY_USER
     - echo $CI_REGISTRY_PASSWORD
@@ -89,9 +89,9 @@ core prod deploy:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
     - docker pull $CI_REGISTRY_IMAGE/prod/core:$CI_COMMIT_SHA
     - docker-compose -f docker-compose-prod.yml up -d
-    - docker-compose -f docker-compose-prod.yml exec -T ppm-api sh -c "python src/manage.py showmigrations"
-    - docker-compose -f docker-compose-prod.yml exec -T ppm-api sh -c "python src/manage.py migrate --noinput"
-    - docker-compose -f docker-compose-prod.yml exec -T ppm-api sh -c "python src/manage.py collectstatic --noinput"
+    - docker-compose -f docker-compose-prod.yml exec -T auditor-v2-api sh -c "python src/manage.py showmigrations"
+    - docker-compose -f docker-compose-prod.yml exec -T auditor-v2-api sh -c "python src/manage.py migrate --noinput"
+    - docker-compose -f docker-compose-prod.yml exec -T auditor-v2-api sh -c "python src/manage.py collectstatic --noinput"
     - docker restart server-a-nginx
     - echo 'y' | docker system prune
   when: manual
