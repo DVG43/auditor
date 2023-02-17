@@ -35,7 +35,7 @@ THIRD_PARTY_APPS = [
     'django_cleanup',
     'nested_inline',
     'templated_email',
-    'fcm_django',
+    # 'fcm_django',
     'django_celery_beat',
     'drf_spectacular',
     'storages',
@@ -174,7 +174,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "share", "auditor-v2_media")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-REDIS_URL = 'redis://redis:6379/'
 
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
 CELERY_ACCEPT_CONTENT = ['application/json']

@@ -25,7 +25,6 @@ core dev build:
     - echo $CI_REGISTRY_USER
     - echo $CI_REGISTRY_PASSWORD
     - cp $API_PG_SSLROOTCERT_DATA ./backend/src/postgres_ssl.crt
-    - cp $CRED_DATA ./backend/src/credentials.json
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --context . --dockerfile ./docker/backend/Dockerfile --destination $CI_REGISTRY_IMAGE/core:$CI_COMMIT_SHA --use-new-run=true
   tags:
@@ -68,7 +67,6 @@ core prod build:
     - echo $CI_REGISTRY_USER
     - echo $CI_REGISTRY_PASSWORD
     - cp $API_PG_SSLROOTCERT_DATA ./backend/src/postgres_ssl.crt
-    - cp $CRED_DATA ./backend/src/credentials.json
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --context . --dockerfile ./docker/backend/Dockerfile --destination $CI_REGISTRY_IMAGE/prod/core:$CI_COMMIT_SHA --use-new-run=true
   tags:
