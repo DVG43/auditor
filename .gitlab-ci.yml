@@ -51,7 +51,7 @@ core dev deploy:
     - docker restart main_nginx
     - echo 'y' | docker system prune
   tags:
-    - kinomanager-shell
+    - top-runner-shell
   only:
     - develop
 
