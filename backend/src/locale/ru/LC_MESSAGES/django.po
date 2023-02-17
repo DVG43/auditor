@@ -1,0 +1,994 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-02-14 17:16+0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Artem Osokin <aptem21@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: backend/src/accounts/apps.py:8
+msgid "Clients"
+msgstr "Клиенты"
+
+#: backend/src/accounts/models.py:72
+#, fuzzy
+#| msgid "Russian rouble"
+msgid "Russian"
+msgstr "Российский рубль"
+
+#: backend/src/accounts/models.py:73
+msgid "English"
+msgstr ""
+
+#: backend/src/accounts/models.py:77 backend/src/callsheets/models.py:157
+msgid "Address"
+msgstr "Адрес"
+
+#: backend/src/accounts/models.py:78
+msgid "First name"
+msgstr "Имя"
+
+#: backend/src/accounts/models.py:79
+msgid "Last name"
+msgstr "Фамилия"
+
+#: backend/src/accounts/models.py:80 backend/src/common/models.py:55
+#: backend/src/contacts/models.py:21
+msgid "Phone"
+msgstr "Номер телефона"
+
+#: backend/src/accounts/models.py:81
+msgid "Birth date"
+msgstr "Дата рождения"
+
+#: backend/src/accounts/models.py:83
+msgid "Verification code"
+msgstr "Код проверки"
+
+#: backend/src/accounts/models.py:84
+msgid "Is verified"
+msgstr "Проверен"
+
+#: backend/src/accounts/models.py:85 backend/src/common/models.py:25
+msgid "Created at"
+msgstr "Создан"
+
+#: backend/src/accounts/models.py:87
+msgid "Avatar"
+msgstr "Фото профиля"
+
+#: backend/src/accounts/models.py:88
+msgid "Is active"
+msgstr "Активный"
+
+#: backend/src/accounts/models.py:89
+msgid "Staff status"
+msgstr "Администрация"
+
+#: backend/src/accounts/models.py:90
+msgid "Superuser status"
+msgstr "Администратор"
+
+#: backend/src/accounts/models.py:92
+msgid "changed_password_date"
+msgstr "Дата и время последнего изменения пароля"
+
+#: backend/src/accounts/models.py:98
+msgid "User language"
+msgstr "Язык пользователя"
+
+#: backend/src/accounts/models.py:108
+msgid "Promo bordomatic like"
+msgstr ""
+
+#: backend/src/accounts/models.py:109
+#, fuzzy
+#| msgid "Document id"
+msgid "Promo document like"
+msgstr "Id документа"
+
+#: backend/src/accounts/models.py:111
+msgid "Is invited"
+msgstr ""
+
+#: backend/src/accounts/models.py:113
+msgid "Used disk space"
+msgstr "Использовано места на диске"
+
+#: backend/src/accounts/models.py:117 backend/src/common/models.py:39
+msgid "Data row order"
+msgstr ""
+
+#: backend/src/accounts/models.py:125
+#: backend/src/objectpermissions/models.py:105
+#: backend/src/subscription/models.py:17 backend/src/subscription/models.py:128
+msgid "User"
+msgstr "Пользователь"
+
+#: backend/src/accounts/models.py:126
+msgid "Users"
+msgstr "Пользователи"
+
+#: backend/src/bordomatic/models.py:12 backend/src/bordomatic/models.py:31
+msgid "Сториборд"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:14 backend/src/bordomatic/models.py:33
+msgid "Видео"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:15 backend/src/bordomatic/models.py:34
+#: backend/src/bordomatic/models.py:89 backend/src/bordomatic/models.py:115
+#: backend/src/bordomatic/models.py:125 backend/src/bordomatic/models.py:139
+msgid "Дата загрузки"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:17 backend/src/bordomatic/models.py:36
+msgid "ФПС"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:18 backend/src/bordomatic/models.py:37
+msgid "Длина"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:19 backend/src/bordomatic/models.py:38
+msgid "Ширина"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:67
+msgid "Картинка для бордоматика"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:70 backend/src/bordomatic/models.py:97
+msgid "Картинка"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:71 backend/src/bordomatic/models.py:98
+msgid "Время кадра"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:73 backend/src/bordomatic/models.py:87
+#: backend/src/bordomatic/models.py:100 backend/src/bordomatic/models.py:114
+msgid "Парамер эффекта"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:80 backend/src/bordomatic/models.py:107
+msgid "Наименование эффекта"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:86 backend/src/bordomatic/models.py:113
+msgid "Субтитр"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:94
+msgid "Картинка для бордоматика (Приват)"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:120
+msgid "Аудио для бордоматика"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:123 backend/src/bordomatic/models.py:137
+msgid "Аудио"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:124 backend/src/bordomatic/models.py:138
+msgid "Имя аудиофайла"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:127 backend/src/bordomatic/models.py:141
+msgid "Начало"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:128 backend/src/bordomatic/models.py:142
+msgid "Конец"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:129 backend/src/bordomatic/models.py:143
+msgid "Громкость"
+msgstr ""
+
+#: backend/src/bordomatic/models.py:134
+msgid "Аудио для бордоматика (Приват)"
+msgstr ""
+
+#: backend/src/callsheets/apps.py:8 backend/src/callsheets/models.py:112
+msgid "Callsheets"
+msgstr "Вызывные листы"
+
+#: backend/src/callsheets/models.py:15
+msgid "Current"
+msgstr "Текущий"
+
+#: backend/src/callsheets/models.py:16
+msgid "Hour"
+msgstr "Часовой"
+
+#: backend/src/callsheets/models.py:18
+msgid "Name"
+msgstr "Название"
+
+#: backend/src/callsheets/models.py:19 backend/src/callsheets/models.py:111
+msgid "Callsheet"
+msgstr "Вызывной лист"
+
+#: backend/src/callsheets/models.py:24 backend/src/folders/models.py:12
+#: backend/src/projects/models.py:40 backend/src/shootingplans/models.py:21
+#: backend/src/storyboards/models.py:18 backend/src/timing/models.py:19
+msgid "Project"
+msgstr "Проект"
+
+#: backend/src/callsheets/models.py:25 backend/src/shootingplans/models.py:23
+msgid "Date"
+msgstr "Дата"
+
+#: backend/src/callsheets/models.py:27
+msgid "Film day number"
+msgstr "Номер съёмочного дня"
+
+#: backend/src/callsheets/models.py:32
+msgid "Start time"
+msgstr "Начало дня"
+
+#: backend/src/callsheets/models.py:33
+msgid "Finish time"
+msgstr "Конец дня"
+
+#: backend/src/callsheets/models.py:35
+msgid "Lunch type"
+msgstr "Тип обеда"
+
+#: backend/src/callsheets/models.py:42
+msgid "Lunch time"
+msgstr "Время обеда"
+
+#: backend/src/callsheets/models.py:48 backend/src/callsheets/models.py:162
+msgid "Shift type"
+msgstr "Тип смены"
+
+#: backend/src/callsheets/models.py:54 backend/src/common/models.py:58
+msgid "Contact"
+msgstr "Контакт"
+
+#: backend/src/callsheets/models.py:59
+msgid "Sunrise"
+msgstr "Рассвет"
+
+#: backend/src/callsheets/models.py:60
+msgid "Sunset"
+msgstr "Закат"
+
+#: backend/src/callsheets/models.py:61
+msgid "Temperature"
+msgstr ""
+
+#: backend/src/callsheets/models.py:63
+msgid "Max temperature"
+msgstr ""
+
+#: backend/src/callsheets/models.py:68
+msgid "Min temperature"
+msgstr ""
+
+#: backend/src/callsheets/models.py:72
+msgid "Weather"
+msgstr "Погода"
+
+#: backend/src/callsheets/models.py:73
+msgid "City"
+msgstr "Город"
+
+#: backend/src/callsheets/models.py:74
+msgid "Latitude"
+msgstr "Широта"
+
+#: backend/src/callsheets/models.py:75
+msgid "Longitude"
+msgstr "Долгота"
+
+#: backend/src/callsheets/models.py:96 backend/src/document/models.py:22
+#: backend/src/projects/models.py:58 backend/src/projects/models.py:83
+#: backend/src/projects/models.py:113 backend/src/shootingplans/models.py:29
+#: backend/src/storyboards/models.py:32 backend/src/timing/models.py:24
+#, fuzzy
+#| msgid "Document type"
+msgid "Document logo"
+msgstr "Тип документа"
+
+#: backend/src/callsheets/models.py:101 backend/src/document/models.py:30
+#: backend/src/folders/models.py:17 backend/src/folders/models.py:24
+#: backend/src/projects/models.py:63 backend/src/projects/models.py:88
+#: backend/src/projects/models.py:118 backend/src/shootingplans/models.py:34
+#: backend/src/storyboards/models.py:37 backend/src/timing/models.py:30
+msgid "Folder"
+msgstr "Каталог"
+
+#: backend/src/callsheets/models.py:148
+msgid "Callsheet member"
+msgstr "Вызывной лист"
+
+#: backend/src/callsheets/models.py:149
+msgid "Callsheet members"
+msgstr "Участники вызывного листа"
+
+#: backend/src/callsheets/models.py:158
+msgid "Check-in"
+msgstr "Время заезда"
+
+#: backend/src/callsheets/models.py:159
+msgid "Check-out"
+msgstr "Время выезда"
+
+#: backend/src/callsheets/models.py:160
+msgid "Action"
+msgstr "Старт мотор"
+
+#: backend/src/callsheets/models.py:161
+msgid "Cut"
+msgstr "Стоп мотор"
+
+#: backend/src/callsheets/models.py:179
+msgid "Location"
+msgstr "Локация"
+
+#: backend/src/callsheets/models.py:180
+msgid "Locations"
+msgstr "Локации"
+
+#: backend/src/callsheets/models.py:187 backend/src/callsheets/models.py:216
+#: backend/src/common/models.py:22 backend/src/common/models.py:65
+#: backend/src/common/models.py:98 backend/src/document/models.py:17
+msgid "Owner"
+msgstr "Владелец"
+
+#: backend/src/callsheets/models.py:195 backend/src/callsheets/models.py:224
+#: backend/src/projects/models.py:78 backend/src/storyboards/models.py:87
+msgid "File"
+msgstr "Файл"
+
+#: backend/src/callsheets/models.py:199
+msgid "Location map"
+msgstr "Схема проезда"
+
+#: backend/src/callsheets/models.py:200
+msgid "Location maps"
+msgstr "Схемы проезда"
+
+#: backend/src/callsheets/models.py:228
+msgid "Callsheet logo"
+msgstr "Логотип вызывного листа"
+
+#: backend/src/callsheets/models.py:229
+msgid "Callsheet logos"
+msgstr "Логотипы вызывных листов"
+
+#: backend/src/common/apps.py:8
+msgid "Common"
+msgstr "Общие"
+
+#: backend/src/common/models.py:23 backend/src/contacts/models.py:37
+#: backend/src/contacts/models.py:53
+msgid "Title"
+msgstr "Название"
+
+#: backend/src/common/models.py:24
+msgid "Description"
+msgstr "Описание"
+
+#: backend/src/common/models.py:27
+msgid "Last modified by"
+msgstr "Изменил"
+
+#: backend/src/common/models.py:29
+msgid "Last modified at"
+msgstr "Изменён"
+
+#: backend/src/common/models.py:30
+msgid "Deleted id"
+msgstr "Id удаления"
+
+#: backend/src/common/models.py:32
+msgid "Deleted at"
+msgstr "Удалён"
+
+#: backend/src/common/models.py:34 backend/src/contacts/models.py:39
+#: backend/src/contacts/models.py:54
+msgid "Plate color"
+msgstr "Цвет плашки"
+
+#: backend/src/common/models.py:45
+msgid "Column order"
+msgstr "Порядок колонок"
+
+#: backend/src/common/models.py:51 backend/src/projects/models.py:109
+msgid "Text"
+msgstr "Текст"
+
+#: backend/src/common/models.py:52
+msgid "Select choice"
+msgstr "Выбор варианта"
+
+#: backend/src/common/models.py:53
+#, fuzzy
+#| msgid "Select choice"
+msgid "Multiselect choice"
+msgstr "Выбор варианта"
+
+#: backend/src/common/models.py:54 backend/src/contacts/models.py:22
+msgid "Email"
+msgstr "Адрес эл.почты"
+
+#: backend/src/common/models.py:56
+msgid "Image"
+msgstr "Изображение"
+
+#: backend/src/common/models.py:57
+msgid "Time"
+msgstr "Время"
+
+#: backend/src/common/models.py:61
+msgid "Column title"
+msgstr "Заголовок столбца"
+
+#: backend/src/common/models.py:63
+msgid "Column type"
+msgstr "Тип столбца"
+
+#: backend/src/common/models.py:71 backend/src/common/models.py:104
+msgid "User column"
+msgstr "Клиентская колонка"
+
+#: backend/src/common/models.py:72
+msgid "User columns"
+msgstr "Клиентские колонки"
+
+#: backend/src/common/models.py:85
+msgid "Choice for select field"
+msgstr "Вариант выбора"
+
+#: backend/src/common/models.py:86
+msgid "Choices for select field"
+msgstr "Варианты выбора"
+
+#: backend/src/common/models.py:105
+msgid "Content"
+msgstr "Содержимое"
+
+#: backend/src/common/models.py:110
+msgid "Choice id"
+msgstr "Id выбора"
+
+#: backend/src/common/models.py:116
+#, fuzzy
+#| msgid "Choice id"
+msgid "Choices id"
+msgstr "Id выбора"
+
+#: backend/src/common/models.py:124 backend/src/common/models.py:125
+msgid "Usercolumn data"
+msgstr "Содержимое ячейки"
+
+#: backend/src/contacts/apps.py:8 backend/src/contacts/models.py:29
+#: backend/src/projects/models.py:27
+msgid "Crew members"
+msgstr "Участники съёмочной группы"
+
+#: backend/src/contacts/models.py:10
+msgid "Name Surname"
+msgstr "Имя Фамилия"
+
+#: backend/src/contacts/models.py:13 backend/src/contacts/models.py:37
+#: backend/src/contacts/models.py:44
+msgid "Position"
+msgstr "Должность"
+
+#: backend/src/contacts/models.py:18 backend/src/contacts/models.py:53
+#: backend/src/contacts/models.py:59
+msgid "Department"
+msgstr "Департамент"
+
+#: backend/src/contacts/models.py:28
+msgid "Crew member"
+msgstr "Участник съёмочной группы"
+
+#: backend/src/contacts/models.py:45
+msgid "Positions"
+msgstr "Должности"
+
+#: backend/src/contacts/models.py:60
+msgid "Departments"
+msgstr "Департаменты"
+
+#: backend/src/document/models.py:24
+msgid "Родитель"
+msgstr ""
+
+#: backend/src/folders/apps.py:8 backend/src/folders/models.py:25
+msgid "Folders"
+msgstr "Каталоги"
+
+#: backend/src/objectpermissions/apps.py:8
+#: backend/src/objectpermissions/models.py:118
+msgid "Object permissions"
+msgstr "Права доступа"
+
+#: backend/src/objectpermissions/models.py:33
+msgid "Permission"
+msgstr "Право доступа"
+
+#: backend/src/objectpermissions/models.py:34
+msgid "Content type"
+msgstr "Тип контента"
+
+#: backend/src/objectpermissions/models.py:35
+msgid "Objects id"
+msgstr "Id объекта"
+
+#: backend/src/objectpermissions/models.py:117
+msgid "Object permission"
+msgstr "Права доступа"
+
+#: backend/src/projects/apps.py:7 backend/src/projects/models.py:41
+msgid "Projects"
+msgstr "Проекты"
+
+#: backend/src/projects/models.py:21
+msgid "Logo"
+msgstr "Логотип"
+
+#: backend/src/projects/models.py:31
+msgid "Frame order"
+msgstr "Порядок кадров"
+
+#: backend/src/projects/models.py:54
+msgid "Url"
+msgstr "Ссылка"
+
+#: backend/src/projects/models.py:79
+#, fuzzy
+#| msgid "First name"
+msgid "Filename"
+msgstr "Имя файла"
+
+#: backend/src/shared_access/apps.py:8 backend/src/shared_access/apps.py:9
+msgid "Shared access"
+msgstr ""
+
+#: backend/src/shared_access/models.py:24
+msgid "Invite"
+msgstr ""
+
+#: backend/src/shared_access/models.py:25
+msgid "Invites"
+msgstr ""
+
+#: backend/src/shootingplans/apps.py:8 backend/src/shootingplans/models.py:43
+msgid "Shootingplans"
+msgstr "Шутингпланы"
+
+#: backend/src/shootingplans/models.py:42
+msgid "Shootingplan"
+msgstr "Шутингплан"
+
+#: backend/src/shootingplans/models.py:71
+msgid "Unit"
+msgstr "Юнит"
+
+#: backend/src/shootingplans/models.py:72
+msgid "Units"
+msgstr "Юниты"
+
+#: backend/src/shootingplans/models.py:100
+msgid "Unit frame"
+msgstr "Кадр юнита"
+
+#: backend/src/shootingplans/models.py:101
+msgid "Unit frames"
+msgstr "Кадры юнитов"
+
+#: backend/src/storyboards/apps.py:8 backend/src/storyboards/models.py:45
+msgid "Storyboards"
+msgstr "Сториборды"
+
+#: backend/src/storyboards/models.py:25
+msgid "Frame columns"
+msgstr "Колонки кадров"
+
+#: backend/src/storyboards/models.py:44 backend/src/storyboards/models.py:61
+msgid "Storyboard"
+msgstr "Сториборд"
+
+#: backend/src/storyboards/models.py:73
+msgid "Frame"
+msgstr "Кадр сториборда"
+
+#: backend/src/storyboards/models.py:74
+msgid "Frames"
+msgstr "Кадры сторибордов"
+
+#: backend/src/storyboards/models.py:92
+msgid "Shot"
+msgstr "Кадр"
+
+#: backend/src/storyboards/models.py:93
+msgid "Shots"
+msgstr "Кадры"
+
+#: backend/src/storyboards/models.py:115
+msgid "Footage version"
+msgstr "Монтажная версия"
+
+#: backend/src/storyboards/models.py:116
+msgid "Footage versions"
+msgstr "Монтажные версии"
+
+#: backend/src/storyboards/models.py:137
+msgid "Footage frame"
+msgstr "Кадр монтажной версии"
+
+#: backend/src/storyboards/models.py:138
+msgid "Footage frames"
+msgstr "Кадры монтажной версии"
+
+#: backend/src/subscription/admin.py:35
+msgid "Periods"
+msgstr "Периоды"
+
+#: backend/src/subscription/admin.py:44
+msgid "end datetime"
+msgstr "Дата окончания"
+
+#: backend/src/subscription/apps.py:8 backend/src/subscription/models.py:152
+#: backend/src/subscription/models.py:227
+#: backend/src/subscription/models.py:260
+#: backend/src/subscription/models.py:311
+msgid "Subscription"
+msgstr "Подписка"
+
+#: backend/src/subscription/models.py:19 backend/src/subscription/models.py:23
+msgid "Tax payer id"
+msgstr "ИНН"
+
+#: backend/src/subscription/models.py:20
+msgid "Tax payer title"
+msgstr "Наименование налогоплательщика"
+
+#: backend/src/subscription/models.py:24
+msgid "Tax payer ids"
+msgstr "ИНН"
+
+#: backend/src/subscription/models.py:35 backend/src/subscription/models.py:36
+#: backend/src/subscription/models.py:69 backend/src/subscription/models.py:138
+msgid "Payment details"
+msgstr "Платёжные данные"
+
+#: backend/src/subscription/models.py:41
+msgid "Russian rouble"
+msgstr "Российский рубль"
+
+#: backend/src/subscription/models.py:49 backend/src/subscription/models.py:56
+#: backend/src/subscription/models.py:246
+msgid "Currency"
+msgstr "Валюта"
+
+#: backend/src/subscription/models.py:50
+msgid "Currency icon"
+msgstr "Значок валюты"
+
+#: backend/src/subscription/models.py:57
+msgid "Currencies"
+msgstr "Валюты"
+
+#: backend/src/subscription/models.py:62
+msgid "Credit/debit card"
+msgstr "Банковская карта"
+
+#: backend/src/subscription/models.py:63
+msgid "Invoice"
+msgstr "Счёт"
+
+#: backend/src/subscription/models.py:72 backend/src/subscription/models.py:78
+msgid "Payment method"
+msgstr "Метод оплаты"
+
+#: backend/src/subscription/models.py:79
+msgid "Payment methods"
+msgstr "Методы оплаты"
+
+#: backend/src/subscription/models.py:88
+msgid "Is trial"
+msgstr "Пробный период"
+
+#: backend/src/subscription/models.py:89 backend/src/subscription/utils.py:80
+msgid "Student tariff"
+msgstr "Студенческий тариф"
+
+#: backend/src/subscription/models.py:90
+msgid "Tariff name"
+msgstr "Название тарифа"
+
+#: backend/src/subscription/models.py:91
+msgid "Tariff description"
+msgstr "Описание тарифа"
+
+#: backend/src/subscription/models.py:92
+msgid "Base price/month"
+msgstr "Базовая цена за месяц"
+
+#: backend/src/subscription/models.py:100
+#: backend/src/subscription/models.py:109
+#: backend/src/subscription/models.py:133
+msgid "Tariff"
+msgstr "Тариф"
+
+#: backend/src/subscription/models.py:101
+msgid "Tariffs"
+msgstr "Тарифы"
+
+#: backend/src/subscription/models.py:112
+msgid "Subscription period"
+msgstr "Период подписки"
+
+#: backend/src/subscription/models.py:113
+#: backend/src/subscription/models.py:176
+msgid "Discount"
+msgstr "Скидка"
+
+#: backend/src/subscription/models.py:119
+#: backend/src/subscription/models.py:183
+msgid "Tariff period"
+msgstr "Период тарифа"
+
+#: backend/src/subscription/models.py:120
+msgid "Tariff periods"
+msgstr "Периоды тарифа"
+
+#: backend/src/subscription/models.py:141
+msgid "Subscription end timestamp"
+msgstr "Срок окончания подписки"
+
+#: backend/src/subscription/models.py:142
+msgid "Recurrent active"
+msgstr "Рекуррентный платёж"
+
+#: backend/src/subscription/models.py:147
+msgid "Recurrent payment task"
+msgstr "Задача: рекуррентный платёж"
+
+#: backend/src/subscription/models.py:149
+msgid "Pay day"
+msgstr "Дата платежа"
+
+#: backend/src/subscription/models.py:153
+msgid "Subscriptions"
+msgstr "Подписки"
+
+#: backend/src/subscription/models.py:164
+msgid "School name"
+msgstr "Наименование школы"
+
+#: backend/src/subscription/models.py:170
+#: backend/src/subscription/models.py:192
+msgid "School"
+msgstr "Школа"
+
+#: backend/src/subscription/models.py:171
+msgid "Schools"
+msgstr "Школы"
+
+#: backend/src/subscription/models.py:175
+msgid "Code"
+msgstr "Код"
+
+#: backend/src/subscription/models.py:177
+msgid "Start"
+msgstr "Дата начала"
+
+#: backend/src/subscription/models.py:178
+msgid "End"
+msgstr "Дата окончания"
+
+#: backend/src/subscription/models.py:179
+#, fuzzy
+#| msgid "Student promocod"
+msgid "Student promocode"
+msgstr "Промокод студенческий"
+
+#: backend/src/subscription/models.py:180
+msgid "Amount of use"
+msgstr "Количество использования"
+
+#: backend/src/subscription/models.py:181
+msgid "Total usage"
+msgstr ""
+
+#: backend/src/subscription/models.py:210
+#: backend/src/subscription/models.py:220
+#: backend/src/subscription/models.py:252
+msgid "Promocode"
+msgstr "Промокод"
+
+#: backend/src/subscription/models.py:211
+msgid "Promocodes"
+msgstr "Промокоды"
+
+#: backend/src/subscription/models.py:215
+#: backend/src/subscription/models.py:239
+msgid "Payment timestamp"
+msgstr "Время оплаты"
+
+#: backend/src/subscription/models.py:231
+msgid "Students promocode payment"
+msgstr "Оплата студенческим промокодом"
+
+#: backend/src/subscription/models.py:232
+msgid "Students promocode payments"
+msgstr "Оплаты студенческим промокодом"
+
+#: backend/src/subscription/models.py:241
+msgid "Subscription period end"
+msgstr "Окончание периода подписки"
+
+#: backend/src/subscription/models.py:248
+msgid "Order total"
+msgstr "Итого"
+
+#: backend/src/subscription/models.py:249
+msgid "Month qty"
+msgstr "Номер месяца"
+
+#: backend/src/subscription/models.py:250
+msgid "Payment complete"
+msgstr "Платёж исполнен"
+
+#: backend/src/subscription/models.py:251
+msgid "Paid at"
+msgstr "Дата оплаты"
+
+#: backend/src/subscription/models.py:263
+msgid "Recurrent"
+msgstr "Рекуррентный платеж"
+
+#: backend/src/subscription/models.py:266
+msgid "Card payment"
+msgstr "Оплата картой"
+
+#: backend/src/subscription/models.py:267
+msgid "Card payments"
+msgstr "Оплаты картой"
+
+#: backend/src/subscription/models.py:314
+msgid "Invoice title"
+msgstr "Заголовок счёта"
+
+#: backend/src/subscription/models.py:316
+msgid "Invoice file"
+msgstr "Счёт"
+
+#: backend/src/subscription/models.py:319
+msgid "Bank transfer"
+msgstr "Банковский перевод"
+
+#: backend/src/subscription/models.py:320
+msgid "Bank transfers"
+msgstr "Банковские переводы"
+
+#: backend/src/subscription/utils.py:21
+msgid ""
+"The full plan includes unlimited access to all PPM functionality. Unlimited "
+"number of shootingplans, storyboards, projects. The ability to share your "
+"documents and follow the development of PPM."
+msgstr ""
+"Включает в себя неограниченный доступ ко всему функционалу Кино Менеджера. "
+"Неограниченное количество шутингпланов, сторибордов, проектов. Возможность "
+"делиться проектом и следить за развитием."
+
+#: backend/src/subscription/utils.py:32
+msgid ""
+"Don`t worry - all your data, collected shootingplans and storyboards "
+"securely stored. To continue using PPM, choose the duration of the "
+"subscription and pay for it."
+msgstr ""
+"Не переживайте - все ваши данные, собраные шутингпланы и сториборды надёжно "
+"хранятся у нас. Чтобы продолжить пользоваться PPM, необходимо выбрать "
+"продолжительность подписки и оплатить."
+
+#: backend/src/subscription/utils.py:39
+#, fuzzy
+#| msgid "Trial period 14 days"
+msgid "Trial period one month"
+msgstr "Пробный период один месяц"
+
+#: backend/src/subscription/utils.py:48
+msgid "Full access"
+msgstr "Полный доступ"
+
+#: backend/src/timing/models.py:39 backend/src/timing/models.py:56
+msgid "Timing"
+msgstr ""
+
+#: backend/src/timing/models.py:40
+msgid "Timings"
+msgstr ""
+
+#: backend/src/timing/models.py:61 backend/src/timing/models.py:73
+msgid "Group"
+msgstr ""
+
+#: backend/src/timing/models.py:62
+msgid "Groups"
+msgstr ""
+
+#: backend/src/timing/models.py:80
+msgid "Event"
+msgstr ""
+
+#: backend/src/timing/models.py:81
+#, fuzzy
+#| msgid "Clients"
+msgid "Events"
+msgstr "Клиенты"
+
+#: backend/src/trash/apps.py:8
+msgid "Recycle bin"
+msgstr "Корзина"
+
+#~ msgid "The student tariff is intended for educational use."
+#~ msgstr ""
+#~ "Студенческий тариф, предназначенный для использования в образовательных "
+#~ "целях"
+
+#~ msgid "Document name"
+#~ msgstr "Название документа"
+
+#~ msgid "Put in trash by"
+#~ msgstr "Отправлено в корзину от"
+
+#~ msgid "Deleted since"
+#~ msgstr "Дата удаления"
+
+#, fuzzy
+#~| msgid "Promocode"
+#~ msgid "Promo-code"
+#~ msgstr "Промокод"
+
+#~ msgid "Subscription of"
+#~ msgstr "Подписка пользователя"
+
+#~ msgid "Subscription info"
+#~ msgstr "Данные подписки"
+
+#~ msgid "Interior"
+#~ msgstr "Интерьер"
+
+#~ msgid "Exterior"
+#~ msgstr "Экстерьер"
+
+#~ msgid "Lunch start"
+#~ msgstr "Начало обеда"
+
+#~ msgid "Current lunch"
+#~ msgstr "Текущий обед"
+
+#~ msgid "Is deleted"
+#~ msgstr "В корзине"
+
+#~ msgid "Payment number"
+#~ msgstr "Номер платежа"
+
+#~ msgid "Payment ID"
+#~ msgstr "ID платежа (Тинькофф)"

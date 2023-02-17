@@ -1,0 +1,13 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.0.1"
+tag_format = "v$minor.$major.$patch.$prerelease"
+
+[tool.coverage.run]
+branch = true
+source = ["./src"]
+omit = ["*/manage.py", "*/tests/*"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "src.settings"
+python_files = ["tests.py", "test_*.py" ,"*_tests.py"]

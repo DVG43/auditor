@@ -1,0 +1,61 @@
+---
+version: '2.4'
+
+services:
+
+  auditor-v2-api:
+    image: $CI_REGISTRY_IMAGE/core:$CI_COMMIT_SHA
+    user: app:app
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
+    container_name: "auditor-v2-api"
+    hostname: "auditor-v2-api"
+    restart: unless-stopped
+    entrypoint: /app/docker/backend/wsgi-entrypoint.sh
+    env_file: .env
+    volumes:
+      - shared_web_root:/app/backend/src/share/
+    networks:
+      - devserver_default
+    healthcheck:
+      test: curl -s -I --fail http://auditor-v2-api/ht/
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  auditor-v2-redis:
+     image: redis:6.2.6
+     container_name: "auditor-v2-redis"
+     hostname: "auditor-v2-redis"
+     restart: unless-stopped
+     healthcheck:
+        test: redis-cli ping
+        interval: 5s
+        timeout: 15s
+        retries: 3
+     networks:
+       - devserver_default
+
+  auditor-v2-celery:
+     image: $CI_REGISTRY_IMAGE/core:$CI_COMMIT_SHA
+     user: app:app
+     build:
+       context: .
+       dockerfile: ./docker/backend/Dockerfile
+     container_name: "auditor-v2-celery"
+     restart: unless-stopped
+     entrypoint: /app/docker/backend/celery-entrypoint.sh
+     env_file: .env
+     networks:
+       - devserver_default
+     depends_on:
+       - auditor-v2-api
+       - auditor-v2-redis
+networks:
+  devserver_default:
+    external: true
+volumes:
+  shared_web_root:
+    external: true

@@ -1,0 +1,50 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "==3.2"
+djangorestframework = "*"
+djangorestframework-simplejwt = "*"
+django-cors-headers = "*"
+drf-spectacular = "*"
+django-cleanup = "*"
+psycopg2-binary = "*"
+drf-nested-routers = "*"
+gunicorn = "*"
+pillow = "*"
+redis = "*"
+celery = "*"
+pytest-django = "*"
+drf-writable-nested = "*"
+django-nested-inline = "*"
+django-templated-email = "*"
+djangorestframework-camel-case = "*"
+django-celery-beat = "*"
+fcm-django = "*"
+decorator = "==4.4.2"
+imageio = "==2.22.1"
+imageio-ffmpeg = "==0.4.7"
+moviepy = "==1.0.3"
+proglog = "==0.1.10"
+tqdm = "==4.64.1"
+drf-yasg = "*"
+boto3 = "*"
+django-storages = "*"
+python-dateutil = "*"
+social-auth-app-django = "==5.0.0"
+social-auth-core = "==4.2.0"
+beautifulsoup4 = "==4.11.1"
+channels = "==3.0.4"
+channels-redis = "==4.0.0"
+django-channels-graphql-ws = "==0.9.1"
+graphene-django = "==2.15.0"
+uvicorn = {extras = ["standart"], version = "*"}
+websockets = "*"
+django-graphql-jwt = "==0.3.4"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"

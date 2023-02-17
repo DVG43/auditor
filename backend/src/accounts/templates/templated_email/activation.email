@@ -1,0 +1,12 @@
+{% block subject %}{{subject}}{% endblock %}
+{% block html %}
+<style>
+body {
+	max-width: 600px;
+	margin: 0 auto;
+}
+</style>
+<p style="margin-bottom: 30px">{{body}}</p>
+<strong>{{code}}</strong>
+</body>
+{% endblock %}
