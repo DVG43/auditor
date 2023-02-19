@@ -80,6 +80,7 @@ class UserSerializer(AccountSerializer):
     subscription_end = serializers.IntegerField(
         source='subscription.end_date', read_only=True, allow_null=True)
     oauth2_providers = serializers.SerializerMethodField()
+    is_verified = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = User

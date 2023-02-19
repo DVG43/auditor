@@ -26,7 +26,7 @@ full_description = _('The full plan includes unlimited access to all '
 
 
 def check_or_create_subscription_objects():
-    trial_tariff = get_object_or_404(Tariff, is_trial=True)
+    trial_tariff = Tariff.objects.filter(is_trial=True)
     if not trial_tariff:
         pd = PaymentDetails.objects.create()
         trial_description = _('Don`t worry - all your data, collected '
