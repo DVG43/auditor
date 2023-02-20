@@ -18,7 +18,6 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from accounts.models import User
-from callsheets.models import Callsheet
 from document.models import Document
 from common.models import UserColumn, UserCell, UserChoice, UsercellImage, StandardIcon
 from common.permissions import IsOwnerOrIsProjectAccess, IsOwner
@@ -34,8 +33,7 @@ from common.utils import (
     get_model,
     unpack_nested_kwargs,
     get_object_or_404,
-    organize_data_row_sort_arrays,
-    contact_to_callsheetmember, add_userfields,
+    organize_data_row_sort_arrays, add_userfields,
     insert_frames, check_file_size,
     change_disk_space,
     recount_disk_space,
@@ -44,10 +42,8 @@ from common.utils import (
 )
 from folders.utils import get_child_folders
 from projects.models import Project, Link, File, Text
-from shootingplans.models import Shootingplan
 from storyboards.models import Storyboard, Shot
 from folders.models import Folder
-from callsheets.serializers import CallsheetmemberSerializer  # DO NOT REMOVE!
 from storyboards.serializers import FrameSerializer  # DO NOT REMOVE!
 
 
@@ -65,7 +61,7 @@ class FilterQuerySetMixin(viewsets.ReadOnlyModelViewSet):
         # queryset = get_model(base).objects.filter(owner=user)
         if self.request.user.is_invited:
             queryset = get_model(base).objects.filter(doc_uuid=self.request.user.document)
-        if base in ['project', 'shootingplan', 'callsheet', 'storyboard',
+        if base in ['project', 'storyboard',
                     'file', 'link', 'text', 'document']:
             queryset = queryset.filter(deleted_id__isnull=True).filter(owner__is_active=True)
 
@@ -99,7 +95,7 @@ class FilterQuerySetMixin(viewsets.ReadOnlyModelViewSet):
             filter_kw = {f"host_{kw['host']}": kw['host_pk']}
 
         # Фильтр userfields для всех frames
-        if base == 'usercell' and kw['parent'] in ['storyboard', 'unit']:
+        if base == 'usercell' and kw['parent'] in ['storyboard']:
             filter_kw = {
                 f"of_{kw['host']}__host_{kw['parent']}": kw['parent_pk']
             }
@@ -110,17 +106,9 @@ class FilterQuerySetMixin(viewsets.ReadOnlyModelViewSet):
             filter_kw = {'owner': user}
 
         # Фильтр usercolumns для всех frames
-        if base == 'usercolumn' and kw['parent'] in ['storyboard', 'unit']:
+        if base == 'usercolumn' and kw['parent'] in ['storyboard']:
             filter_kw = {f"of_{kw['parent']}": kw['parent_pk']}
 
-        # Фильтр usercolumns для callsheet и location
-        if base == 'usercolumn' and kw['host'] in \
-            ['callsheet', 'location']:
-            filter_kw = {f"of_{kw['host']}": kw['host_pk']}
-
-        # Фильтр usercolumns для участников вызывного
-        if base == 'usercolumn' and kw['host'] == 'callsheetmember':
-            filter_kw = {f"of_{kw['host']}": kw['parent_pk']}
 
         print('^^^', filter_kw, '^^^')
         self.queryset = queryset.filter(**filter_kw)
@@ -132,7 +120,7 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
     permission_classes = [IsOwnerOrIsProjectAccess]
 
     def retrieve(self, request, *args, **kwargs):
-        if self.basename in ['storyboard', 'chrono', 'unit', 'callsheet']:
+        if self.basename in ['storyboard', 'chrono']:
             instance = self.get_object()
             # чистка и сортировка массивов сортировки
             organize_data_row_sort_arrays(instance)
@@ -204,7 +192,7 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
 
         # Получение существующих юзер.колонок для документа и их добавление
         # для всех объектов
-        if base in ['frame', 'unitframe', 'callsheetmember']:
+        if base in ['frame']:
             print(149)
             add_userfields(user, host_obj, new_obj)
 
@@ -212,23 +200,7 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
         if base == 'contact' and kw['host'] == 'project':
             print(154)
             host_obj.contacts.add(new_obj)
-            for cs in host_obj.callsheets.all():
-                cs.members.add(new_obj)
 
-        # Добавление участника в вызывной, при создании из вызывного
-        if base == 'callsheetmember' and kw['host'] == 'callsheet':
-            print(159)
-            host_obj.members.add(new_obj)
-            # обновляем время и юзера последнего изменения сториборда, вызывного или шутингплана
-            update_host_modified_date(kw, request.user.email)
-            return self.list(request)
-
-        # Копируем контакты из проекта в вызывной при создании вызывного
-        if host_obj and base == 'callsheet':
-            print(165)
-            for cnt in host_obj.contacts.all():
-                csm = contact_to_callsheetmember(cnt, new_obj)
-                new_obj.members.add(csm)
         new_obj.save()
         new_obj.refresh_from_db()
 
@@ -241,9 +213,8 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
 
         # обновляем время и юзера последнего изменения сториборда, вызывного или шутингплана,
         # при изменении дочерних объектов
-        if base in ["unitframe", "unit", "chrono", "shot", "frame", "chronoframe",
-                    "location", "callsheetlogo", "locationmap", "usercell",
-                    "userchoice", "usercellimage", "usercolumn", "userfield"]:
+        if base in ["chrono", "shot", "frame", "chronoframe",
+                    "usercell", "userchoice", "usercellimage", "usercolumn", "userfield"]:
             update_host_modified_date(kw, request.user.email)
 
         serializer = self.get_serializer(instance=new_obj)
@@ -291,20 +262,14 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
                 return Response({'file': 'Not enough space on disk for file'},
                                 status=status.HTTP_400_BAD_REQUEST)
 
-        if self.basename in ['contact', 'callsheetmember'] \
-            and kw['parent'] in ['project', 'callsheet'] \
+        if self.basename in ['contact'] \
+            and kw['parent'] in ['project'] \
             and not request.data:
             print(186, 'PVS.update Add contact to document')
             contact = get_object_or_404('contact', kw['base_pk'])
             host_obj = get_object_or_404(kw['host'], kw['host_pk'])
-            if kw['host'] == 'callsheet':
-                # Копирование контакта в вызывной и добавление к нему
-                # userfields из колонок участников вызывного
-                csm = contact_to_callsheetmember(contact, host_obj)
-                add_userfields(request.user, host_obj, csm)
-            else:
-                # Добавление участников в проект из съёмочной группы
-                host_obj.contacts.add(contact)
+            # Добавление участников в проект из съёмочной группы
+            host_obj.contacts.add(contact)
             return self.list(request)
 
         if base == 'storyboard' and kw['base_pk'] == '0':
@@ -346,7 +311,7 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
                     raise ParseError(
                         {'error': 'userfields must be a list of objects'})
 
-        if 'frames' in request.data and base in ['chrono', 'unit']:
+        if 'frames' in request.data and base in ['chrono']:
             # при добавлении фреймов из СБ создаём chronoframe/unitframe и
             # добавляем в них фреймы СБ по id указанным в списке frames: [ ]
             instance = get_object_or_404(base, kw['base_pk'])  #
@@ -388,16 +353,14 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
         if getattr(instance, '_prefetched_objects_cache', None):
             instance._prefetched_objects_cache = {}
 
-        if base in ['storyboard', 'chrono', 'unit', 'callsheet']:
+        if base in ['storyboard', 'chrono']:
             organize_data_row_sort_arrays(instance)
             serializer = self.get_serializer(instance=instance)
 
         # обновляем время и юзера последнего изменения сториборда, вызывного или шутингплана,
         # при изменении дочерних объектов
-        if base in ["unitframe", "unit", "chrono", "shot", "frame", "chronoframe",
-                    "location", "callsheetlogo", "locationmap", "usercell",
-                    "userchoice", "usercellimage", "usercolumn", "userfield",
-                    "callsheetmember"]:
+        if base in ["chrono", "shot", "frame", "chronoframe",
+                    "usercell", "userchoice", "usercellimage", "usercolumn", "userfield"]:
             update_host_modified_date(kw, request.user.email)
 
         return Response(serializer.data)
@@ -441,8 +404,7 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
                                 doc.deleted_id = uuid4()
                                 doc.deleted_since = timezone.now()
                                 doc.save()
-        elif isinstance(obj,
-                        (Callsheet, Shootingplan, Link, File, Text, Document)):
+        elif isinstance(obj, (Link, File, Text, Document)):
             obj.deleted_id = uuid4()
             obj.deleted_since = timezone.now()
             obj.save()
@@ -466,10 +428,8 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
         else:
             # обновляем время и юзера последнего изменения сториборда, вызывного или шутингплана,
             # при изменении дочерних объектов
-            if base in ["unitframe", "unit", "chrono", "frame", "chronoframe",
-                        "location", "usercell",
-                        "userchoice", "usercellimage", "userfield",
-                        "callsheetmember"]:
+            if base in ["chrono", "frame", "chronoframe",
+                        "usercell", "userchoice", "usercellimage", "userfield"]:
                 update_host_modified_date(self.kw, request.user.email)
             obj.delete()
         return Response({'success': 'object deleted'}, status=204)
@@ -491,20 +451,7 @@ class UserColumnViewSet(PpmViewSet):
         print(347, usercolumn, 'created')
 
         obj = None
-        if 'callsheetmember' in kw['host']:
-            obj = get_object_or_404(kw['parent'], kw['parent_pk'])
-            print(343, obj)
-            obj.member_columns.add(usercolumn)  # привязка к cs
-            members_count = obj.members.count()
-            print(346, members_count)
-            if members_count > 0:
-                for member_obj in obj.members.all():
-                    usercell = UserCell.objects.create(
-                        host_usercolumn=usercolumn, owner=request.user)
-                    member_obj.userfields.add(usercell)
-                    print(352, member_obj)
 
-            serializer = self.get_serializer(instance=usercolumn)
 
         if kw['host'].endswith('frame'):
             print(357)
@@ -531,22 +478,13 @@ class UserColumnViewSet(PpmViewSet):
                 if frame_count > 0:
                     for frame_obj in frames_attr.all():
                         cls_name = frame_obj.__class__.__name__
-                        if cls_name == 'Unitframe' and frame_obj.sbdframe \
-                            or cls_name == 'Frame':
+                        if cls_name == 'Frame':
                             usercell = UserCell.objects.create(
                                 host_usercolumn=usercolumn, owner=request.user)
                             frame_obj.userfields.add(usercell)
 
                 serializer = self.get_serializer(instance=usercolumn)
 
-        if kw['host'] in ['callsheet', 'location']:
-            print(388)
-            obj = get_object_or_404(kw['host'], kw['host_pk'])
-            obj.usercolumns.add(usercolumn)  # привязка к callsheet
-            usercell = UserCell.objects.create(
-                owner=request.user, host_usercolumn=usercolumn)
-            obj.userfields.add(usercell)
-            serializer = UserCellSerializer(instance=usercell)
 
         # обновляем время и юзера последнего изменения сториборда, вызывного или шутингплана,
         # при изменении дочерних объектов
@@ -593,12 +531,9 @@ class CalendarView(views.APIView):
         to_date = kwargs['to']
         from_date_dt = datetime.date.fromisoformat(from_date)
         to_date_dt = datetime.date.fromisoformat(to_date)
-        qc = (Q(callsheets__date__gte=from_date) &
-              Q(callsheets__date__lte=to_date))
-        qs = (Q(shootingplans__date__gte=from_date) &
-              Q(shootingplans__date__lte=to_date))
+
         q_user_trash = Q(owner=request.user) & Q(deleted_id__isnull=True)
-        q = (qc | qs) & q_user_trash
+        q = q_user_trash
 
         projects = Project.objects.filter(q).distinct()
         response = []
@@ -608,20 +543,6 @@ class CalendarView(views.APIView):
                 'project_name': project.name,
                 'documents': []})
             # TODO Refactor
-            for cs in project.callsheets.filter(deleted_id__isnull=True):
-                if to_date_dt >= cs.date >= from_date_dt:
-                    response[idx]['documents'].append({
-                        'id': cs.id,
-                        'model': 'callsheet',
-                        'name': cs.name,
-                        'date': cs.date})
-            for shp in project.shootingplans.filter(deleted_id__isnull=True):
-                if to_date_dt >= shp.date >= from_date_dt:
-                    response[idx]['documents'].append({
-                        'id': shp.id,
-                        'model': 'shootingplan',
-                        'name': shp.name,
-                        'date': shp.date})
         serializer = CalendarSerializer(response, many=True)
         return Response(serializer.data)
 

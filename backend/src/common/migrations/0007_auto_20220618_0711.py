@@ -9,9 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('shootingplans', '0012_auto_20220613_1156'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('callsheets', '0016_auto_20220618_0711'),
         ('storyboards', '0012_alter_frame_userfields'),
         ('common', '0006_auto_20220613_0614'),
     ]

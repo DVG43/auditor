@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AnonymousUser
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import BasePermission
@@ -51,8 +52,9 @@ class IsOwnerOrIsProjectAccess(BasePermission):
         kw = unpack_nested_kwargs(view.kwargs, view.basename)
 
         # если пользователь является пользователем по ссылке, то мы его пропускаем
-        if request.user.is_invited:
-            return True
+        if not isinstance(request.user, AnonymousUser):
+            if request.user.is_invited:
+                return True
 
         # проверяем доступ редактора при создании документа в директории или проекте
         if view.action == "create" and view.basename != 'project':

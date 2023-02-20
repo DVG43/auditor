@@ -3,7 +3,6 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from callsheets.models import Callsheet
 from common.mixins import CopyAndMoveDocMixin
 from common.utils import get_model, count_space_per_object, recount_disk_space
 from common.views import PpmViewSet
@@ -21,7 +20,7 @@ from storyboards.views import create_default_storyboard_frame_columns
 
 class ProjectViewSet(PpmViewSet, ShareMixin):
     queryset = Project.objects.prefetch_related(
-        'contacts', 'storyboards', 'shootingplans', 'documents', 'callsheets',
+        'contacts', 'storyboards', 'documents',
         'links', 'files', 'texts', 'timings')
     http_method_names = ['get', 'post', 'patch', 'delete']
 
@@ -69,21 +68,10 @@ class ProjectViewSet(PpmViewSet, ShareMixin):
             # собирает документы, в которых хранятся файлы
             storyboard = Storyboard.objects.filter(host_project=prj).first()
             files = File.objects.filter(host_project=prj.id).all()
-            callsheets = Callsheet.objects.filter(host_project=prj.id).all()
 
             prj_size = 0
             documents = []
 
-            # получает статистику использования памяти по вызывным (логотипы и карты)
-            for cls in callsheets:
-                callsheet_size = count_space_per_object(request.user, cls, "callsheet")
-                prj_size += callsheet_size
-                documents.append({
-                    "id": cls.id,
-                    "model": "callsheet",
-                    "name": cls.name,
-                    "size": callsheet_size
-                })
 
             # получает статистику по сториборду (картинки шотов)
             if storyboard:
@@ -125,7 +113,7 @@ class ProjectViewSet(PpmViewSet, ShareMixin):
     def clean_space(self, request, *args, **kwargs):
         """
         Принимает на вход данные вида:
-        {"model": "storyboard"|"shootingplan"|"callsheet",
+        {"model": "storyboard"|"documents"|"timings",
         "id": int}
         И безвозвратно удаляет выбранный проект или документ.
         """
@@ -133,8 +121,6 @@ class ProjectViewSet(PpmViewSet, ShareMixin):
             "project",
             "storyboard",
             "file",
-            "callsheet",
-            "shootingplan",
             "text",
             "link",
             "document",

@@ -62,7 +62,6 @@ class ContactViewSet(PpmViewSet):
         # Отвязка контакта без глобального удаления:
         # Привязка контакта:
         # DELETE /project/3/contacts/2/ (удалить контакт 2 из проекта 3)
-        # DELETE /callsheets/1/contacts/5/ (контакт 5 из вызывного 1)
         if kw['host']:
             host_obj = get_object_or_404(kw['host'], kw['host_pk'])
             host_obj.contacts.remove(instance)
@@ -86,7 +85,6 @@ class ContactViewSet(PpmViewSet):
         instance.save()
         # Привязка контакта:
         # PUT /project/3/contacts/2/ (контакт 2 к проекту 3)
-        # PUT /callsheets/1/contacts/5/ (контакт 5 к вызывному 1)
         if self.action == 'update' and kw['host']:
             host_obj = get_object_or_404(kw['host'], kw['host_pk'])
             host_obj.contacts.add(instance)

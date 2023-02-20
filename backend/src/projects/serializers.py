@@ -1,12 +1,10 @@
 import time
 from datetime import datetime
 
-from callsheets.models import Callsheet
 from common.serializers import PpmDocSerializer
 from contacts.serializers import ContactSerializer
 from projects.models import Project, Link, File, Text
 from rest_framework import serializers
-from shootingplans.models import Shootingplan
 from storyboards.models import Storyboard
 from document.models import Document
 from timing.models import Timing
@@ -76,24 +74,6 @@ class RevStoryboardSerializer(serializers.ModelSerializer, LastModifiedMixin):
         return 'storyboard'
 
 
-class RevShootingplanSerializer(serializers.ModelSerializer, LastModifiedMixin):
-    model = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Shootingplan
-        list_serializer_class = FilteredListSerializer
-        fields = ['id', 'model', 'name', 'date', 'tag_color', 'doc_uuid',
-                  'order_id', 'document_logo',
-                  'last_modified_name',
-                  'last_modified_date',
-                  'folder'
-                  # 'last_modified_time',
-                  ]
-
-    def get_model(self, obj):
-        return 'shootingplan'
-
-
 class RevDocumentSerializer(serializers.ModelSerializer, LastModifiedMixin):
     model = serializers.SerializerMethodField()
 
@@ -128,24 +108,6 @@ class RevTimingSerializer(serializers.ModelSerializer, LastModifiedMixin):
 
     def get_model(self, obj):
         return 'timing'
-
-
-class RevCallsheetSerializer(serializers.ModelSerializer, LastModifiedMixin):
-    model = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Callsheet
-        list_serializer_class = FilteredListSerializer
-        fields = ['id', 'model', 'name', 'date', 'tag_color', 'doc_uuid',
-                  'order_id', 'document_logo',
-                  'last_modified_name',
-                  'last_modified_date',
-                  'folder'
-                  # 'last_modified_time',
-                  ]
-
-    def get_model(self, obj):
-        return 'callsheet'
 
 
 class LinkSerializer(PpmDocSerializer, LastModifiedMixin):
@@ -217,10 +179,6 @@ class TextSerializer(PpmDocSerializer, LastModifiedMixin):
 
 class RevDocSerializer(serializers.Serializer):
     storyboards = RevStoryboardSerializer(
-        many=True, read_only=True)
-    shootingplans = RevShootingplanSerializer(
-        many=True, read_only=True)
-    callsheets = RevCallsheetSerializer(
         many=True, read_only=True)
     documents = RevDocumentSerializer(
         many=True, read_only=True)

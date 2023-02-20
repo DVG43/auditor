@@ -9,10 +9,9 @@ from projects.models import Project
 
 
 class CopyAndMoveDocMixin(ViewSet):
-    allowed_move_models = ['file', 'callsheet', 'text', 'link']
+    allowed_move_models = ['file', 'text', 'link']
 
-    allowed_copy_models = ['file', 'callsheet', 'text', 'link',
-                           'shootingplan']
+    allowed_copy_models = ['file', 'text', 'link']
 
     @action(methods=["PATCH"], detail=True, url_path='copy')
     def copy_document(self, request, **kwargs):
@@ -37,7 +36,7 @@ class CopyAndMoveDocMixin(ViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
         model_name = request.data['model']
         if model_name not in self.allowed_copy_models:
-            return Response({"model": "only callsheets, texts, files, links"
+            return Response({"model": "only texts, files, links"
                                       " are allowed to copy and move"},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -74,7 +73,7 @@ class CopyAndMoveDocMixin(ViewSet):
         model_name = request.data['model']
 
         if model_name not in self.allowed_move_models:
-            return Response({"model": "only callsheets, texts, files, links"
+            return Response({"model": "only texts, files, links"
                                       " are allowed to copy and move"},
                             status=status.HTTP_400_BAD_REQUEST)
 

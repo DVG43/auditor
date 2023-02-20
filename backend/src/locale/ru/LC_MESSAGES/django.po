@@ -576,30 +576,6 @@ msgstr ""
 msgid "Invites"
 msgstr ""
 
-#: backend/src/shootingplans/apps.py:8 backend/src/shootingplans/models.py:43
-msgid "Shootingplans"
-msgstr "Шутингпланы"
-
-#: backend/src/shootingplans/models.py:42
-msgid "Shootingplan"
-msgstr "Шутингплан"
-
-#: backend/src/shootingplans/models.py:71
-msgid "Unit"
-msgstr "Юнит"
-
-#: backend/src/shootingplans/models.py:72
-msgid "Units"
-msgstr "Юниты"
-
-#: backend/src/shootingplans/models.py:100
-msgid "Unit frame"
-msgstr "Кадр юнита"
-
-#: backend/src/shootingplans/models.py:101
-msgid "Unit frames"
-msgstr "Кадры юнитов"
-
 #: backend/src/storyboards/apps.py:8 backend/src/storyboards/models.py:45
 msgid "Storyboards"
 msgstr "Сториборды"
