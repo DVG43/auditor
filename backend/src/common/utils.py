@@ -13,12 +13,9 @@ from rest_framework.exceptions import ValidationError
 
 import settings
 from accounts.models import User
-from callsheets.models import Callsheetmember, Location, LocationMap, CallsheetLogo, Callsheet
 from common.models import UserCell
 from projects import models
 from projects.models import Project
-from shootingplans.models import Unit, Shootingplan
-from shootingplans.serializers import UnitframeSerializer
 from storyboards.models import Frame
 from storyboards.serializers import ChronoframeSerializer
 from timing.models import TimingGroup, Timing
@@ -102,7 +99,7 @@ def organize_data_row_sort_arrays(instance):
         for ident in instance_data_row_ids:
             instance.data_row_order.append(ident)
 
-    if instance_has_userfields and instance._meta.object_name != 'Callsheet':
+    if instance_has_userfields:
         if Frame.objects.first():
             frame = instance_data_row_attribute.first()
             column_ids = list(frame.userfields.values('field_id'))
@@ -125,19 +122,6 @@ def organize_data_row_sort_arrays(instance):
             field.auto_now = True
 
 
-def contact_to_callsheetmember(cnt, callsheet):
-    member_data = {
-        'host_callsheet_id': callsheet.id,
-        'name': cnt.name,
-        'phone': cnt.phone,
-        'email': cnt.email,
-        'department': cnt.department,
-        'position': cnt.position,
-        'owner': cnt.owner
-    }
-    return Callsheetmember.objects.create(**member_data)
-
-
 def add_userfields(user, host_obj, new_obj):
     """
     Получение существующих юзер.колонок для модели и их добавление
@@ -146,15 +130,12 @@ def add_userfields(user, host_obj, new_obj):
     print(139, 'common.add_userfields')
     new_obj_name = new_obj.__class__.__name__
     columns = []
-    if new_obj_name == 'Callsheetmember':
-        columns = host_obj.member_columns.all()
-    elif new_obj_name in ['Frame', 'Unitframe']:
+    if new_obj_name in ['Frame']:
         columns = host_obj.frame_columns.all()
     for usercolumn in columns:
         usercell = UserCell.objects.create(
             host_usercolumn=usercolumn, owner=user)
-        if (new_obj_name == 'Unitframe' and new_obj.sbdframe) or \
-            new_obj_name == 'Frame' or new_obj_name == 'Callsheetmember':
+        if new_obj_name == 'Frame':
             new_obj.userfields.add(usercell)
 
 
@@ -167,8 +148,6 @@ def insert_frames(user, base, instance, frames_ids: list):
         serializer = None
         if base == 'chrono':
             serializer = ChronoframeSerializer
-        elif base == 'unit':
-            serializer = UnitframeSerializer
         print(150, 'pass context')
         serializer = serializer(data=frame_data, context={'user': user})
         print(152, serializer.__class__.__name__)
@@ -234,10 +213,10 @@ def find_host_project(kw):
 
 def update_host_modified_date(kw, user_email):
     """
-    Обновляет время и юзера последнего изменения сториборда, вызывного или шутингплана
+    Обновляет время и юзера последнего изменения сториборда
     """
     for key, value in kw.items():
-        if value in ["storyboard", "callsheet", "shootingplan"]:
+        if value in ["storyboard"]:
             pk = int(kw.get(f'{key}_pk'))
             instance = get_model(value).objects.filter(
                 id=pk).first()
@@ -302,15 +281,9 @@ def copy_file(parent_object, related_object=None):
         file_path = os.path.join(os.getcwd(),
                                  settings.MEDIA_ROOT,
                                  file_field_instance.name)
-        if isinstance(parent_object, Callsheet):
-            pk = str(parent_object.pk)
-            model = 'callsheet'
-        elif isinstance(parent_object, models.File):
+        if isinstance(parent_object, models.File):
             pk = str(parent_object.pk)
             model = 'file'
-        else:
-            pk = str(parent_object.host_callsheet.pk)
-            model = 'callsheet'
         new_path = os.path.join(os.getcwd(),
                                 settings.MEDIA_ROOT,
                                 owner_pk,
@@ -388,7 +361,7 @@ def duplicate_object(parent_object, project_id, host=None):
                 print(f' - {len(relations)} relations to set')
                 relations_to_set[field.name] = relations
     # Duplicate the parent object
-    if isinstance(parent_object, Callsheet) or isinstance(parent_object, Shootingplan) or isinstance(parent_object, Timing):
+    if isinstance(parent_object, Timing):
 
         # Keep the original pk of the copied object
         old_parent_obj_pk = parent_object.pk
@@ -407,14 +380,6 @@ def duplicate_object(parent_object, project_id, host=None):
     elif isinstance(parent_object, TimingGroup):
         parent_object.pk = None
         parent_object.host_timing = host
-        parent_object.save()
-    elif isinstance(parent_object, Location) or isinstance(parent_object, Callsheetmember):
-        parent_object.pk = None
-        parent_object.host_callsheet = host
-        parent_object.save()
-    elif isinstance(parent_object, Unit):
-        parent_object.pk = None
-        parent_object.host_storyboard = host
         parent_object.save()
     elif isinstance(parent_object, models.File):
         new_path = copy_file(parent_object)
@@ -439,11 +404,9 @@ def duplicate_object(parent_object, project_id, host=None):
                 # this field to the parent object, creating the new
                 # child -> parent relationship. if object is Location or Callsheetmember
                 # duplicates it as parent obj.
-                if isinstance(related_object, Location) or isinstance(related_object, Callsheetmember) \
-                    or isinstance(related_object, Unit) or isinstance(related_object, TimingGroup):
+                if isinstance(related_object, TimingGroup):
                     duplicate_object(related_object, project_id, host=parent_object)
-                elif not isinstance(related_object, LocationMap) and \
-                    not isinstance(related_object, CallsheetLogo):
+                else:
                     related_object.pk = None
                     setattr(related_object, related_object_field.name, parent_object)
                     related_object.save()
@@ -451,14 +414,7 @@ def duplicate_object(parent_object, project_id, host=None):
                     text = str(related_object)
                     text = (text[:40] + '..') if len(text) > 40 else text
                     print(f'|- Copied child object ({text})')
-                else:
-                    new_path = copy_file(parent_object, related_object)
-                    instance = construct_new_instance_with_file(related_object, new_path)
-                    setattr(instance, related_object_field.name, parent_object)
-                    instance.save()
-                    text = str(instance)
-                    text = (text[:40] + '..') if len(text) > 40 else text
-                    print(f'|- Copied child object ({text})')
+
 
     # Set the many-to-many relations on the copied parent
     for field_name, relations in relations_to_set.items():

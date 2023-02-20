@@ -39,9 +39,7 @@ THIRD_PARTY_APPS = [
     'django_celery_beat',
     'drf_spectacular',
     'storages',
-    # 'oauth2_provider',
     'social_django',
-    # 'drf_social_oauth2',
     'channels',
     "graphene_django",
 ]
@@ -53,11 +51,8 @@ PROJECT_APPS = [
     'trash',
     'storyboards',
     'contacts',
-    'callsheets',
-    'shootingplans',
     'subscription',
     'tinkoff_pay',
-    'bordomatic',
     'timing',
     'document',
     'folders'
@@ -215,8 +210,6 @@ SIMPLE_JWT = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        # 'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-        # 'drf_social_oauth2.authentication.SocialAuthentication',
 
     ),
 
@@ -411,8 +404,6 @@ GRAPHQL_JWT = {
 
 REL_DOCS = [
     'storyboards',
-    'shootingplans',
-    'callsheets',
     'links',
     'files',
     'texts',

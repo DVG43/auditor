@@ -12,11 +12,9 @@ from rest_framework.viewsets import GenericViewSet
 
 import settings
 from accounts.models import User
-from callsheets.models import Callsheet
 from common.permissions import IsOwner
 from common.utils import count_space_per_object
 from projects.models import Project, Link, File, Text
-from shootingplans.models import Shootingplan
 from storyboards.models import Storyboard
 from document.models import Document
 from timing.models import Timing
@@ -34,8 +32,6 @@ class TrashViewSet(GenericViewSet):
         print(24, 'TrashVS.get_queryset')
         q = (
             Q(deleted_id__isnull=False) |
-            Q(shootingplans__deleted_id__isnull=False) |
-            Q(callsheets__deleted_id__isnull=False) |
             Q(storyboards__deleted_id__isnull=False) |
             Q(links__deleted_id__isnull=False) |
             Q(files__deleted_id__isnull=False) |
@@ -106,8 +102,6 @@ class TrashViewSet(GenericViewSet):
         qs = self.get_queryset().filter(deleted_id=kwargs['pk'])
         if not qs:
             qs = Storyboard.objects.filter(deleted_id=kwargs['pk']) or \
-                 Shootingplan.objects.filter(deleted_id=kwargs['pk']) or \
-                 Callsheet.objects.filter(deleted_id=kwargs['pk']) or \
                  Link.objects.filter(deleted_id=kwargs['pk']) or \
                  File.objects.filter(deleted_id=kwargs['pk']) or \
                  Text.objects.filter(deleted_id=kwargs['pk']) or \
@@ -127,16 +121,6 @@ class TrashViewSet(GenericViewSet):
                     inst_sb_deleted.deleted_id = None
                     inst_sb_deleted.deleted_since = None
                     inst_sb_deleted.save()
-                if instance.callsheets.count() > 0:
-                    for cs in instance.callsheets.filter(deleted_id__isnull=False):
-                        cs.deleted_id = None
-                        cs.deleted_since = None
-                        cs.save()
-                if instance.shootingplans.count() > 0:
-                    for sp in instance.shootingplans.filter(deleted_id__isnull=False):
-                        sp.deleted_id = None
-                        sp.deleted_since = None
-                        sp.save()
                 if instance.documents.count() > 0:
                     for doc in instance.documents.filter(deleted_id__isnull=False):
                         doc.deleted_id = None
@@ -176,7 +160,7 @@ class TrashViewSet(GenericViewSet):
                                     doc.deleted_id = None
                                     doc.deleted_since = None
                                     doc.save()
-            elif isinstance(instance, (Storyboard, Shootingplan, Callsheet, Document)):
+            elif isinstance(instance, (Storyboard, Document)):
                 prj = instance.host_project
                 if prj.deleted_id:
                     prj.deleted_id = None
@@ -201,8 +185,6 @@ class TrashViewSet(GenericViewSet):
         """
         Project.objects.filter(deleted_id__isnull=False).filter(owner=request.user).delete()
         Storyboard.objects.filter(deleted_id__isnull=False).filter(owner=request.user).delete()
-        Shootingplan.objects.filter(deleted_id__isnull=False).filter(owner=request.user).delete()
-        Callsheet.objects.filter(deleted_id__isnull=False).filter(owner=request.user).delete()
         Link.objects.filter(deleted_id__isnull=False).filter(owner=request.user).delete()
         File.objects.filter(deleted_id__isnull=False).filter(owner=request.user).delete()
         Text.objects.filter(deleted_id__isnull=False).filter(owner=request.user).delete()
@@ -218,7 +200,6 @@ class TrashViewSet(GenericViewSet):
         Считает и отдает вес файлов в корзине.
         """
         storyboards = Storyboard.objects.filter(deleted_id__isnull=False).filter(owner=request.user).all()
-        callsheets = Callsheet.objects.filter(deleted_id__isnull=False).filter(owner=request.user).all()
         projects = Project.objects.filter(
             deleted_id__isnull=False).filter(
             owner=request.user).filter(
@@ -228,9 +209,6 @@ class TrashViewSet(GenericViewSet):
         documents = Document.objects.filter(deleted_id__isnull=False).filter(owner=request.user).all()
 
         trash_size = 0
-        for cls in callsheets:
-            callsheet_size = count_space_per_object(request.user, cls, "callsheet")
-            trash_size += callsheet_size
 
         for file in files:
             trash_size += file.file.size

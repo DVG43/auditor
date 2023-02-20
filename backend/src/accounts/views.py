@@ -27,11 +27,9 @@ from accounts.utils import (
     send_reset_password_email,
     send_change_email)
 from accounts.permissions import IsActivated
-from callsheets.models import Callsheet
 from common.utils import get_model, check_file_size, recount_disk_space, like_or_dislike_object
 from contacts.models import Department, Position
 from objectpermissions.models import UserPermission
-from shootingplans.models import Shootingplan
 from document.models import Document
 from social_core.utils import user_is_active
 from social_django.utils import psa, load_strategy, load_backend
@@ -62,20 +60,12 @@ def get_profile_with_tokens(user, email, password):
 def check_obj_class(doc_uuid):
     storyboard_obj = Storyboard.objects.filter(
         doc_uuid=doc_uuid).first()
-    shootingplan_obj = Shootingplan.objects.filter(
-        doc_uuid=doc_uuid).first()
-    callsheet_obj = Callsheet.objects.filter(
-        doc_uuid=doc_uuid).first()
     document_obj = Document.objects.filter(
         doc_uuid=doc_uuid).first()
     timing_obj = Timing.objects.filter(
         doc_uuid=doc_uuid).first()
     if storyboard_obj:
         return storyboard_obj
-    elif shootingplan_obj:
-        return shootingplan_obj
-    elif callsheet_obj:
-        return callsheet_obj
     elif document_obj:
         return document_obj
     elif timing_obj:

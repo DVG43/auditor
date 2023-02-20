@@ -30,8 +30,6 @@ class Project(PpmDocModel, ResizeImageMixin):
         models.UUIDField(null=True), blank=True,
         default=list, verbose_name=_('Frame order'))
     # storyboards
-    # shootingplans
-    # callsheets
     # links
 
     class Meta:

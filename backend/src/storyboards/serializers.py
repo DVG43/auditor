@@ -3,7 +3,6 @@ import datetime
 from rest_framework import serializers
 
 from accounts.models import User
-from bordomatic.serializers import BordomaticPrivateModelReadSerializer  #, BordomaticModelReadSerializer
 from common.models import UserColumn
 from common.serializers import (
     PpmDocSerializer,
@@ -119,9 +118,6 @@ class StoryboardDetailSerializer(PpmDocSerializer):
     )
     perm = serializers.SerializerMethodField()
 
-    bordomatic_private = BordomaticPrivateModelReadSerializer(many=True, required=False)
-    #bordomatic = BordomaticModelReadSerializer(many=True, required=False)
-
     class Meta:
         model = Storyboard
         fields = [
@@ -131,8 +127,8 @@ class StoryboardDetailSerializer(PpmDocSerializer):
             'host_project', 'perms', 'invites', 'doc_uuid',
             'last_modified_user', 'last_modified_date',
             'last_modified_name', 'perm',
-            'frame_order', 'document_logo', 'bordomatic_private',
-            'folder'  #'bordomatic'
+            'frame_order', 'document_logo',
+            'folder'
         ]
 
     def get_last_modified_name(self, obj):

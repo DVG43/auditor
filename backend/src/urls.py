@@ -39,11 +39,8 @@ urlpatterns = [
         path('', include('projects.urls')),
         path('', include('contacts.urls')),
         path('', include('storyboards.urls')),
-        path('', include('shootingplans.urls')),
-        path('', include('callsheets.urls')),
         # path('pay/', include('tinkoff_pay.urls')),
         path('', include('subscription.urls')),
-        path('', include('bordomatic.urls')),
         path('', include('document.urls')),
         path('', include('folders.urls')),
         path('document/share/', include([

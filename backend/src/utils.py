@@ -26,14 +26,7 @@ def get_host_id_model(obj):
     if str(obj.__class__.__name__) == "Shot":
         frame = obj.host_frame
         return [frame.host_storyboard.id, "storyboard"]
-    elif str(obj.__class__.__name__) == "CallsheetLogo":
-        return [obj.host_callsheet.id, "callsheet"]
-    elif str(obj.__class__.__name__) in "LocationMap":
-        location = obj.host_location
-        return [location.host_callsheet.id, "callsheet"]
-    elif str(obj.__class__.__name__) in ['Callsheet',
-                                         'Storyboard',
-                                         'Shootingplan',
+    elif str(obj.__class__.__name__) in ['Storyboard',
                                          'File',
                                          'Text',
                                          'Link',

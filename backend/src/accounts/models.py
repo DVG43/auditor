@@ -105,7 +105,6 @@ class User(AbstractBaseUser, ResizeImageMixin):
     b24_contact_id = models.IntegerField(null=True, blank=True)
     b24_deal_id = models.IntegerField(null=True, blank=True)
 
-    like = models.BooleanField(_('Promo bordomatic like'), default=False)
     document_like = models.BooleanField(_('Promo document like'), default=False)
     document = models.UUIDField(null=True)
     is_invited = models.BooleanField(_('Is invited'), default=False)

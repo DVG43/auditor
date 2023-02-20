@@ -12,7 +12,6 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('common', '0001_initial'),
-        ('callsheets', '0001_initial'),
     ]
 
     operations = [

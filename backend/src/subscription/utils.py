@@ -20,7 +20,7 @@ from subscription.models import (
 
 full_description = _('The full plan includes unlimited access to all '
                      'PPM functionality. Unlimited number of '
-                     'shootingplans, storyboards, projects. The '
+                     'storyboards, projects. The '
                      'ability to share your documents and follow the '
                      'development of PPM.')
 
@@ -30,7 +30,7 @@ def check_or_create_subscription_objects():
     if not trial_tariff:
         pd = PaymentDetails.objects.create()
         trial_description = _('Don`t worry - all your data, collected '
-                              'shootingplans and storyboards securely stored. '
+                              'storyboards securely stored. '
                               'To continue using PPM, choose the duration of '
                               'the subscription and pay for it.')
         trial = Tariff.objects.create(
