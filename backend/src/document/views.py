@@ -2,13 +2,19 @@ from accounts.permissions import IsActivated
 from common.permissions import IsOwner, IsOwnerOrIsInvited
 from django.shortcuts import get_object_or_404
 from document.models import Document
-from document.serializers import DocumentLogoSerializer, ProjectSerializer, DocumentSerializer
+from document.serializers import DocumentLogoSerializer, ProjectSerializer, DocumentSerializer, TextGenerationSerializer
 from rest_framework import generics, viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from projects.models import Project
 from settings import MEDIA_URL
+from rest_framework import views
+from document import utils
+import openai
+import settings
+
+openai.api_key = settings.api_key
 
 
 class ChangeDocumentLogoView(generics.UpdateAPIView):
@@ -48,3 +54,21 @@ class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_serializer_class(self):
         return ProjectSerializer
+
+class TextGeneration(utils.OpenaiMixin, views.APIView):
+    permission_classes = [IsAuthenticated, IsActivated, IsOwnerOrIsInvited]
+    serializer_class = TextGenerationSerializer
+
+    def post(self, request, *args, **kwargs):
+        # проверка валидности полей
+        serializer = TextGenerationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        # извлечение знач переменных
+        source = request.data.get('source')
+        max_tokens = int(request.data.get('max_tokens'))
+
+        # формирование ответа
+        model = "text-davinci-003"
+        prompt = f"Create the text about '{source}'",
+        result = self.text_generator(prompt, model, max_tokens)
+        return Response(result, status=200)
