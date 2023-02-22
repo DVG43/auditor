@@ -90,4 +90,8 @@ class ProjectSerializer(serializers.ModelSerializer):
 class TextGenerationSerializer(serializers.Serializer):
     """Ввод текста для генерации"""
     source = serializers.CharField()
-    max_tokens = serializers.IntegerField()
+    max_tokens = serializers.IntegerField(required=False)
+
+class TextRephraseSerializer(TextGenerationSerializer):
+    """Ввод текста для перефразирования"""
+    pass

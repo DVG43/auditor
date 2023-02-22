@@ -2,7 +2,8 @@ from accounts.permissions import IsActivated
 from common.permissions import IsOwner, IsOwnerOrIsInvited
 from django.shortcuts import get_object_or_404
 from document.models import Document
-from document.serializers import DocumentLogoSerializer, ProjectSerializer, DocumentSerializer, TextGenerationSerializer
+from document.serializers import DocumentLogoSerializer, ProjectSerializer, DocumentSerializer, \
+    TextGenerationSerializer, TextRephraseSerializer
 from rest_framework import generics, viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
@@ -55,7 +56,8 @@ class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
     def get_serializer_class(self):
         return ProjectSerializer
 
-class TextGeneration(utils.OpenaiMixin, views.APIView):
+
+class TextGeneration(views.APIView):
     permission_classes = [IsAuthenticated, IsActivated, IsOwnerOrIsInvited]
     serializer_class = TextGenerationSerializer
 
@@ -65,10 +67,35 @@ class TextGeneration(utils.OpenaiMixin, views.APIView):
         serializer.is_valid(raise_exception=True)
         # извлечение знач переменных
         source = request.data.get('source')
-        max_tokens = int(request.data.get('max_tokens'))
+        max_tokens = 500
+        if request.data.get('max_tokens'):
+            max_tokens = request.data.get('max_tokens')
 
         # формирование ответа
         model = "text-davinci-003"
-        prompt = f"Create the text about '{source}'",
-        result = self.text_generator(prompt, model, max_tokens)
+        prompt = f"Create the text about '{source}'"
+        result = utils.text_generator(prompt, model, max_tokens)
+        return Response(result, status=200)
+
+
+class TextRephrase(utils.AiTranslator, views.APIView):
+    permission_classes = [IsAuthenticated, IsActivated, IsOwnerOrIsInvited]
+    serializer_class = TextRephraseSerializer
+
+    def post(self, request, *args, **kwargs):
+        # проверка валидности полей
+        serializer = TextRephraseSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        # извлечение знач переменных
+        source = request.data.get('source')
+        max_tokens = 500
+        if request.data.get('max_tokens'):
+            max_tokens = request.data.get('max_tokens')
+
+        # формирование ответа
+        model = "text-davinci-003"
+        prompt = utils.AiTranslator.rephrase_prompt(source),
+        result = utils.text_generator(prompt, model, max_tokens)
+        if result.choices[0].text != "":
+            result.choices[0].text = utils.AiTranslator.rephrase_postprocess(result.choices[0].text)
         return Response(result, status=200)
