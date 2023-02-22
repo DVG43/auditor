@@ -14,8 +14,6 @@ from projects.serializers import (ProjectDetailSerializer,
 from shared_access.mixins import ShareMixin
 from shared_access.serializers import ShareProjectSerializer, ShareDeleteSerializer
 from storyboards.models import Storyboard
-from storyboards.serializers import StoryboardDetailSerializer
-from storyboards.views import create_default_storyboard_frame_columns
 
 
 class ProjectViewSet(PpmViewSet, ShareMixin):
@@ -40,16 +38,6 @@ class ProjectViewSet(PpmViewSet, ShareMixin):
             return res
 
         prj_id = res.data['id']
-        prj_name = request.data['name']
-        data = {
-            'name': f'{prj_name}_Сториборд',
-            'host_project': prj_id
-        }
-        context = {'user': request.user}
-        serializer = StoryboardDetailSerializer(data=data, context=context)
-        serializer.is_valid(raise_exception=True)
-        sb = serializer.create(serializer.validated_data)
-        create_default_storyboard_frame_columns(sb, request.user)
 
         prj = Project.objects.get(pk=prj_id)
         serializer = self.get_serializer(instance=prj)
@@ -71,7 +59,6 @@ class ProjectViewSet(PpmViewSet, ShareMixin):
 
             prj_size = 0
             documents = []
-
 
             # получает статистику по сториборду (картинки шотов)
             if storyboard:
