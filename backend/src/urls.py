@@ -15,6 +15,7 @@ from projects.views import ProjectViewSet
 from trash.views import TrashViewSet
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
+from poll.urls import poll_endpoints, endpoints_v2
 
 router = SimpleRouter()
 router.register(r'contacts', ContactViewSet)
@@ -34,6 +35,7 @@ urlpatterns = [
         path('oauth/social-disconnect/', SocialDisconnect.as_view()),
         path('oauth/', include('social_django.urls', namespace='social')),
         path('calendar/<str:from>/<str:to>/', CalendarView.as_view()),
+        path('poll/', include(poll_endpoints)),
         path('url_opengraph/', GetOpenGraphTagsView.as_view()),
         path('', include(router.urls)),
         path('', include('projects.urls')),

@@ -55,7 +55,8 @@ PROJECT_APPS = [
     'tinkoff_pay',
     'timing',
     'document',
-    'folders'
+    'folders',
+    'poll'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS

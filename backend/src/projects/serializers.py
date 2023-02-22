@@ -5,6 +5,7 @@ from common.serializers import PpmDocSerializer
 from contacts.serializers import ContactSerializer
 from projects.models import Project, Link, File, Text
 from rest_framework import serializers
+from poll.models.poll import Poll
 from storyboards.models import Storyboard
 from document.models import Document
 from timing.models import Timing
@@ -72,6 +73,24 @@ class RevStoryboardSerializer(serializers.ModelSerializer, LastModifiedMixin):
 
     def get_model(self, obj):
         return 'storyboard'
+
+
+class RevPollSerializer(serializers.ModelSerializer, LastModifiedMixin):
+    model = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Poll
+        list_serializer_class = FilteredListSerializer
+        fields = ['poll_id', 'model', 'name', 'tag_color',
+                  # 'order_id', 'document_logo',
+                  'last_modified_name',
+                  'last_modified_date',
+                  'folder'
+                  # 'last_modified_time',
+                  ]
+
+    def get_model(self, obj):
+        return 'poll'
 
 
 class RevDocumentSerializer(serializers.ModelSerializer, LastModifiedMixin):
@@ -183,6 +202,8 @@ class RevDocSerializer(serializers.Serializer):
     documents = RevDocumentSerializer(
         many=True, read_only=True)
     timings = RevTimingSerializer(
+        many=True, read_only=True)
+    polls = RevPollSerializer(
         many=True, read_only=True)
     links = LinkSerializer(
         many=True, read_only=True)
