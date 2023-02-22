@@ -86,3 +86,8 @@ class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ("id", "documents")
+
+class TextGenerationSerializer(serializers.Serializer):
+    """Ввод текста для генерации"""
+    source = serializers.CharField()
+    max_tokens = serializers.IntegerField()

@@ -1,4 +1,5 @@
 from .models import Document, Element
+import openai
 
 def organize_data_row_sort_arrays(instance):
     # чистка и сортировка массивов сортировки
@@ -34,3 +35,17 @@ def organize_data_row_sort_arrays(instance):
             field.auto_now = True
 
     return instance
+
+
+class OpenaiMixin():
+    def text_generator(self, prompt, model, max_tokens):
+        response = openai.Completion.create(
+            model=model,
+            prompt=prompt,
+            temperature=0.7,
+            max_tokens=max_tokens,
+            top_p=1,
+            frequency_penalty=0.0,
+            presence_penalty=0.0
+        )
+        return response

@@ -411,3 +411,5 @@ REL_DOCS = [
     'documents',
     'folders'
 ]
+
+api_key = os.environ.get('API_KEY')
