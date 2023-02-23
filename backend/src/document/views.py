@@ -63,18 +63,23 @@ class TextGeneration(views.APIView):
 
     def post(self, request, *args, **kwargs):
         # проверка валидности полей
+        if request.data.get('tone') == "null":
+            request.data['tone'] = None
         serializer = TextGenerationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         # извлечение знач переменных
         source = request.data.get('source')
+        language = request.data.get('language')
+        tone = request.data.get('tone')
         max_tokens = 500
         if request.data.get('max_tokens'):
             max_tokens = request.data.get('max_tokens')
 
         # формирование ответа
         model = "text-davinci-003"
-        prompt = f"Create the text about '{source}'"
+        prompt = utils.AiTranslator.theme_to_paragraph_prompt(theme=source, lang=language, tone=tone)
         result = utils.text_generator(prompt, model, max_tokens)
+        result.choices[0].text = utils.AiTranslator.theme_to_paragraph_postprocess(result.choices[0].text)
         return Response(result, status=200)
 
 
