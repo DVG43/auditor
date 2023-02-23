@@ -8,6 +8,7 @@ from rest_framework import serializers
 from storyboards.models import Storyboard
 from document.models import Document
 from timing.models import Timing
+from folders.models import Folder
 from accounts.models import User
 
 
@@ -72,6 +73,22 @@ class RevStoryboardSerializer(serializers.ModelSerializer, LastModifiedMixin):
 
     def get_model(self, obj):
         return 'storyboard'
+
+
+class RevFolderSerializer(serializers.ModelSerializer, LastModifiedMixin):
+    model = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Folder
+        list_serializer_class = FilteredListSerializer
+        fields = ['id', 'model', 'name', 'tag_color',
+                  'last_modified_name',
+                  'last_modified_date',
+                  # 'last_modified_time',
+                  ]
+
+    def get_model(self, obj):
+        return 'folder'
 
 
 class RevDocumentSerializer(serializers.ModelSerializer, LastModifiedMixin):
@@ -189,6 +206,8 @@ class RevDocSerializer(serializers.Serializer):
     files = FileSerializer(
         many=True, read_only=True)
     texts = TextSerializer(
+        many=True, read_only=True)
+    folders = RevFolderSerializer(
         many=True, read_only=True)
 
 

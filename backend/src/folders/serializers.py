@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from common.serializers import PpmDocSerializer
 from folders.models import Folder
-from projects.serializers import RevDocSerializer
+from projects.serializers import RevDocSerializer, FilteredListSerializer
 
 
 class FolderDocsSerializer(RevDocSerializer):
@@ -15,12 +15,13 @@ class FolderSerializer(PpmDocSerializer):
 
     class Meta:
         model = Folder
+        list_serializer_class = FilteredListSerializer
         fields = [
             'id', 'tag_color', 'name',
             'host_project',
             'last_modified_user', 'last_modified_date',
             'parent_folder', 'child_folders',
-            'folder_objects'
+            'folder_objects', 'deleted_id'
         ]
 
     def get_child_folders(self, obj):
@@ -43,6 +44,7 @@ class FolderSerializer(PpmDocSerializer):
 class FolderListSerializer(PpmDocSerializer):
     class Meta:
         model = Folder
+        list_serializer_class = FilteredListSerializer
         fields = [
             'id',
             'parent_folder',
