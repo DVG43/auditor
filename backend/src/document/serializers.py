@@ -94,7 +94,6 @@ class TextRephraseSerializer(serializers.Serializer):
 
 class TextGenerationSerializer(TextRephraseSerializer):
     """Ввод текста для генерации"""
-    pass
     tone = serializers.ChoiceField(choices={
             "grateful",
             "excited",
