@@ -73,12 +73,12 @@ class TextGeneration(views.APIView):
         language = request.data.get('language')
         tone = request.data.get('tone')
         max_tokens = 1500
-        if request.data.get('max_tokens'):
-            max_tokens = request.data.get('max_tokens')
+        # if request.data.get('max_tokens'):
+        #     max_tokens = request.data.get('max_tokens')
 
         # формирование ответа
         model = "text-davinci-003"
-        prompt = AiTranslator.theme_to_paragraph_prompt(theme=source, len_words=65, lang=language, tone=tone)
+        prompt = AiTranslator.theme_to_paragraph_prompt(theme=source, len_words=85, lang=language, tone=tone)
         result = utils.text_generator(prompt, model, max_tokens)
         result.choices[0].text = AiTranslator.theme_to_paragraph_postprocess(result.choices[0].text)
         return Response(result, status=200)
@@ -95,8 +95,8 @@ class TextRephrase(views.APIView):
         # извлечение знач переменных
         source = request.data.get('source')
         max_tokens = 500
-        if request.data.get('max_tokens'):
-            max_tokens = request.data.get('max_tokens')
+        # if request.data.get('max_tokens'):
+        #     max_tokens = request.data.get('max_tokens')
 
         # формирование ответа
         model = "text-davinci-003"
