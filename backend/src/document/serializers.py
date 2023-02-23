@@ -87,11 +87,28 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = ("id", "documents")
 
-class TextGenerationSerializer(serializers.Serializer):
-    """Ввод текста для генерации"""
+class TextRephraseSerializer(serializers.Serializer):
+    """Ввод текста для перефразирования"""
     source = serializers.CharField()
     max_tokens = serializers.IntegerField(required=False)
 
-class TextRephraseSerializer(TextGenerationSerializer):
-    """Ввод текста для перефразирования"""
-    pass
+class TextGenerationSerializer(TextRephraseSerializer):
+    """Ввод текста для генерации"""
+    tone = serializers.ChoiceField(choices={
+            "grateful",
+            "excited",
+            "rude",
+            "sad",
+            "informative",
+            "witty",
+            "negative",
+            "neutral",
+            "positive",
+            "professional",
+            "convincing",
+            "engaging",
+            "humorous"
+        },
+        required=False,
+        allow_null=True)
+    language = serializers.CharField(required=False)

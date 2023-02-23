@@ -12,6 +12,7 @@ from projects.models import Project
 from settings import MEDIA_URL
 from rest_framework import views
 from document import utils
+from document.ai_translator import AiTranslator
 import openai
 import settings
 
@@ -63,22 +64,27 @@ class TextGeneration(views.APIView):
 
     def post(self, request, *args, **kwargs):
         # проверка валидности полей
+        if request.data.get('tone') == "null":
+            request.data['tone'] = None
         serializer = TextGenerationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         # извлечение знач переменных
         source = request.data.get('source')
-        max_tokens = 500
+        language = request.data.get('language')
+        tone = request.data.get('tone')
+        max_tokens = 1500
         if request.data.get('max_tokens'):
             max_tokens = request.data.get('max_tokens')
 
         # формирование ответа
         model = "text-davinci-003"
-        prompt = f"Create the text about '{source}'"
+        prompt = AiTranslator.theme_to_paragraph_prompt(theme=source, len_words=65, lang=language, tone=tone)
         result = utils.text_generator(prompt, model, max_tokens)
+        result.choices[0].text = AiTranslator.theme_to_paragraph_postprocess(result.choices[0].text)
         return Response(result, status=200)
 
 
-class TextRephrase(utils.AiTranslator, views.APIView):
+class TextRephrase(views.APIView):
     permission_classes = [IsAuthenticated, IsActivated, IsOwnerOrIsInvited]
     serializer_class = TextRephraseSerializer
 
@@ -94,8 +100,8 @@ class TextRephrase(utils.AiTranslator, views.APIView):
 
         # формирование ответа
         model = "text-davinci-003"
-        prompt = utils.AiTranslator.rephrase_prompt(source),
+        prompt = AiTranslator.rephrase_prompt(source),
         result = utils.text_generator(prompt, model, max_tokens)
         if result.choices[0].text != "":
-            result.choices[0].text = utils.AiTranslator.rephrase_postprocess(result.choices[0].text)
+            result.choices[0].text = AiTranslator.rephrase_postprocess(result.choices[0].text)
         return Response(result, status=200)
