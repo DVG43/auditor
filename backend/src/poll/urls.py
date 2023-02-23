@@ -30,7 +30,7 @@ analitics_router = DefaultRouter()
 analitics_router.register('pollanalitics',PollAnaliticsViewSet,'pollanalitics')
 
 poll_endpoints = [
-    path('api-auth/', include('rest_framework.urls')),
+    # path('api-auth/', include('rest_framework.urls')),
     # Poll
     path('', PollCreate.as_view()),
     path('my/', PollList.as_view()),

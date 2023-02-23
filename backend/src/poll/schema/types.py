@@ -1,6 +1,7 @@
+import graphene
 from graphene_django.types import DjangoObjectType
 from poll.models import analitics as analitics_models
-from poll.models import answers as answers_models
+from poll.models import answer as answer_models
 from poll.models import poll as poll_models
 from poll.models import polltheme as polltheme_models
 from poll.models import questions as questions_models
@@ -17,12 +18,12 @@ class PollAnaliticsType(DjangoObjectType):
 # Answer
 class AnswerQuestionType(DjangoObjectType):
     class Meta:
-        model = answers_models.AnswerQuestion
+        model = answer_models.AnswerQuestion
 
 
 class UserAnswerQuestionType(DjangoObjectType):
     class Meta:
-        model = answers_models.UserAnswerQuestion
+        model = answer_models.UserAnswerQuestion
 
 
 # Poll
@@ -51,11 +52,6 @@ class PollThemeType(DjangoObjectType):
 class DivisionQuestionType(DjangoObjectType):
     class Meta:
         model = questions_models.DivisionQuestion
-
-
-class EventType(DjangoObjectType):
-    class Meta:
-        model = questions_models.Event
 
 
 class ItemQuestionType(DjangoObjectType):

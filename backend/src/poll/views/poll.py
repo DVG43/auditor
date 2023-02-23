@@ -313,7 +313,7 @@ class PollTagsCollection(APIView):
 
         return Response({'result': serialized_tags.data}, status=HTTPStatus.OK)
 
-    def post(self, request):
+    def post(self, request, pk):
         try:
             for poll in request.data['polls']:
                 get_poll = Poll.objects.get(poll_id=poll)

@@ -71,7 +71,6 @@ class PollSerializer(serializers.ModelSerializer):
         if 'request' in self.context:
             self.owner = self.context.get('request').user
 
-
     def to_representation(self, instance):
         questions = instance.get_questions()
         instance.normalize_questions_order_id()
@@ -151,15 +150,18 @@ class PollSerializer(serializers.ModelSerializer):
         poll = Poll()
         poll_setting = validated_data.pop('setting', {})
         poll.owner = validated_data.get('owner')
-        poll.name = validated_data.get('name', f'Форма № {self.owner.poll_set.count() + 1}')
+        poll.name = validated_data.get('name')
         poll.image = validated_data.get('image', '')
         poll.test_mode_global = validated_data.get('test_mode_global', False) in ['true', 'True', True]
         poll.host_project = validated_data.get('host_project')
+        poll.folder = validated_data.get('folder')
+        poll.last_modified_user = validated_data.get('last_modified_user')
         poll.save()
         tags = validated_data.get('tags', [])
         for tag in tags:
             instance_tag, created = PollTags.objects.get_or_create(**tag)
             poll.tags_list.add(instance_tag)
+        poll.save()
         poll_setting['poll'] = poll
         PollSettingsSerializer.create(PollSettingsSerializer(), validated_data=poll_setting)
         return poll
