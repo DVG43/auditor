@@ -410,7 +410,8 @@ REL_DOCS = [
     'texts',
     'timings',
     'documents',
-    'folders'
+    'folders',
+    'polls'
 ]
 
 api_key = os.environ.get('API_KEY')

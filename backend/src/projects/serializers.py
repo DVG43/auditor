@@ -82,7 +82,7 @@ class RevPollSerializer(serializers.ModelSerializer, LastModifiedMixin):
     class Meta:
         model = Poll
         list_serializer_class = FilteredListSerializer
-        fields = ['poll_id', 'model', 'name', 'tag_color',
+        fields = ['id', 'model', 'name', 'tag_color',
                   # 'order_id', 'document_logo',
                   'last_modified_name',
                   'last_modified_date',
