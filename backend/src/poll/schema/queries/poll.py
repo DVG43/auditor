@@ -14,19 +14,20 @@ from poll.serializers import (
 )
 
 
-class Query(ObjectType):
+class QueryPoll(ObjectType):
     all_polls = graphene.List(types.PollType, prj_id=graphene.Int())
     all_poll_tags = graphene.List(types.PollTagsType, poll_id=graphene.Int(), prj_id=graphene.Int())
     # all_poll_questions = graphene.List(types.PollTagsType, poll_id=graphene.Int(), prj_id=graphene.Int())
-    poll_by_id = graphene.Field(types.PollType, poll_id=graphene.Int(), prj_id=graphene.Int())
-    poll_setting_by_id = graphene.Field(types.PollSettingsType, poll_id=graphene.Int(), prj_id=graphene.Int())
+    poll_by_id = graphene.Field(types.PollType, poll_id=graphene.Int())
+    poll_setting_by_id = graphene.Field(types.PollSettingsType, poll_id=graphene.Int())
+    poll_tag_by_id = graphene.Field(types.PollTagsType, tag_id=graphene.Int())
 
     @login_required
     def resolve_all_polls(self, info, prj_id=None):
         PermissionClass.has_permission(info)
         PermissionClass.has_query_object_permission(info, prj_id)
         ret = poll_models.Poll.objects.filter(
-            host_project__pk=prj_id).all()
+            host_project__pk=prj_id, deleted_id__isnull=True).all()
         return ret
 
     @login_required
@@ -78,28 +79,33 @@ class Query(ObjectType):
     #                         free_answer_serializer.data)}
 
     @login_required
-    def resolve_poll_by_id(self, info, poll_id=None, prj_id=None):
+    def resolve_poll_by_id(self, info, poll_id=None):
         PermissionClass.has_permission(info)
-        PermissionClass.has_query_object_permission(info, prj_id)
 
-        ret = poll_models.Poll.objects.get(poll_id=poll_id)
+        ret = poll_models.Poll.objects.get(id=poll_id)
+        prj_id = ret.host_project.id
+        PermissionClass.has_query_object_permission(info, prj_id)
 
         return ret
 
     @login_required
-    def resolve_poll_setting_by_id(self, info, poll_id=None, prj_id=None):
+    def resolve_poll_setting_by_id(self, info, poll_id=None):
         PermissionClass.has_permission(info)
-        PermissionClass.has_query_object_permission(info, prj_id)
 
-        ret = poll_models.PollSettings.objects.get(poll_id=poll_id)
+        ret = poll_models.PollSettings.objects.get(id=poll_id)
+        prj_id = ret.poll.host_project.id
+        PermissionClass.has_query_object_permission(info, prj_id)
 
         return ret
 
     @login_required
-    def resolve_poll_tag_id(self, info, tag_id=None, prj_id=None):
+    def resolve_poll_tag_by_id(self, info, tag_id=None):
         PermissionClass.has_permission(info)
-        PermissionClass.has_query_object_permission(info, prj_id)
 
         ret = poll_models.PollTags.objects.get(tag_id=tag_id)
+        polls = ret.poll_set.all()
+        for poll in polls:
+            prj_id = poll.host_project.id
+            PermissionClass.has_query_object_permission(info, prj_id)
 
         return ret

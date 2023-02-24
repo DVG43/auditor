@@ -19,6 +19,7 @@ from storyboards.models import Storyboard
 from document.models import Document
 from timing.models import Timing
 from folders.models import Folder
+from poll.models.poll import Poll
 from folders.utils import get_child_folders
 from .serializers import TrashProjectListSerializer
 
@@ -38,7 +39,8 @@ class TrashViewSet(GenericViewSet):
             Q(texts__deleted_id__isnull=False) |
             Q(timings__deleted_id__isnull=False) |
             Q(documents__deleted_id__isnull=False) |
-            Q(folders__deleted_id__isnull=False)
+            Q(folders__deleted_id__isnull=False)|
+            Q(polls__deleted_id__isnull=False)
         )
         queryset = Project.objects \
             .filter(owner=self.request.user) \
@@ -107,7 +109,8 @@ class TrashViewSet(GenericViewSet):
                  Text.objects.filter(deleted_id=kwargs['pk']) or \
                  Timing.objects.filter(deleted_id=kwargs['pk']) or \
                  Document.objects.filter(deleted_id=kwargs['pk']) or \
-                 Folder.objects.filter(deleted_id=kwargs['pk'])
+                 Folder.objects.filter(deleted_id=kwargs['pk']) or \
+                 Poll.objects.filter(deleted_id=kwargs['pk'])
         if qs:
             instance = qs.first()
             if isinstance(instance, Project):
@@ -191,6 +194,7 @@ class TrashViewSet(GenericViewSet):
         Timing.objects.filter(deleted_id__isnull=False).filter(owner=request.user).delete()
         Document.objects.filter(deleted_id__isnull=False).filter(owner=request.user).delete()
         Folder.objects.filter(deleted_id__isnull=False).filter(owner=request.user).delete()
+        Poll.objects.filter(deleted_id__isnull=False).filter(owner=request.user).delete()
         self.change_disk_space(request.user)
         return Response({"success": "all data deleted from trash"}, status=status.HTTP_204_NO_CONTENT)
 

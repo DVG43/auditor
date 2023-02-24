@@ -23,7 +23,7 @@ class Poll(PpmDocModel):
     """
     Poll
     """
-    poll_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     # user = models.ForeignKey(User, on_delete=models.CASCADE)
     # title = models.CharField(max_length=200, default='')
     image = models.CharField(max_length=200, default='')
@@ -47,7 +47,7 @@ class Poll(PpmDocModel):
     class Meta:
         db_table = 'poll'
         verbose_name_plural = 'polls'
-        ordering = ['-poll_id']
+        ordering = ['-id']
         indexes = [
             models.Index(fields=['owner'])
         ]
