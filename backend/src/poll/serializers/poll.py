@@ -176,7 +176,7 @@ class PollListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Poll
-        fields = ['poll_id', 'name', 'test_mode_global', 'count_answers', 'last_open', 'new_survey_passing',
+        fields = ['id', 'name', 'test_mode_global', 'count_answers', 'last_open', 'new_survey_passing',
                   'author', 'tags', 'setting']
 
     def get_new_survey_passing(self, instance):
