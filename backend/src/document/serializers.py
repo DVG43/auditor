@@ -112,3 +112,4 @@ class TextGenerationSerializer(TextRephraseSerializer):
         required=False,
         allow_null=True)
     language = serializers.CharField(required=False)
+    keywords = serializers.CharField(required=False)
