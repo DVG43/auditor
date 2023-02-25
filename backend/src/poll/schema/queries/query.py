@@ -1,4 +1,5 @@
 import graphene
+
 from poll.schema.queries.poll import QueryPoll
 
 

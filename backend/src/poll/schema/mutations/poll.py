@@ -4,7 +4,6 @@ import graphene
 from django.utils import timezone
 from graphene_django.rest_framework.mutation import SerializerMutation
 from graphql_jwt.decorators import login_required
-from graphene_django.rest_framework.serializer_converter import convert_serializer_to_input_type
 
 from graphql_utils.utils_graphql import PermissionClass
 from projects.models import Project

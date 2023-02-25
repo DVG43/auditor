@@ -31,9 +31,11 @@ class PermissionClass:
             raise PermissionDenied({'error': 'you are not authenticated'})
         if user.is_invited:
             return user
-        subs_end = user.subscription.end_datetime
-        if subs_end.astimezone(tz=timezone.utc) < timezone.now():
-            raise PermissionDenied({'error': 'you subscription is over'})
+
+        ### Временное отключение требования к подписке
+        # subs_end = user.subscription.end_datetime
+        # if subs_end.astimezone(tz=timezone.utc) < timezone.now():
+        #     raise PermissionDenied({'error': 'you subscription is over'})
         return user
 
     @classmethod

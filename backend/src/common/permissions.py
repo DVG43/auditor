@@ -8,9 +8,11 @@ from common.utils import find_host_project, unpack_nested_kwargs, get_model
 
 class IsOwner(BasePermission):
     def has_permission(self, request, view):
-        subs_end = request.user.subscription.end_datetime
-        if subs_end.astimezone(tz=timezone.utc) < timezone.now():
-            raise PermissionDenied({'error': 'you subscription is over'})
+
+        ### Временное отключение требования к подписке
+        # subs_end = request.user.subscription.end_datetime
+        # if subs_end.astimezone(tz=timezone.utc) < timezone.now():
+        #     raise PermissionDenied({'error': 'you subscription is over'})
         return request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
@@ -26,9 +28,10 @@ class IsOwnerOrIsInvited(BasePermission):
         if request.user.is_invited:
             return True
 
-        subs_end = request.user.subscription.end_datetime
-        if subs_end.astimezone(tz=timezone.utc) < timezone.now():
-            raise PermissionDenied({'error': 'you subscription is over'})
+        ### Временное отключение требования к подписке
+        # subs_end = request.user.subscription.end_datetime
+        # if subs_end.astimezone(tz=timezone.utc) < timezone.now():
+        #     raise PermissionDenied({'error': 'you subscription is over'})
         return request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
@@ -74,10 +77,11 @@ class IsOwnerOrIsProjectAccess(BasePermission):
                             {'error': 'You don`t have access to this object'})
 
         # проверяем подписку
-        subs_end = request.user.subscription.end_datetime \
-            if hasattr(request.user, 'subscription') else None
-        if subs_end is not None and subs_end.astimezone(tz=timezone.utc) < timezone.now():
-            raise PermissionDenied({'error': 'you subscription is over'})
+        ### Временное отключение требования к подписке
+        # subs_end = request.user.subscription.end_datetime \
+        #     if hasattr(request.user, 'subscription') else None
+        # if subs_end is not None and subs_end.astimezone(tz=timezone.utc) < timezone.now():
+        #     raise PermissionDenied({'error': 'you subscription is over'})
         return request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
