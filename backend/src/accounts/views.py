@@ -8,7 +8,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from django.utils.crypto import get_random_string
 from rest_framework import viewsets, status, generics, permissions
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -502,9 +501,11 @@ class SocialComplete(APIView):
                 access_token = serializer.data.get('access_token')
             if isinstance(request.user, AnonymousUser):
                 user = backend.do_auth(access_token)
-                verify_user(user)
-                user.is_verified = False
-                user.save()
+                sub = Subscription.objects.filter(user=user)
+                if not sub:
+                    verify_user(user)
+                    user.is_verified = False
+                    user.save()
             else:
                 user = request.user
         except HTTPError as error:
