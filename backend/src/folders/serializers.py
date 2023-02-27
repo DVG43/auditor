@@ -17,8 +17,7 @@ class FolderSerializer(PpmDocSerializer):
         model = Folder
         list_serializer_class = FilteredListSerializer
         fields = [
-            'id', 'tag_color', 'name',
-            'host_project',
+            'id', 'name',
             'last_modified_user', 'last_modified_date',
             'parent_folder', 'child_folders',
             'folder_objects', 'deleted_id'
@@ -42,6 +41,7 @@ class FolderSerializer(PpmDocSerializer):
 
 
 class FolderListSerializer(PpmDocSerializer):
+
     class Meta:
         model = Folder
         list_serializer_class = FilteredListSerializer

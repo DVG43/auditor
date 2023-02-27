@@ -72,7 +72,6 @@ class RevStoryboardSerializer(serializers.ModelSerializer, LastModifiedMixin):
                   # 'last_modified_time',
                   ]
 
-
     def get_model(self, obj):
         return 'storyboard'
 
@@ -84,7 +83,7 @@ class RevPollSerializer(serializers.ModelSerializer, LastModifiedMixin):
         model = Poll
         list_serializer_class = FilteredListSerializer
         fields = ['id', 'model', 'name', 'tag_color',
-                  # 'order_id', 'document_logo',
+                  'order_id', 'document_logo',
                   'last_modified_name',
                   'last_modified_date',
                   'folder'
@@ -216,8 +215,6 @@ class TextSerializer(PpmDocSerializer, LastModifiedMixin):
 
 
 class RevDocSerializer(serializers.Serializer):
-    storyboards = RevStoryboardSerializer(
-        many=True, read_only=True)
     documents = RevDocumentSerializer(
         many=True, read_only=True)
     timings = RevTimingSerializer(

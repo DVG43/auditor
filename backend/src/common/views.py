@@ -62,7 +62,7 @@ class FilterQuerySetMixin(viewsets.ReadOnlyModelViewSet):
         if self.request.user.is_invited:
             queryset = get_model(base).objects.filter(doc_uuid=self.request.user.document)
         if base in ['project', 'storyboard',
-                    'file', 'link', 'text', 'document']:
+                    'file', 'link', 'text', 'document', 'folder']:
             queryset = queryset.filter(deleted_id__isnull=True).filter(owner__is_active=True)
 
         # Если в запросе есть /storyboards/0/ - выдать сториборд проекта
@@ -91,7 +91,7 @@ class FilterQuerySetMixin(viewsets.ReadOnlyModelViewSet):
         filter_kw = {}
         # Фильтр по родительскому документу
         if base not in ['project', 'contact', 'trash', 'usercell',
-                        'usercolumn']:
+                        'usercolumn', 'folder']:
             filter_kw = {f"host_{kw['host']}": kw['host_pk']}
 
         # Фильтр userfields для всех frames
@@ -120,12 +120,12 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
     permission_classes = [IsOwnerOrIsProjectAccess]
 
     def retrieve(self, request, *args, **kwargs):
-        if self.basename in ['storyboard', 'chrono']:
-            instance = self.get_object()
-            # чистка и сортировка массивов сортировки
-            organize_data_row_sort_arrays(instance)
-            serializer = self.get_serializer(instance)
-            return Response(serializer.data)
+        # if self.basename in ['storyboard', 'chrono']:
+        #     instance = self.get_object()
+        #     # чистка и сортировка массивов сортировки
+        #     organize_data_row_sort_arrays(instance)
+        #     serializer = self.get_serializer(instance)
+        #     return Response(serializer.data)
         return super().retrieve(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
@@ -166,23 +166,23 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
             if not disk_space:
                 return Response({'file': 'Not enough space on disk for file'},
                                 status=status.HTTP_400_BAD_REQUEST)
-        # проверка прав на род.документ
-        if kw['host'] and kw['host_pk'] != "0":
-            print(128)
-            host_obj = get_object_or_404(kw['host'], kw['host_pk'])
-        elif kw['host'] == 'storyboard' and kw['host_pk'] == '0':
-            print(131)
-            host_obj = Storyboard.objects \
-                .filter(deleted_id__isnull=True) \
-                .filter(host_project=kw['parent_pk']).first()
+        # # проверка прав на род.документ
+        # if kw['host'] and kw['host_pk'] != "0":
+        #     print(128)
+        #     host_obj = get_object_or_404(kw['host'], kw['host_pk'])
+        # elif kw['host'] == 'storyboard' and kw['host_pk'] == '0':
+        #     print(131)
+        #     host_obj = Storyboard.objects \
+        #         .filter(deleted_id__isnull=True) \
+        #         .filter(host_project=kw['parent_pk']).first()
         # привязка к род. документу
-        if host_obj:
-            print(137, type(request.data))
-            request.data.update({f"host_{kw['host']}": host_obj.id})
-        if base not in ["project"]:
-            host_prj = find_host_project(kw)
-            if host_prj:
-                request.data.update({"owner": host_prj.owner})
+        # if host_obj:
+        #     print(137, type(request.data))
+        #     request.data.update({f"host_{kw['host']}": host_obj.id})
+        # if base not in ["project"]:
+        #     host_prj = find_host_project(kw)
+        #     if host_prj:
+        #         request.data.update({"owner": host_prj.owner})
         print(139, 'host_obj =', host_obj)
         serializer = self.get_serializer(data=request.data)
         print(141, serializer.__class__.__name__)
@@ -190,11 +190,11 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
         new_obj = self.perform_create(serializer)
         print(144, new_obj, 'created')
 
-        # Получение существующих юзер.колонок для документа и их добавление
-        # для всех объектов
-        if base in ['frame']:
-            print(149)
-            add_userfields(user, host_obj, new_obj)
+        # # Получение существующих юзер.колонок для документа и их добавление
+        # # для всех объектов
+        # if base in ['frame']:
+        #     print(149)
+        #     add_userfields(user, host_obj, new_obj)
 
         # Добавление участника в проект, при создании из проекта
         if base == 'contact' and kw['host'] == 'project':
