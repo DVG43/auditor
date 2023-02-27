@@ -38,9 +38,7 @@ class TrashViewSet(GenericViewSet):
             Q(files__deleted_id__isnull=False) |
             Q(texts__deleted_id__isnull=False) |
             Q(timings__deleted_id__isnull=False) |
-            Q(documents__deleted_id__isnull=False) |
-            Q(folders__deleted_id__isnull=False)|
-            Q(polls__deleted_id__isnull=False)
+            Q(documents__deleted_id__isnull=False)
         )
         queryset = Project.objects \
             .filter(owner=self.request.user) \
