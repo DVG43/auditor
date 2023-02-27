@@ -139,7 +139,7 @@ class CreateDocumen(graphene.Mutation):
             document_instance.parent = Document.objects.get(pk=input.parent)
             document_instance.save()
         else:
-            Document.objects.create(
+            children_document_instance = Document.objects.create(
                 name="Без названия",
                 parent=document_instance,
                 content=default_content,
@@ -147,6 +147,8 @@ class CreateDocumen(graphene.Mutation):
                 last_modified_user=info.context.user.email,
                 owner=get_user_model().objects.get(pk=info.context.user.pk)
             )
+            if hasattr(children_document_instance, "perms"):
+                children_document_instance.owner.grant_object_perm(children_document_instance, 'own')
         if input.document_logo_url:
             document_instance.document_logo = download_logo(
                 url=input.document_logo_url,
