@@ -1,13 +1,15 @@
+import uuid
 from operator import attrgetter
 
 from django.db import models
 from jsonfield import JSONField
 from django.utils.translation import gettext_lazy as _
+from django.db.models import ImageField
 
 from accounts.models import User
 from common.models import PpmDocModel, permissions
 from objectpermissions.registration import register
-from projects.models import Project
+from utils import get_doc_upload_path
 
 
 class PollTags(models.Model):
@@ -38,11 +40,14 @@ class Poll(PpmDocModel):
         verbose_name=_('Folder'),
         blank=True, null=True
     )
-    host_project = models.ForeignKey(
-        Project,
-        related_name="polls",
-        on_delete=models.CASCADE
+    order_id = models.UUIDField(
+        null=True,
+        unique=True,
+        default=uuid.uuid4
     )
+    document_logo = ImageField(upload_to=get_doc_upload_path,
+                               null=True, blank=True,
+                               verbose_name=_('Document logo'))
 
     class Meta:
         db_table = 'poll'

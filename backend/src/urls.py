@@ -40,7 +40,7 @@ urlpatterns = [
         path('', include(router.urls)),
         path('', include('projects.urls')),
         path('', include('contacts.urls')),
-        path('', include('storyboards.urls')),
+        # path('', include('storyboards.urls')),
         # path('pay/', include('tinkoff_pay.urls')),
         path('', include('subscription.urls')),
         path('', include('document.urls')),
