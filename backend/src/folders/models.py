@@ -18,7 +18,7 @@ class Folder(PpmDocModel):
         verbose_name=_('Folder'),
         blank=True, null=True
     )
-    order_id = models.UUIDField(null=True, unique=True, default=uuid.uuid4)
+    order_id = models.UUIDField(null=True, default=uuid.uuid4)
     doc_order = ArrayField(
         models.UUIDField(null=True), blank=True,
         default=list, verbose_name=_('Frame order'))
