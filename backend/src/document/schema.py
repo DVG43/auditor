@@ -15,7 +15,7 @@ from graphql_utils.utils_graphql import \
 from projects.models import Project
 import datetime
 
-from .models import Document, Element, TagForDocument
+from .models import Document
 from .permissions import PermissionClass
 from .utils import organize_data_row_sort_arrays
 from settings import MEDIA_URL
@@ -60,16 +60,6 @@ class DocumentsType(DjangoObjectType):
             return None
 
 
-class ElementForDocumentType(DjangoObjectType):
-    class Meta:
-        model = Element
-
-
-class TagForDocumentType(DjangoObjectType):
-    class Meta:
-        model = TagForDocument
-
-
 class UserForDocumentType(DjangoObjectType):
     class Meta:
         model = User
@@ -83,24 +73,8 @@ class ProjectForDocumentType(DjangoObjectType):
 
 
 class Query(graphene.ObjectType):
-    document_elements = graphene.List(ElementForDocumentType, doc_id=graphene.Int())
-    document_element = graphene.Field(ElementForDocumentType, id=graphene.Int())
     document_documents = graphene.List(DocumentsType, project_id=graphene.Int())
     document_document = graphene.Field(DocumentsType, doc_id=graphene.Int())
-    document_tags = graphene.List(TagForDocumentType, doc_id=graphene.Int())
-    document_tag = graphene.Field(TagForDocumentType, id=graphene.Int())
-
-    @login_required
-    def resolve_document_element(self, info, **kwargs):
-        """"разрешен для владельца и у кого есть uuid документа если доступ открыт"""
-        id = kwargs.get('id')
-        if id is not None:
-            element_instance = Element.objects.get(pk=id)
-            doc_id = element_instance.document_id.id
-            PermissionClass.has_permission(info)
-            PermissionClass.has_query_object_permission(info, doc_id)
-            return element_instance
-        return None
 
     @login_required
     def resolve_document_document(self, info, **kwargs):
@@ -113,30 +87,6 @@ class Query(graphene.ObjectType):
         return None
 
     @login_required
-    def resolve_document_tag(self, info, **kwargs):
-        """"разрешен всем если доступ открыт а владельцу в любом случае"""
-        id = kwargs.get('id')
-        if id is not None:
-            tag_instance = TagForDocument.objects.get(pk=id)
-            doc_id = tag_instance.document_id.id
-            PermissionClass.has_permission(info)
-            PermissionClass.has_query_object_permission(info, doc_id)
-            return tag_instance
-        return None
-
-    # @graphene.resolve_only_args
-    @login_required
-    def resolve_document_elements(self, info, **kwargs):
-        """"разрешен для владельца и у кого есть uuid документа если доступ открыт"""
-        doc_id = kwargs.get('doc_id')
-        if doc_id is not None:
-            PermissionClass.has_permission(info)
-            PermissionClass.has_query_object_permission(info, doc_id)
-            return Element.objects.filter(document_id__pk=doc_id)
-        return None
-
-    # @graphene.resolve_only_args
-    # @login_required
     def resolve_document_documents(self, info, **kwargs):
         """"возвращает только свои докумнты"""
         project_id = kwargs.get('project_id')
@@ -144,28 +94,8 @@ class Query(graphene.ObjectType):
         PermissionClassProject.has_query_object_permission(info, project_id)
         return Document.objects.filter(Q(host_project__pk=project_id) & Q(deleted_id__isnull=True))
 
-    @login_required
-    def resolve_document_tags(self, info, **kwargs):
-        """"разрешен для владельца и у кого есть uuid документа если доступ открыт"""
-        doc_id = kwargs.get('doc_id')
-        if doc_id is not None:
-            PermissionClass.has_permission(info)
-            PermissionClass.has_query_object_permission(info, doc_id)
-            return TagForDocument.objects.filter(document_id__pk=doc_id)
-        return None
-
 
 # Create Input Objects Type
-class ElementForDocumentInput(graphene.InputObjectType):
-    content = graphene.String(required=False)
-    position = graphene.Int(required=False)
-
-
-class TagForDocumentInput(graphene.InputObjectType):
-    document_id = graphene.ID(required=False)
-    word = graphene.String(required=False)
-
-
 class DocumentInput(graphene.InputObjectType):
     name = graphene.String(required=False)
     project_id = graphene.ID(required=False)
@@ -176,143 +106,6 @@ class DocumentInput(graphene.InputObjectType):
 
 
 # Mutations
-class CreateElementForDocument(graphene.Mutation):
-    """"разрешен для владельца и у кого есть uuid документа если доступ открыт"""
-
-    class Arguments:
-        doc_id = graphene.ID(required=True)
-        input = ElementForDocumentInput(required=True)
-
-    ok = graphene.Boolean()
-    element = graphene.Field(ElementForDocumentType)
-    data_row_order = graphene.List(graphene.Int)
-
-    @staticmethod
-    def mutate(root, info, doc_id, input=None):
-        PermissionClass.has_permission(info)
-        PermissionClass.has_mutate_object_permission(info, doc_id)
-        ok = False
-        if input.position or input.position == 0:
-            element_instance = Element(content=input.content,
-                                       document_id=Document.objects.get(pk=doc_id))  # document=input.document)
-            element_instance.save()
-            document_instance = Document.objects.get(pk=doc_id)
-            document_instance.last_modified_user = info.context.user.email
-            document_instance.data_row_order.insert(input.position, element_instance.id)
-            doc_new_ins = organize_data_row_sort_arrays(document_instance).data_row_order
-            ok = True
-            return CreateElementForDocument(ok=ok, data_row_order=doc_new_ins, element=element_instance)
-        return CreateElementForDocument(ok=ok, data_row_order=None, element=None)
-
-
-class UpdateElementForDocument(graphene.Mutation):
-    """"разрешен для владельца и у кого есть uuid документа если доступ открыт"""
-
-    class Arguments:
-        id = graphene.Int(required=True)
-        input = ElementForDocumentInput(required=True)
-
-    ok = graphene.Boolean()
-    element = graphene.Field(ElementForDocumentType)
-
-    @staticmethod
-    def mutate(root, info, id, input=None):
-        ok = False
-        element_instance = Element.objects.get(pk=id)
-
-        if element_instance:
-            doc_id = element_instance.document_id.id
-            PermissionClass.has_permission(info)
-            PermissionClass.has_query_object_permission(info, doc_id)
-
-            doc_id = element_instance.document_id.id
-            if input.content or (input.content == ""):
-                element_instance.content = input.content
-            ok = True
-            element_instance.save()
-
-            document_instance = Document.objects.get(pk=doc_id)
-            document_instance.last_modified_user = info.context.user.email
-            document_instance.save()
-
-            return UpdateElementForDocument(ok=ok, element=element_instance)
-        return UpdateElementForDocument(ok=ok, element=element_instance)
-
-
-class DeleteElementForDocument(graphene.Mutation):
-    """"разрешен для владельца и у кого есть uuid документа если доступ открыт"""
-
-    class Arguments:
-        id = graphene.Int(required=True)
-
-    ok = graphene.Boolean()
-    id = graphene.Int()
-    data_row_order = graphene.List(graphene.Int)
-
-    # staticmethod
-    def mutate(root, info, id, input=None):
-        ok = False
-        element_instance = Element.objects.get(pk=id)
-
-        if element_instance:
-            doc_id = element_instance.document_id.id
-            PermissionClass.has_permission(info)
-            PermissionClass.has_query_object_permission(info, doc_id)
-            element_instance.delete()
-
-            document_instance = Document.objects.get(pk=doc_id)
-            document_instance.last_modified_user = info.context.user.email
-            document_instance.data_row_order.remove(id)
-            organize_data_row_sort_arrays(document_instance)
-
-            document_instance.save()
-            ok = True
-
-            return DeleteElementForDocument(ok=ok, data_row_order=document_instance.data_row_order, id=id)
-
-
-class CreateTagForDocument(graphene.Mutation):
-    """разрешено всем"""
-
-    class Arguments:
-        input = TagForDocumentInput(required=True)
-
-    ok = graphene.Boolean()
-    tag = graphene.Field(TagForDocumentType)
-
-    @staticmethod
-    def mutate(root, info, input=None):
-        ok = True
-        PermissionClass.has_permission(info)
-        PermissionClass.has_query_object_permission(info, input.document_id)
-
-        tag_instance = TagForDocument(word=input.word, document_id=Document.objects.get(
-            pk=input.document_id))  # document=input.document)
-        tag_instance.save()
-        return CreateTagForDocument(ok=ok, tag=tag_instance)
-
-
-class DeleteTagForDocument(graphene.Mutation):
-    """разрешено только владельцу"""
-
-    class Arguments:
-        id = graphene.Int(required=True)
-
-    ok = graphene.Boolean()
-
-    @staticmethod
-    def mutate(root, info, id, input=None):
-        ok = False
-        tag_instance = TagForDocument.objects.get(Q(pk=id) & Q(document_id__owner=info.context.user.pk))
-        if tag_instance:
-            doc_id = tag_instance.document_id.id
-            PermissionClass.has_permission(info)
-            PermissionClass.has_query_object_permission(info, doc_id)
-            ok = True
-            tag_instance.delete()
-            return DeleteTagForDocument(ok=ok)
-
-
 class CreateDocumen(graphene.Mutation):
     """создается в документах у пользователя который создает"""
 
@@ -325,6 +118,7 @@ class CreateDocumen(graphene.Mutation):
     @staticmethod
     def mutate(root, info, input=None):
         ok = False
+        default_content = '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'
         PermissionClassProject.has_permission(info)
         PermissionClassProject.has_query_object_permission(
             info,
@@ -337,21 +131,28 @@ class CreateDocumen(graphene.Mutation):
             owner=get_user_model().objects.get(pk=info.context.user.pk),
             last_modified_user=info.context.user.email,
             host_project=host_project,
-            content=input.content if input.content else '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'
+            content=input.content if input.content else default_content
         )
+        document_instance.save()
+        document_instance.refresh_from_db()
         if input.parent:
             document_instance.parent = Document.objects.get(pk=input.parent)
-        document_instance.save()
+            document_instance.save()
+        else:
+            Document.objects.create(
+                name="Без названия",
+                parent=document_instance,
+                content=default_content,
+                host_project=host_project,
+                last_modified_user=info.context.user.email,
+                owner=get_user_model().objects.get(pk=info.context.user.pk)
+            )
         if input.document_logo_url:
             document_instance.document_logo = download_logo(
                 url=input.document_logo_url,
                 project=host_project
             )
             document_instance.save()
-        element_instance = Element(content="<p></p>\n", document_id=document_instance)
-        element_instance.save()
-        document_instance.data_row_order = [element_instance.pk]
-        document_instance.save()
         if hasattr(document_instance, "perms"):
             document_instance.owner.grant_object_perm(document_instance, 'own')
         ok = True
@@ -458,7 +259,6 @@ class CopyDocumen(graphene.Mutation):
         PermissionClass.has_query_object_permission(info, id)
 
         document_instance = Document.objects.get(pk=id)
-        tuple_data_row_order = tuple(document_instance.data_row_order)
         if document_instance:
             document_instance.pk = None
             document_instance.order_id = None
@@ -466,25 +266,6 @@ class CopyDocumen(graphene.Mutation):
             document_instance.doc_uuid = None
             document_instance.name = document_instance.name + " копия"
             document_instance.save()
-            element_instances = Element.objects.filter(document_id__pk=id)  # .order_by("document_id__data_row_order")
-            # element_instances = Element.objects.filter(pk__in=new_data_row_order)
-            new_order_elem = list(tuple_data_row_order)
-            if element_instances:
-                for element in element_instances:
-                    old_pk = element.pk
-                    element.pk = None
-                    element.document_id = document_instance
-                    element.save()
-                    new_order_elem[tuple_data_row_order.index(old_pk)] = element.pk
-            tag_instances = TagForDocument.objects.filter(document_id__pk=id)
-            if tag_instances:
-                for tag in tag_instances:
-                    tag.pk = None
-                    tag.document_id = document_instance
-                    tag.save()
-            document_instance.data_row_order = new_order_elem
-            # document_instance.save()
-            organize_data_row_sort_arrays(document_instance)
             if hasattr(document_instance, "perms"):
                 document_instance.owner.grant_object_perm(document_instance, 'own')
             ok = True
@@ -516,11 +297,6 @@ class DeleteDocument(graphene.Mutation):
 
 
 class Mutation(graphene.ObjectType):
-    document_create_element = CreateElementForDocument.Field()
-    document_update_element = UpdateElementForDocument.Field()
-    document_delete_element = DeleteElementForDocument.Field()
-    document_create_tag = CreateTagForDocument.Field()
-    document_delete_tag = DeleteTagForDocument.Field()
     document_create_document = CreateDocumen.Field()
     document_update_document = UpdateDocumen.Field()
     document_delete_document = DeleteDocument.Field()
