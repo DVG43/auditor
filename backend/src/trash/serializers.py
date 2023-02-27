@@ -59,9 +59,10 @@ class TrashProjectListSerializer(PpmDocSerializer):
         docs = []
         rel_docs = settings.REL_DOCS
         for doc_type in rel_docs:
-            for doc in getattr(obj, doc_type).filter(deleted_id__isnull=False):
-                if doc:
-                    docs.append(doc)
+            if doc_type not in ['polls', 'folders']:
+                for doc in getattr(obj, doc_type).filter(deleted_id__isnull=False):
+                    if doc:
+                        docs.append(doc)
         serializer = TrashDocSerializer(docs, many=True)
         return serializer.data
 
