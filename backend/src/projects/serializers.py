@@ -8,6 +8,7 @@ from rest_framework import serializers
 from poll.models.poll import Poll
 from storyboards.models import Storyboard
 from document.models import Document
+from document.serializers import RecursiveSerializer
 from timing.models import Timing
 from folders.models import Folder
 from accounts.models import User
@@ -112,6 +113,7 @@ class RevFolderSerializer(serializers.ModelSerializer, LastModifiedMixin):
 
 class RevDocumentSerializer(serializers.ModelSerializer, LastModifiedMixin):
     model = serializers.SerializerMethodField()
+    children = RecursiveSerializer(many=True)
 
     class Meta:
         model = Document
@@ -120,7 +122,7 @@ class RevDocumentSerializer(serializers.ModelSerializer, LastModifiedMixin):
                   'order_id', 'document_logo',
                   'last_modified_name',
                   'last_modified_date',
-                  'folder'
+                  'folder', 'children'
                   # 'last_modified_time',
                   ]
 
