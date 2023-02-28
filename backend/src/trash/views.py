@@ -21,26 +21,26 @@ from timing.models import Timing
 from folders.models import Folder
 from poll.models.poll import Poll
 from folders.utils import get_child_folders
-from .serializers import TrashProjectListSerializer
+from .serializers import TrashFolderListSerializer
 
 
 class TrashViewSet(GenericViewSet):
     permission_classes = [IsAuthenticated, IsOwner]
     http_method_names = ['get', 'delete']
-    queryset = Project.objects.filter(deleted_id__isnull=False)
+    queryset = Folder.objects.filter(deleted_id__isnull=False)
 
     def get_queryset(self):
         print(24, 'TrashVS.get_queryset')
         q = (
             Q(deleted_id__isnull=False) |
-            Q(storyboards__deleted_id__isnull=False) |
             Q(links__deleted_id__isnull=False) |
             Q(files__deleted_id__isnull=False) |
             Q(texts__deleted_id__isnull=False) |
             Q(timings__deleted_id__isnull=False) |
-            Q(documents__deleted_id__isnull=False)
+            Q(documents__deleted_id__isnull=False)|
+            Q(parent_folder__deleted_id__isnull=False)
         )
-        queryset = Project.objects \
+        queryset = Folder.objects \
             .filter(owner=self.request.user) \
             .filter(q)
         return queryset
@@ -48,7 +48,7 @@ class TrashViewSet(GenericViewSet):
     def list(self, request, *args, **kwargs):
         self.clean_old_docs()
         self.change_disk_space(request.user)
-        serializer = TrashProjectListSerializer(
+        serializer = TrashFolderListSerializer(
             self.get_queryset().distinct(), many=True, context={'request': request})
         return Response(serializer.data)
 
@@ -133,15 +133,20 @@ class TrashViewSet(GenericViewSet):
                         file.deleted_since = None
                         file.save()
                 if instance.folders.count() > 0:
-                    for folder in instance.files.filter(deleted_id__isnull=False):
+                    for folder in instance.folders.filter(deleted_id__isnull=False):
                         folder.deleted_id = None
                         folder.deleted_since = None
                         folder.save()
                 if instance.links.count() > 0:
-                    for link in instance.files.filter(deleted_id__isnull=False):
+                    for link in instance.links.filter(deleted_id__isnull=False):
                         link.deleted_id = None
                         link.deleted_since = None
                         link.save()
+                if instance.polls.count() > 0:
+                    for poll in instance.polls.filter(deleted_id__isnull=False):
+                        poll.deleted_id = None
+                        poll.deleted_since = None
+                        poll.save()
             elif isinstance(instance, Folder):
                 folders = [instance]
                 child_folders = instance.folders.all()

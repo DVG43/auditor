@@ -1,12 +1,12 @@
 import time
-from datetime import datetime
+# from datetime import datetime
 
 from common.serializers import PpmDocSerializer
 from contacts.serializers import ContactSerializer
 from projects.models import Project, Link, File, Text
 from rest_framework import serializers
 from poll.models.poll import Poll
-from storyboards.models import Storyboard
+# from storyboards.models import Storyboard
 from document.models import Document
 from document.serializers import RecursiveSerializer
 from timing.models import Timing
@@ -58,22 +58,22 @@ class FilteredListSerializer(serializers.ListSerializer):
         return super(FilteredListSerializer, self).to_representation(data)
 
 
-class RevStoryboardSerializer(serializers.ModelSerializer, LastModifiedMixin):
-    model = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Storyboard
-        list_serializer_class = FilteredListSerializer
-        fields = ['id', 'model', 'name', 'tag_color', 'doc_uuid',
-                  'order_id', 'document_logo',
-                  'last_modified_name',
-                  'last_modified_date',
-                  'folder'
-                  # 'last_modified_time',
-                  ]
-
-    def get_model(self, obj):
-        return 'storyboard'
+# class RevStoryboardSerializer(serializers.ModelSerializer, LastModifiedMixin):
+#     model = serializers.SerializerMethodField()
+#
+#     class Meta:
+#         model = Storyboard
+#         list_serializer_class = FilteredListSerializer
+#         fields = ['id', 'model', 'name', 'tag_color', 'doc_uuid',
+#                   'order_id', 'document_logo',
+#                   'last_modified_name',
+#                   'last_modified_date',
+#                   'folder'
+#                   # 'last_modified_time',
+#                   ]
+#
+#     def get_model(self, obj):
+#         return 'storyboard'
 
 
 class RevPollSerializer(serializers.ModelSerializer, LastModifiedMixin):
@@ -82,7 +82,7 @@ class RevPollSerializer(serializers.ModelSerializer, LastModifiedMixin):
     class Meta:
         model = Poll
         list_serializer_class = FilteredListSerializer
-        fields = ['id', 'model', 'name', 'tag_color',
+        fields = ['id', 'model', 'name',
                   'order_id', 'document_logo',
                   'last_modified_name',
                   'last_modified_date',
@@ -100,10 +100,9 @@ class RevFolderSerializer(serializers.ModelSerializer, LastModifiedMixin):
     class Meta:
         model = Folder
         list_serializer_class = FilteredListSerializer
-        fields = ['id', 'model', 'name', 'tag_color',
+        fields = ['id', 'model', 'name',
                   'last_modified_name',
                   'last_modified_date',
-                  # 'last_modified_time',
                   ]
 
     def get_model(self, obj):
@@ -122,7 +121,6 @@ class RevDocumentSerializer(serializers.ModelSerializer, LastModifiedMixin):
                   'last_modified_name',
                   'last_modified_date',
                   'folder', 'children'
-                  # 'last_modified_time',
                   ]
 
     def get_model(self, obj):
@@ -140,7 +138,6 @@ class RevTimingSerializer(serializers.ModelSerializer, LastModifiedMixin):
                   'last_modified_name',
                   'last_modified_date',
                   'folder'
-                  # 'last_modified_time',
                   ]
 
     def get_model(self, obj):
@@ -162,7 +159,6 @@ class LinkSerializer(PpmDocSerializer, LastModifiedMixin):
                   'last_modified_name',
                   'last_modified_date',
                   'folder'
-                  # 'last_modified_time',
                   ]
 
     def get_model(self, obj):
@@ -185,7 +181,6 @@ class FileSerializer(PpmDocSerializer, LastModifiedMixin):
                   'last_modified_name',
                   'last_modified_date',
                   'folder'
-                  # 'last_modified_time',
                   ]
 
     def get_model(self, obj):
@@ -207,7 +202,6 @@ class TextSerializer(PpmDocSerializer, LastModifiedMixin):
                   'last_modified_name',
                   'last_modified_date',
                   'folder'
-                  # 'last_modified_time',
                   ]
 
     def get_model(self, obj):
@@ -226,8 +220,6 @@ class RevDocSerializer(serializers.Serializer):
     files = FileSerializer(
         many=True, read_only=True)
     texts = TextSerializer(
-        many=True, read_only=True)
-    folders = RevFolderSerializer(
         many=True, read_only=True)
 
 
@@ -261,7 +253,6 @@ class ProjectListSerializer(PpmDocSerializer, LastModifiedMixin):
             'doc_order',
             'last_modified_name',
             'last_modified_date',
-            # 'last_modified_time'
         ]
 
     def get_documents(self, instance):

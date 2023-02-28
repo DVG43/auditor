@@ -1,3 +1,7 @@
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from common.views import PpmViewSet
 from folders.models import Folder
 from folders.serializers import\
@@ -23,3 +27,11 @@ class FolderViewSet(PpmViewSet, ShareMixin):
         else:
             return FolderSerializer
 
+    @action(methods=["GET"], detail=False, url_path='tree')
+    def get_folders_tree(self, request):
+        folders = Folder.objects.filter(
+            owner=request.user,
+            parent_folder=None
+        )
+        serializer = self.get_serializer(folders, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
