@@ -62,7 +62,8 @@ class DocumentSerializer(serializers.ModelSerializer):
             "data_row_order",
             "project_id",
             "project_name",
-            'folder'
+            'folder',
+            'content',
         )
 
     def get_perm(self, obj):
