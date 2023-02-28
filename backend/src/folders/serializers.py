@@ -18,9 +18,11 @@ class FolderSerializer(PpmDocSerializer):
         list_serializer_class = FilteredListSerializer
         fields = [
             'id', 'name',
-            'last_modified_user', 'last_modified_date',
-            'parent_folder', 'child_folders',
-            'folder_objects', 'deleted_id'
+            'folder_objects',
+            'parent_folder',
+            'doc_order',
+            'order_id',
+            'child_folders'
         ]
 
     def get_child_folders(self, obj):
@@ -31,12 +33,14 @@ class FolderSerializer(PpmDocSerializer):
         return FolderDocsSerializer(instance, context=self.context).data
 
     def _get_folders_tree(self, obj):
-        tree = dict()
+        child_folders = list()
         folders = obj.folders.all()
         if folders:
             for folder in folders:
-                tree.update({folder.id: self._get_folders_tree(folder)})
-            return tree
+                child_folders.append(
+                    FolderSerializer(folder, context=self.context).data
+                )
+            return child_folders
         return None
 
 
@@ -48,6 +52,8 @@ class FolderListSerializer(PpmDocSerializer):
         fields = [
             'id',
             'parent_folder',
-            'tag_color',
-            'name'
+            'name',
+            'last_modified_user',
+            'last_modified_date',
+            'document_logo'
         ]

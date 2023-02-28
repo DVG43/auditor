@@ -2,14 +2,14 @@ import os
 import settings
 from rest_framework import serializers
 from common.serializers import PpmDocSerializer
-from projects.models import Project
+from folders.models import Folder
 
 
 class TrashDocSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     model = serializers.SerializerMethodField()
     name = serializers.CharField()
-    project = serializers.SerializerMethodField()
+    folder = serializers.SerializerMethodField()
     deleted_id = serializers.UUIDField()
     deleted_since = serializers.DateTimeField()
     doc_size = serializers.SerializerMethodField()
@@ -17,8 +17,11 @@ class TrashDocSerializer(serializers.Serializer):
     def get_model(self, obj):
         return obj.__class__.__name__.lower()
 
-    def get_project(self, obj):
-        return obj.host_project.name
+    def get_folder(self, obj):
+        if self.get_model(obj) == 'folder':
+            return obj.parent_folder.name
+        else:
+            return obj.folder.name
 
     def get_doc_size(self, obj):
         owner_id = obj.owner_id
@@ -37,21 +40,21 @@ class TrashDocSerializer(serializers.Serializer):
         return size
 
 
-class TrashProjectListSerializer(PpmDocSerializer):
+class TrashFolderListSerializer(PpmDocSerializer):
     documents = serializers.SerializerMethodField()
-    project = serializers.CharField(source='name')
+    folder = serializers.CharField(source='name')
     doc_size = serializers.SerializerMethodField()
 
     class Meta:
-        model = Project
+        model = Folder
         fields = [
             'id',
             'name',
-            'project',
             'deleted_id',
             'deleted_since',
             'doc_size',
             'documents',
+            'folder'
 
         ]
 
@@ -59,10 +62,9 @@ class TrashProjectListSerializer(PpmDocSerializer):
         docs = []
         rel_docs = settings.REL_DOCS
         for doc_type in rel_docs:
-            if doc_type not in ['polls', 'folders']:
-                for doc in getattr(obj, doc_type).filter(deleted_id__isnull=False):
-                    if doc:
-                        docs.append(doc)
+            for doc in getattr(obj, doc_type).filter(deleted_id__isnull=False):
+                if doc:
+                    docs.append(doc)
         serializer = TrashDocSerializer(docs, many=True)
         return serializer.data
 
