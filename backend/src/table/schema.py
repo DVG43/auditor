@@ -324,7 +324,6 @@ class UpdateTableColumn(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         table_instance = DefaultTableModel.objects.filter(id=input["host_table"]).first()
-
         if table_instance.host_document:
             folder_id = table_instance.host_document.host_project.id
         else:

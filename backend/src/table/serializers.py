@@ -82,8 +82,6 @@ class DefaultTableSerializer(PpmDocSerializer):
     owner = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), write_only=True, required=False)
     document_logo_url = serializers.URLField(write_only=True, required=False)
-    frame_columns = serializers.SerializerMethodField()
-    frames = serializers.SerializerMethodField()
 
     class Meta:
         model = DefaultTableModel
@@ -91,12 +89,6 @@ class DefaultTableSerializer(PpmDocSerializer):
 
     def get_model(self, obj):
         return 'table'
-
-    def get_frame_columns(self, obj):
-        return UserColumnSerializer(many=True, read_only=True)
-
-    def get_frames(self, obj):
-        return DefaultTableFrame(many=True, read_only=True)
 
 
 class UserCellSerializer(WritableNestedModelSerializer, PpmDocSerializer):
