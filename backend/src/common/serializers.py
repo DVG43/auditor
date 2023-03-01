@@ -6,6 +6,7 @@ from rest_framework.exceptions import ValidationError
 from accounts.models import User
 from common.models import PERMS, UserColumn, UserCell, UserChoice, UsercellImage, StandardIcon
 from objectpermissions.models import UserPermission
+from projects.models import Project
 
 
 class PpmDocSerializer(serializers.ModelSerializer):
@@ -26,6 +27,7 @@ class PpmDocSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
+        print(validated_data)
         if 'owner' not in validated_data:
             if ('request' in self.context and
             'owner' in self.context['request'].data.keys()):
@@ -84,7 +86,13 @@ class UserChoiceSerializer(PpmDocSerializer):
 
 class UserColumnSerializer(WritableNestedModelSerializer, PpmDocSerializer):
     column_id = serializers.IntegerField(source='id', read_only=True)
-    choices = UserChoiceSerializer(many=True, required=False)
+    choices = serializers.SerializerMethodField()
+    column_type = serializers.CharField(max_length=11)
+    host_project = serializers.PrimaryKeyRelatedField(
+        queryset=Project.objects.all(), write_only=True, required=False)
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), write_only=True, required=False)
+    host_document_id = serializers.IntegerField(required=False)
 
     class Meta:
         model = UserColumn
@@ -93,9 +101,13 @@ class UserColumnSerializer(WritableNestedModelSerializer, PpmDocSerializer):
             'column_name',
             'column_type',
             'choices',
+            'host_project',
+            'owner',
+            'host_document_id'
         ]
 
     def run_validation(self, data=None):
+        print(data)
         userfield_types = dict(UserColumn.USERCOLUMN_TYPES)
         if 'column_type' in data and data['column_type'] not in userfield_types:
             raise ValidationError({
@@ -104,6 +116,9 @@ class UserColumnSerializer(WritableNestedModelSerializer, PpmDocSerializer):
                     'choices': userfield_types
                 }})
         return super().run_validation(data)
+
+    def get_choices(self, obj):
+        return UserChoiceSerializer(many=True, required=False)
 
 
 class ChoiceSerializer(serializers.ModelSerializer):
@@ -146,7 +161,7 @@ class UserCellSerializer(WritableNestedModelSerializer, PpmDocSerializer):
         model = UserCell
         fields = [
             'cell_id', 'cell_content', 'choice_id', 'images',
-            'host_usercolumn',
+            'id', 'host_usercolumn',
             'column_id', 'column_name', 'column_type',
             'choices_id'
         ]

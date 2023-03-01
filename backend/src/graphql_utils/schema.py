@@ -8,13 +8,15 @@ from poll.schema.mutations.mutations import Mutation as MutationPoll
 from timing.schema import Query as QueryTiming
 from timing.schema import Mutation as MutationTiming
 from timing.schema import Subscription as SubscriptionTiming
+from table.schema import Query as DefaultQueryTable
+from table.schema import Mutation as MutationDefaultTable
 
 
-class Query(QueryDocument, QueryTiming, QueryPoll):
+class Query(QueryDocument, QueryTiming, DefaultQueryTable, QueryPoll):
     pass
 
 
-class Mutation(MutationDocument, MutationTiming, MutationPoll):
+class Mutation(MutationDocument, MutationTiming, MutationDefaultTable, MutationPoll):
     pass
 
 

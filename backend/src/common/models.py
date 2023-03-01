@@ -51,11 +51,13 @@ class UserColumn(models.Model):
         ('text', _('Text')),
         ('select', _('Select choice')),
         ('multiselect', _('Multiselect choice')),
+        ('numbers', _("Numbers")),
         ('email', _('Email')),
         ('phone', _('Phone')),
         ('image', _('Image')),
         ('time', _('Time')),
         ('contact', _('Contact')),
+        ('tablelink', _("Link to table"))
     )
     column_name = models.CharField(
         _('Column title'), max_length=30, blank=False, null=False)
@@ -64,6 +66,7 @@ class UserColumn(models.Model):
     # choices
     owner = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name=_('Owner'))
     # cells
+    is_visible = models.BooleanField(_("Is visible"), default=True)
 
     class Meta:
         db_table = 'ppm_usercolumns'
