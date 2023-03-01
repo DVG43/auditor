@@ -22,7 +22,12 @@ class FolderSerializer(PpmDocSerializer):
             'parent_folder',
             'doc_order',
             'order_id',
-            'child_folders'
+            'child_folders',
+            'document_logo'
+        ]
+        read_only_fields = [
+            'last_modified_user',
+            'last_modified_date',
         ]
 
     def get_child_folders(self, obj):
