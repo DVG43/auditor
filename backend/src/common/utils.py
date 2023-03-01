@@ -9,6 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.db import utils
+from rest_framework import status
 from rest_framework.exceptions import ValidationError
 
 import settings
@@ -16,9 +17,11 @@ from accounts.models import User
 from common.models import UserCell
 from projects import models
 from projects.models import Project
+from rest_framework.response import Response
 from storyboards.models import Frame
 from storyboards.serializers import ChronoframeSerializer
 from timing.models import TimingGroup, Timing
+from folders.models import Folder
 
 
 def get_model(model_name):
@@ -467,3 +470,14 @@ def copy_document_logo(copied_instance, original_instance_pk):
         old_parent_obj = model.objects.get(pk=original_instance_pk)
         copied_instance.document_logo.save(new_picture_name, picture_copy)
         old_parent_obj.document_logo.save(old_picture_name, picture_copy)
+
+
+def check_folder_exist(request):
+    for folder in ['folder', 'parent_polder']:
+        if folder in request.data:
+            folder = Folder.objects.filter(
+                id=request.data[folder],
+                deleted_id__isnull=True
+            )
+            if not folder:
+                raise ValidationError({'folder': 'does not exist'})

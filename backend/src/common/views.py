@@ -39,6 +39,7 @@ from common.utils import (
     recount_disk_space,
     update_host_modified_date,
     find_host_project,
+    check_folder_exist
 )
 from folders.utils import get_child_folders
 from projects.models import Project, Link, File, Text
@@ -134,6 +135,8 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
         base = self.basename or kwargs['basename']
         kw = unpack_nested_kwargs(self.kwargs, base)
         host_obj = None
+
+        check_folder_exist(request)
 
         # скачиваем логотип для документа по ссылке
         if 'document_logo_url' in request.data:
@@ -231,6 +234,7 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
         kw = unpack_nested_kwargs(kwargs, base)
         self.kw = kw
 
+        check_folder_exist(request)
         # скачиваем логотип для документа по ссылке
         if 'document_logo_url' in request.data:
             url = request.data['document_logo_url']
