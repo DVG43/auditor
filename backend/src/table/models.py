@@ -2,13 +2,16 @@ from common.models import PpmDocModel, permissions
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from document.models import Document
+from folders.models import Folder
 from objectpermissions.registration import register
 
 
 class DefaultTableModel(PpmDocModel):
-    host_document_id = models.IntegerField(_("Host document id"), blank=True, null=True)
-    host_document_model = models.CharField(_("Host document model"), max_length=255,
-                                           blank=True, null=True)
+    host_document = models.ForeignKey(Document, related_name="tables", on_delete=models.CASCADE,
+                                      null=True, blank=True)
+    host_folder = models.ForeignKey(Folder, related_name="tables", on_delete=models.CASCADE,
+                                    null=True, blank=True)
 
     frame_columns = models.ManyToManyField(
         'common.UserColumn',

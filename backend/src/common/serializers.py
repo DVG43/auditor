@@ -6,7 +6,6 @@ from rest_framework.exceptions import ValidationError
 from accounts.models import User
 from common.models import PERMS, UserColumn, UserCell, UserChoice, UsercellImage, StandardIcon
 from objectpermissions.models import UserPermission
-from projects.models import Project
 
 
 class PpmDocSerializer(serializers.ModelSerializer):
@@ -80,19 +79,14 @@ class UserChoiceSerializer(PpmDocSerializer):
         fields = [
             'id',
             'choice',
-            'color'
+            'color',
+            'host_usercolumn'
         ]
 
 
 class UserColumnSerializer(WritableNestedModelSerializer, PpmDocSerializer):
     column_id = serializers.IntegerField(source='id', read_only=True)
-    choices = serializers.SerializerMethodField()
-    column_type = serializers.CharField(max_length=11)
-    host_project = serializers.PrimaryKeyRelatedField(
-        queryset=Project.objects.all(), write_only=True, required=False)
-    owner = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), write_only=True, required=False)
-    host_document_id = serializers.IntegerField(required=False)
+    choices = UserChoiceSerializer(many=True, required=False)
 
     class Meta:
         model = UserColumn
@@ -101,9 +95,6 @@ class UserColumnSerializer(WritableNestedModelSerializer, PpmDocSerializer):
             'column_name',
             'column_type',
             'choices',
-            'host_project',
-            'owner',
-            'host_document_id'
         ]
 
     def run_validation(self, data=None):
@@ -116,9 +107,6 @@ class UserColumnSerializer(WritableNestedModelSerializer, PpmDocSerializer):
                     'choices': userfield_types
                 }})
         return super().run_validation(data)
-
-    def get_choices(self, obj):
-        return UserChoiceSerializer(many=True, required=False)
 
 
 class ChoiceSerializer(serializers.ModelSerializer):
