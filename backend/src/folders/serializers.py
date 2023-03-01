@@ -39,7 +39,7 @@ class FolderSerializer(PpmDocSerializer):
 
     def _get_folders_tree(self, obj):
         child_folders = list()
-        folders = obj.folders.all()
+        folders = obj.folders.filter(deleted_id__isnull=True)
         if folders:
             for folder in folders:
                 child_folders.append(
