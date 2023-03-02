@@ -6,16 +6,17 @@ from graphql_utils.utils_graphql import PermissionClass
 from poll.schema import types
 from poll.models import (
     poll as poll_models,
-    questions as questions_models
+    # questions as questions_models
 )
-from poll.serializers import (
-    poll as poll_serializers,
-    questions as questions_serializers
-)
+# from poll.serializers import (
+#     poll as poll_serializers,
+#     questions as questions_serializers
+# )
+from rest_framework.generics import get_object_or_404
 
 
 class QueryPoll(ObjectType):
-    all_polls = graphene.List(types.PollType, prj_id=graphene.Int())
+    all_polls = graphene.List(types.PollType)
     all_poll_tags = graphene.List(types.PollTagsType, poll_id=graphene.Int(), prj_id=graphene.Int())
     # all_poll_questions = graphene.List(types.PollTagsType, poll_id=graphene.Int(), prj_id=graphene.Int())
     poll_by_id = graphene.Field(types.PollType, poll_id=graphene.Int())
@@ -23,17 +24,19 @@ class QueryPoll(ObjectType):
     poll_tag_by_id = graphene.Field(types.PollTagsType, tag_id=graphene.Int())
 
     @login_required
-    def resolve_all_polls(self, info, prj_id=None):
+    def resolve_all_polls(self, info):
         PermissionClass.has_permission(info)
-        PermissionClass.has_query_object_permission(info, prj_id)
+        # PermissionClass.has_query_object_permission(info, prj_id)
         ret = poll_models.Poll.objects.filter(
-            host_project__pk=prj_id, deleted_id__isnull=True).all()
+            owner=info.context.user,
+            deleted_id__isnull=True,
+        ).all()
         return ret
 
     @login_required
-    def resolve_all_poll_tags(self, info, poll_id=None, prj_id=None):
+    def resolve_all_poll_tags(self, info, poll_id=None):
         PermissionClass.has_permission(info)
-        PermissionClass.has_query_object_permission(info, prj_id)
+        # PermissionClass.has_query_object_permission(info, prj_id)
         ret = poll_models.PollTags.objects.filter(
             poll=poll_id).all()
         return ret
@@ -82,9 +85,9 @@ class QueryPoll(ObjectType):
     def resolve_poll_by_id(self, info, poll_id=None):
         PermissionClass.has_permission(info)
 
-        ret = poll_models.Poll.objects.get(id=poll_id)
-        prj_id = ret.host_project.id
-        PermissionClass.has_query_object_permission(info, prj_id)
+        ret = get_object_or_404(poll_models.Poll, id=poll_id)
+        # prj_id = ret.host_project.id
+        # PermissionClass.has_query_object_permission(info, prj_id)
 
         return ret
 

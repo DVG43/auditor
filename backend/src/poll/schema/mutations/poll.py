@@ -6,7 +6,7 @@ from graphene_django.rest_framework.mutation import SerializerMutation
 from graphql_jwt.decorators import login_required
 
 from graphql_utils.utils_graphql import PermissionClass
-from projects.models import Project
+# from projects.models import Project
 from folders.models import Folder
 from poll.models import (
     poll as poll_models,
@@ -27,18 +27,16 @@ class CreatePoll(SerializerMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
-        prj_id = input["host_project"]
         PermissionClass.has_permission(info)
-        PermissionClass.has_mutate_object_permission(info, prj_id)
+        # PermissionClass.has_mutate_object_permission(info, prj_id)
 
-        host_project = Project.objects.filter(pk=prj_id).first()
+        # host_project = Project.objects.filter(pk=prj_id).first()
         if "folder" in input:
             folder = Folder.objects.filter(pk=input["folder"]).first()
         else:
             folder = None
         input.update({'owner': info.context.user,
                       'last_modified_user': info.context.user.email,
-                      'host_project': host_project,
                       'folder': folder})
 
         poll = poll_serializers.PollSerializer.create(
@@ -75,12 +73,8 @@ class UpdatePoll(graphene.Mutation):
 
         poll = poll_models.Poll.objects.filter(id=poll_id)
         if poll:
-            prj_id = poll.first().host_project.id
-            print(prj_id)
 
-            PermissionClass.has_mutate_object_permission(info, prj_id)
-
-            print(input['poll_input'])
+            # PermissionClass.has_mutate_object_permission(info, prj_id)
             poll.update(**input['poll_input'])
 
             return UpdatePoll(ok=True, poll=poll.first())
@@ -130,9 +124,8 @@ class UpdatePollSetting(graphene.Mutation):
 
         poll_setting = poll_models.PollSettings.objects.filter(poll_id=poll_id)
         if poll_setting:
-            prj_id = poll_setting.first().poll.host_project.id
 
-            PermissionClass.has_mutate_object_permission(info, prj_id)
+            # PermissionClass.has_mutate_object_permission(info, prj_id)
             poll_setting.update(**input['poll_set_input'])
 
             return UpdatePollSetting(ok=True, poll_setting=poll_setting.first())

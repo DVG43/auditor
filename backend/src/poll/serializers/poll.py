@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from poll.models.poll import Poll, PollSettings, PollTags
 from poll.utils import QUESTION_SERIALIZERS_V1
-from accounts.serializers import UserSerializer
+# from accounts.serializers import UserSerializer
 
 
 class JSONSerializerField(serializers.Field):
@@ -62,7 +62,8 @@ class PollSerializer(serializers.ModelSerializer):
             'last_modified_user',
             'last_modified_date',
             'delete_id',
-            'deleted_since'
+            'deleted_since',
+            'owner'
         ]
 
     def __init__(self, *args, **kwargs):

@@ -7,6 +7,7 @@ from poll.models import polltheme as polltheme_models
 from poll.models import questions as questions_models
 from poll.models import surveypassing as surveypassing_models
 from poll.models import user_access as user_access_models
+from folders.models import Folder
 
 
 # Analitics
@@ -32,9 +33,18 @@ class PollTagsType(DjangoObjectType):
         model = poll_models.PollTags
 
 
+class FolderType(DjangoObjectType):
+
+    class Meta:
+        model = Folder
+
+
 class PollType(DjangoObjectType):
+    folder = graphene.Field(FolderType)
+
     class Meta:
         model = poll_models.Poll
+        fields = '__all__'
 
 
 class PollSettingsType(DjangoObjectType):
