@@ -42,6 +42,7 @@ class Document(PpmDocModel):
 
     class Meta:
         db_table = 'ppm_documents'
+        ordering = ['created_at']
 
 class Element(models.Model):
     document_id = models.ForeignKey(Document, related_name="element", on_delete=models.CASCADE)
