@@ -147,8 +147,8 @@ class DeletePoll(graphene.Mutation):
 
         PermissionClass.has_permission(root)
         if poll:
-            prj_id = poll.host_project.id
-            PermissionClass.has_mutate_object_permission(root, prj_id)
+            # prj_id = poll.host_project.id
+            # PermissionClass.has_mutate_object_permission(root, prj_id)
 
             poll.deleted_id = uuid.uuid4()
             poll.deleted_since = timezone.now()
