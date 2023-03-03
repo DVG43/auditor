@@ -90,7 +90,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('time', models.TimeField(blank=True, null=True)),
-                ('callsheet', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='calltime', to='callsheets.callsheet')),
+
                 ('contact', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='calltime', to='contacts.contact')),
             ],
             options={

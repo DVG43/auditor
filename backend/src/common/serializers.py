@@ -26,6 +26,7 @@ class PpmDocSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
+        print(validated_data)
         if 'owner' not in validated_data:
             if ('request' in self.context and
             'owner' in self.context['request'].data.keys()):
@@ -78,7 +79,8 @@ class UserChoiceSerializer(PpmDocSerializer):
         fields = [
             'id',
             'choice',
-            'color'
+            'color',
+            'host_usercolumn'
         ]
 
 
@@ -96,6 +98,7 @@ class UserColumnSerializer(WritableNestedModelSerializer, PpmDocSerializer):
         ]
 
     def run_validation(self, data=None):
+        print(data)
         userfield_types = dict(UserColumn.USERCOLUMN_TYPES)
         if 'column_type' in data and data['column_type'] not in userfield_types:
             raise ValidationError({
@@ -146,7 +149,7 @@ class UserCellSerializer(WritableNestedModelSerializer, PpmDocSerializer):
         model = UserCell
         fields = [
             'cell_id', 'cell_content', 'choice_id', 'images',
-            'host_usercolumn',
+            'id', 'host_usercolumn',
             'column_id', 'column_name', 'column_type',
             'choices_id'
         ]
