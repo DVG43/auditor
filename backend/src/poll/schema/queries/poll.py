@@ -17,8 +17,7 @@ from rest_framework.generics import get_object_or_404
 
 class QueryPoll(ObjectType):
     all_polls = graphene.List(types.PollType)
-    all_poll_tags = graphene.List(types.PollTagsType, poll_id=graphene.Int(), prj_id=graphene.Int())
-    # all_poll_questions = graphene.List(types.PollTagsType, poll_id=graphene.Int(), prj_id=graphene.Int())
+    all_poll_tags = graphene.List(types.PollTagsType, poll_id=graphene.Int())
     poll_by_id = graphene.Field(types.PollType, poll_id=graphene.Int())
     poll_setting_by_id = graphene.Field(types.PollSettingsType, poll_id=graphene.Int())
     poll_tag_by_id = graphene.Field(types.PollTagsType, tag_id=graphene.Int())
