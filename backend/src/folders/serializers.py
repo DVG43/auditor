@@ -23,7 +23,9 @@ class FolderSerializer(PpmDocSerializer):
             'doc_order',
             'order_id',
             'child_folders',
-            'document_logo'
+            'document_logo',
+            'last_modified_user',
+            'last_modified_date',
         ]
         read_only_fields = [
             'last_modified_user',
