@@ -19,6 +19,7 @@ from .models import Document
 from .permissions import PermissionClass
 from .utils import organize_data_row_sort_arrays
 from settings import MEDIA_URL
+from folders.models import Folder
 
 
 class DocumentsType(DjangoObjectType):
@@ -103,6 +104,7 @@ class DocumentInput(graphene.InputObjectType):
     data_row_order = graphene.List(graphene.Int, required=False)
     document_logo_url = graphene.String(required=False)
     content = graphene.String(required=False)
+    folder = graphene.ID(required=False)
 
 
 # Mutations
@@ -125,13 +127,15 @@ class CreateDocumen(graphene.Mutation):
             input.project_id
         )
         host_project = Project.objects.get(pk=input.project_id)
-
+        if input.folder:
+            folder = Folder.objects.filter(id=input.folder).first()
         document_instance = Document(
             name=input.name, doc_uuid=None,
             owner=get_user_model().objects.get(pk=info.context.user.pk),
             last_modified_user=info.context.user.email,
             host_project=host_project,
-            content=input.content if input.content else default_content
+            content=input.content if input.content else default_content,
+            folder=folder
         )
         document_instance.save()
         document_instance.refresh_from_db()
@@ -187,6 +191,9 @@ class UpdateDocumen(graphene.Mutation):
                 document_instance.data_row_order = input.data_row_order
             if input.content:
                 document_instance.content = input.content
+            if input.folder:
+                folder = Folder.objects.filter(id=input.folder).first()
+                document_instance.folder = folder
             if input.parent and (int(input.parent) != document_instance.id):
                 document_instance.parent = Document.objects.get(pk=input.parent)
             if input.document_logo_url:
