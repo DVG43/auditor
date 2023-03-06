@@ -2,8 +2,8 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-# from firebase_admin import initialize_app, credentials
 
+# from firebase_admin import initialize_app, credentials
 
 DEBUG = os.environ.get("DEBUG", True)
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -15,6 +15,7 @@ CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '*').split(',')
 CORS_ALLOW_ALL_ORIGINS = True
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 # os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"
 
@@ -102,7 +103,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [(os.environ.get('CHANNEL_LAYERS_HOSTS'), 6379)], #127.0.0.1' redis://redis
+            "hosts": [(os.environ.get('CHANNEL_LAYERS_HOSTS'), 6379)],  # 127.0.0.1' redis://redis
         },
     },
 }
@@ -170,7 +171,6 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "share", "auditor-v2_media")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
 CELERY_ACCEPT_CONTENT = ['application/json']
@@ -385,7 +385,7 @@ SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 os.environ['IS_TEST'] = 'False'
 USE_S3 = True
 
-DISK_SIZE = 5*1024*1024*1024
+DISK_SIZE = 5 * 1024 * 1024 * 1024
 DISK_SIZE_GB = 5
 
 # я добавил

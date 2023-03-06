@@ -114,3 +114,18 @@ class TextGenerationSerializer(TextRephraseSerializer):
         allow_null=True)
     language = serializers.CharField(required=False)
     keywords = serializers.CharField(required=False)
+
+
+def is_right_n(value):
+    if not value in {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}:
+        raise serializers.ValidationError('недопустимое число')
+    
+def is_right_size(value):
+    if not value in {0, 1, 2}:
+        raise serializers.ValidationError('недопустимое число')
+
+class ImageGenerationSerializer(serializers.Serializer):
+    """ Вывод urls сгенерированных по описанию prompt изображений """
+    prompt = serializers.CharField()
+    n = serializers.IntegerField(required=False, default=1, validators=[is_right_n])
+    size = serializers.IntegerField(required=False, default=2, validators=[is_right_size])
