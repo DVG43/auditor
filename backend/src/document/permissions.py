@@ -1,23 +1,11 @@
 from rest_framework.exceptions import PermissionDenied
 from django.utils import timezone
 from .models import Document, Element
+from graphql_utils.utils_graphql import \
+    PermissionClass
 
 
-class PermissionClass:
-
-    @classmethod
-    def has_permission(cls, info):
-        user = info.context.user
-        if not user:
-            raise PermissionDenied({'error': 'you are not authenticated'})
-        if user.is_invited:
-            return user
-
-        ### Временное отключение требования к подписке
-        # subs_end = user.subscription.end_datetime
-        # if subs_end.astimezone(tz=timezone.utc) < timezone.now():
-        #     raise PermissionDenied({'error': 'you subscription is over'})
-        return user
+class PermissionClass(PermissionClass):
 
     @classmethod
     def has_query_object_permission(cls, info, doc_id):

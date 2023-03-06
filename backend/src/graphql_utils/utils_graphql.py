@@ -10,6 +10,7 @@ from django.utils import timezone
 from accounts.models import User
 from graphql_utils import errors
 from projects.models import Project
+from folders.models import Folder
 
 
 def jwt_decode(token, context=None):
@@ -51,6 +52,25 @@ class PermissionClass:
         prj = Project.objects.filter(pk=prj_id).first()
         user = info.context.user
         if not user.has_object_perm(prj, ['edit', 'own']):
+            raise PermissionDenied(
+                {'error': 'You don`t have access to this object'})
+
+
+class PermissionClassFolder(PermissionClass):
+
+    @classmethod
+    def has_query_object_permission(cls, info, folder_id):
+        fold = Folder.objects.filter(pk=folder_id).first()
+        user = info.context.user
+        if not user.has_object_perm(fold, ['read', 'edit', 'own']) and not user.is_invited:
+            raise PermissionDenied(
+                {'error': 'You don`t have access to this object'})
+
+    @classmethod
+    def has_mutate_object_permission(cls, info, folder_id):
+        fold = Folder.objects.filter(pk=folder_id).first()
+        user = info.context.user
+        if not user.has_object_perm(fold, ['edit', 'own']):
             raise PermissionDenied(
                 {'error': 'You don`t have access to this object'})
 

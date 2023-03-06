@@ -15,7 +15,12 @@ import uuid
 class Document(PpmDocModel):
     owner = models.ForeignKey(
         'accounts.User', verbose_name=_('Owner'), related_name="documents", on_delete=models.CASCADE)
-    host_project = models.ForeignKey(Project, related_name="documents", on_delete=models.CASCADE)
+    host_project = models.ForeignKey(
+        Project,
+        related_name="documents",
+        on_delete=models.CASCADE,
+        blank=True, null=True
+    )
     doc_uuid = models.UUIDField(editable=False, unique=True, null=True)
     order_id = models.UUIDField(null=True, unique=True, default=uuid.uuid4)
     document_logo = models.ImageField(upload_to=get_doc_upload_path,
