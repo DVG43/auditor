@@ -10,9 +10,4 @@ from poll.models import (
 
 
 # class QueryQuestions(ObjectType):
-#     all_questions = graphene.List(types.PollType, poll_id=graphene.Int())
-#     questions_by_id = graphene.Field(
-#         types.PollType,
-#         qstn_id=graphene.Int(),
-#         qstn_type=graphene.String()
-#     )
+#     pass
