@@ -10,7 +10,7 @@ from graphene import relay
 from graphene_django.types import DjangoObjectType
 from graphql_jwt.decorators import login_required
 from graphql_utils.utils_graphql import \
-    PermissionClass as PermissionClassProject, \
+    PermissionClassFolder, \
     download_logo
 from projects.models import Project
 import datetime
@@ -72,14 +72,18 @@ class ProjectForDocumentType(DjangoObjectType):
     class Meta:
         model = Project
 
+class FolderForDocumentType(DjangoObjectType):
+    class Meta:
+        model = Folder
+
 
 class Query(graphene.ObjectType):
-    document_documents = graphene.List(DocumentsType, project_id=graphene.Int())
+    document_documents = graphene.List(DocumentsType, folder_id=graphene.Int())
     document_document = graphene.Field(DocumentsType, doc_id=graphene.Int())
 
     @login_required
     def resolve_document_document(self, info, **kwargs):
-        """"разрешен для владельца и у кого есть uuid документа если доступ открыт"""
+        """"возвращает документа по id документа"""
         doc_id = kwargs.get('doc_id')
         PermissionClass.has_permission(info)
         PermissionClass.has_query_object_permission(info, doc_id)
@@ -89,11 +93,11 @@ class Query(graphene.ObjectType):
 
     @login_required
     def resolve_document_documents(self, info, **kwargs):
-        """"возвращает только свои докумнты"""
-        project_id = kwargs.get('project_id')
-        PermissionClassProject.has_permission(info)
-        PermissionClassProject.has_query_object_permission(info, project_id)
-        return Document.objects.filter(Q(host_project__pk=project_id) & Q(deleted_id__isnull=True))
+        """"возвращает документа по id папки"""
+        folder_id = kwargs.get('folder_id')
+        PermissionClassFolder.has_permission(info)
+        PermissionClassFolder.has_query_object_permission(info, folder_id)
+        return Document.objects.filter(Q(folder__pk=folder_id) & Q(deleted_id__isnull=True))
 
 
 # Create Input Objects Type
@@ -104,12 +108,12 @@ class DocumentInput(graphene.InputObjectType):
     data_row_order = graphene.List(graphene.Int, required=False)
     document_logo_url = graphene.String(required=False)
     content = graphene.String(required=False)
-    folder = graphene.ID(required=False)
+    folder_id = graphene.ID(required=False)
 
 
 # Mutations
 class CreateDocumen(graphene.Mutation):
-    """создается в документах у пользователя который создает"""
+    """создается в документах"""
 
     class Arguments:
         input = DocumentInput(required=True)
@@ -121,24 +125,26 @@ class CreateDocumen(graphene.Mutation):
     def mutate(root, info, input=None):
         ok = False
         default_content = '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'
-        PermissionClassProject.has_permission(info)
-        PermissionClassProject.has_query_object_permission(
+        PermissionClassFolder.has_permission(info)
+        PermissionClassFolder.has_mutate_object_permission(
             info,
-            input.project_id
+            input.folder_id
         )
-        host_project = Project.objects.get(pk=input.project_id)
-        if input.folder:
-            folder = Folder.objects.filter(id=input.folder).first()
+        # if input.project_id:
+        #     host_project = Project.objects.get(pk=input.project_id)
+        folder = Folder.objects.filter(id=input.folder_id).first()
         document_instance = Document(
             name=input.name, doc_uuid=None,
             owner=get_user_model().objects.get(pk=info.context.user.pk),
             last_modified_user=info.context.user.email,
-            host_project=host_project,
+            host_project=Project.objects.get(pk=input.project_id) if input.project_id else None,
             content=input.content if input.content else default_content,
             folder=folder
         )
         document_instance.save()
         document_instance.refresh_from_db()
+
+        # присвоение родителя или создание поддокумента по умолчанию для корневого документа
         if input.parent:
             document_instance.parent = Document.objects.get(pk=input.parent)
             document_instance.save()
@@ -147,16 +153,18 @@ class CreateDocumen(graphene.Mutation):
                 name="Без названия",
                 parent=document_instance,
                 content=default_content,
-                host_project=host_project,
+                folder=folder,
                 last_modified_user=info.context.user.email,
                 owner=get_user_model().objects.get(pk=info.context.user.pk)
             )
             if hasattr(children_document_instance, "perms"):
                 children_document_instance.owner.grant_object_perm(children_document_instance, 'own')
+
+        # добавление логотипа
         if input.document_logo_url:
             document_instance.document_logo = download_logo(
                 url=input.document_logo_url,
-                project=host_project
+                project=folder
             )
             document_instance.save()
         if hasattr(document_instance, "perms"):
@@ -166,7 +174,7 @@ class CreateDocumen(graphene.Mutation):
 
 
 class UpdateDocumen(graphene.Mutation):
-    """"разрешен для владельца и у кого есть uuid документа если доступ открыт"""
+    """"обновление документа"""
 
     class Arguments:
         id = graphene.ID(required=True)
@@ -179,7 +187,7 @@ class UpdateDocumen(graphene.Mutation):
     def mutate(root, info, id, input=None):
         ok = False
         PermissionClass.has_permission(info)
-        PermissionClass.has_query_object_permission(info, id)
+        PermissionClass.has_mutate_object_permission(info, id)
         document_instance = Document.objects.get(pk=id)
         if document_instance:
             if input.name:
@@ -191,15 +199,15 @@ class UpdateDocumen(graphene.Mutation):
                 document_instance.data_row_order = input.data_row_order
             if input.content:
                 document_instance.content = input.content
-            if input.folder:
-                folder = Folder.objects.filter(id=input.folder).first()
+            if input.folder_id:
+                folder = Folder.objects.filter(id=input.folder_id).first()
                 document_instance.folder = folder
             if input.parent and (int(input.parent) != document_instance.id):
                 document_instance.parent = Document.objects.get(pk=input.parent)
             if input.document_logo_url:
                 document_instance.document_logo = download_logo(
                     url=input.document_logo_url,
-                    project=document_instance.host_project
+                    project=document_instance.folder
                 )
             # document_instance.save()
             organize_data_row_sort_arrays(document_instance)
@@ -208,7 +216,7 @@ class UpdateDocumen(graphene.Mutation):
 
 
 class DocumentOpenAccess(graphene.Mutation):
-    """"разрешен только для владельца"""
+    """"открывает доступ к документу"""
 
     class Arguments:
         id = graphene.ID(required=True)
@@ -220,7 +228,7 @@ class DocumentOpenAccess(graphene.Mutation):
     def mutate(root, info, id, input=None):
         ok = False
         PermissionClass.has_permission(info)
-        PermissionClass.has_query_object_permission(info, id)
+        PermissionClass.has_mutate_object_permission(info, id)
 
         document_instance = Document.objects.get(pk=id)
         if document_instance:
@@ -231,7 +239,7 @@ class DocumentOpenAccess(graphene.Mutation):
 
 
 class DocumentCloseAccess(graphene.Mutation):
-    """"разрешен только для владельца"""
+    """"закрывает дотуп к документу"""
 
     class Arguments:
         id = graphene.ID(required=True)
@@ -243,7 +251,7 @@ class DocumentCloseAccess(graphene.Mutation):
     def mutate(root, info, id, input=None):
         ok = False
         PermissionClass.has_permission(info)
-        PermissionClass.has_query_object_permission(info, id)
+        PermissionClass.has_mutate_object_permission(info, id)
         document_instance = Document.objects.get(pk=id)
         if document_instance:
             document_instance.doc_uuid = None
@@ -253,7 +261,7 @@ class DocumentCloseAccess(graphene.Mutation):
 
 
 class CopyDocumen(graphene.Mutation):
-    """"разрешен для владельца и у кого есть uuid документа если доступ открыт"""
+    """"копирование документа"""
 
     class Arguments:
         id = graphene.ID(required=True)
@@ -265,7 +273,7 @@ class CopyDocumen(graphene.Mutation):
     def mutate(root, info, id, input=None):
         ok = False
         PermissionClass.has_permission(info)
-        PermissionClass.has_query_object_permission(info, id)
+        PermissionClass.has_mutate_object_permission(info, id)
 
         document_instance = Document.objects.get(pk=id)
         if document_instance:
@@ -282,7 +290,7 @@ class CopyDocumen(graphene.Mutation):
 
 
 class DeleteDocument(graphene.Mutation):
-    """"разрешен только владельце"""
+    """"удаление документа"""
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -294,7 +302,7 @@ class DeleteDocument(graphene.Mutation):
     def mutate(root, info, id, input=None):
         ok = False
         PermissionClass.has_permission(info)
-        PermissionClass.has_query_object_permission(info, id)
+        PermissionClass.has_mutate_object_permission(info, id)
 
         document_instance = Document.objects.get(pk=id)
         if document_instance:

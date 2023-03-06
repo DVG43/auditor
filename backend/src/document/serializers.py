@@ -45,8 +45,8 @@ class DocumentSerializer(serializers.ModelSerializer):
     children = RecursiveSerializer(many=True)
     perm = serializers.SerializerMethodField()
     document_logo = serializers.SerializerMethodField()
-    project_id = serializers.IntegerField(source='host_project.id')
-    project_name = serializers.CharField(source='host_project.name')
+    folder_id = serializers.IntegerField(source='folder.id')
+    folder_name = serializers.CharField(source='folder.name')
 
     class Meta:
         list_serializer_class = FilterReviewListSerializer
@@ -60,9 +60,9 @@ class DocumentSerializer(serializers.ModelSerializer):
             "perm",
             "order_id",
             "data_row_order",
-            "project_id",
-            "project_name",
-            'folder',
+            "folder_id",
+            "folder_name",
+            'host_project',
             'content',
         )
 
