@@ -40,45 +40,6 @@ class QueryPoll(ObjectType):
             poll=poll_id).all()
         return ret
 
-    # @login_required
-    # def resolve_all_poll_questions(self, info, poll_id=None, prj_id=None):
-    #     PermissionClass.has_permission(info)
-    #     PermissionClass.has_query_object_permission(info, prj_id)
-    #     division = questions_models.DivisionQuestion.objects.filter(poll_id=poll_id).all()
-    #     division_questions = questions_serializers.DivisionQuestionSerializer(division, many=True)
-    #
-    #     yes_no = questions_models.YesNoQuestion.objects.filter(poll_id=poll_id).all()
-    #     yesno_questions = questions_serializers.YesNoQuestionSerializer(yes_no, many=True)
-    #
-    #     manyfromlist = questions_models.ManyFromListQuestion.objects.filter(poll_id=poll_id).all()
-    #     manyfromlist_questions = questions_serializers.ManyFromListQuestionSerializer(manyfromlist, many=True)
-    #
-    #     text = questions_models.TextQuestion.objects.filter(poll_id=poll_id).all()
-    #     text_questions = questions_serializers.TextQuestionSerializer(text, many=True)
-    #
-    #     rating = questions_models.RatingQuestion.objects.filter(poll_id=poll_id).all()
-    #     rating_questions = questions_serializers.RatingQuestionSerializer(rating, many=True)
-    #
-    #     media = questions_models.MediaQuestion.objects.filter(poll_id=poll_id).all()
-    #     media_questions = questions_serializers.MediaQuestionSerializer(media, many=True)
-    #
-    #     final = questions_models.FinalQuestion.objects.filter(poll_id=poll_id).all()
-    #     final_questions = questions_serializers.FinalQuestionSerializer(final, many=True)
-    #
-    #     heading = questions_models.HeadingQuestion.objects.filter(poll_id=poll_id).all()
-    #     heading_question = questions_serializers.HeadingQuestionSerializer(heading, many=True)
-    #
-    #     free_answer = questions_models.FreeAnswer.objects.filter(poll_id=poll_id).all()
-    #     free_answer_serializer = questions_serializers.FreeAnswerSerializer(free_answer, many=True)
-    #     return {'result':  (division_questions.data,
-    #                         yesno_questions.data,
-    #                         manyfromlist_questions.data,
-    #                         text_questions.data,
-    #                         rating_questions.data,
-    #                         media_questions.data,
-    #                         final_questions.data,
-    #                         heading_question.data,
-    #                         free_answer_serializer.data)}
 
     @login_required
     def resolve_poll_by_id(self, info, poll_id=None):
