@@ -97,7 +97,7 @@ class PollCreate(generics.CreateAPIView):
             request.data['user'] = request.user.pk
 
         response = super(PollCreate, self).post(request, *args, **kwargs)
-        poll_id = response.data['poll_id']
+        poll_id = response.data['id']
         return Response({'result': 'The poll has been created', 'poll_id': str(poll_id)},
                         status=HTTPStatus.OK)
 
@@ -177,7 +177,7 @@ class DuplicatePoll(APIView):
         Get poll
         """
         try:
-            poll = Poll.objects.get(poll_id=pk)
+            poll = Poll.objects.get(id=pk)
             try:
                 poll_setting = PollSettings.objects.get(poll=poll)
             except PollSettings.DoesNotExist:

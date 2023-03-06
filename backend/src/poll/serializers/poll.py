@@ -97,7 +97,7 @@ class PollSerializer(serializers.ModelSerializer):
 
         tags = PollTagsSerializer(instance.tags_list, many=True).data
         response = {
-            'poll_id': instance.poll_id,
+            'id': instance.id,
             'author': instance.owner.email,  # profile.full_name,
             'name': instance.name,
             'test_mode_global': instance.test_mode_global,
