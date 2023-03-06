@@ -10,10 +10,12 @@ from graphql_utils.utils_graphql import PermissionClass
 from folders.models import Folder
 from poll.models import (
     poll as poll_models,
+    questions as qstn_models,
 )
 from poll.schema import types
 from poll.serializers import (
-    poll as poll_serializers
+    poll as poll_serializers,
+    questions as qstn_serializers,
 )
 
 
@@ -192,7 +194,49 @@ class CreatePollTag(graphene.Mutation):
         return CreatePollTag(ok=True)
 
 
+class AllPollQuestions(graphene.Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        poll_id = graphene.ID(required=True)
+
+    division_questions = graphene.List(types.DivisionQuestionType)
+    yesno_questions = graphene.List(types.YesNoQuestionType)
+    manyfromlist_questions = graphene.List(types.ManyFromListQuestionType)
+    text_questions = graphene.List(types.TextQuestionType)
+    media_questions = graphene.List(types.MediaQuestionType)
+    final_questions = graphene.List(types.FinalQuestionType)
+    heading_question = graphene.List(types.HeadingQuestionType)
+    free_answer_question = graphene.List(types.FreeAnswerType)
+
+    @staticmethod
+    @login_required
+    def mutate(cls, info, poll_id, **input):
+
+        PermissionClass.has_permission(info)
+
+        division = qstn_models.DivisionQuestion.objects.filter(poll_id=poll_id).all()
+        yes_no = qstn_models.YesNoQuestion.objects.filter(poll_id=poll_id).all()
+        manyfromlist = qstn_models.ManyFromListQuestion.objects.filter(poll_id=poll_id).all()
+        text = qstn_models.TextQuestion.objects.filter(poll_id=poll_id).all()
+        media = qstn_models.MediaQuestion.objects.filter(poll_id=poll_id).all()
+        final = qstn_models.FinalQuestion.objects.filter(poll_id=poll_id).all()
+        heading = qstn_models.HeadingQuestion.objects.filter(poll_id=poll_id).all()
+        free_answer = qstn_models.FreeAnswer.objects.filter(poll_id=poll_id).all()
+
+        return AllPollQuestions(
+            division_questions=division,
+            yesno_questions=yes_no,
+            manyfromlist_questions=manyfromlist,
+            text_questions=text,
+            media_questions=media,
+            final_questions=final,
+            heading_question=heading,
+            free_answer_question=free_answer
+        )
+
+
 class PollMutation(graphene.ObjectType):
+    all_poll_questions = AllPollQuestions.Field()
     create_poll = CreatePoll.Field()
     update_poll = UpdatePoll.Field()
     update_poll_setting = UpdatePollSetting.Field()

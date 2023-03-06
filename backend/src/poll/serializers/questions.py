@@ -92,9 +92,9 @@ class YesNoAttachedTypeSerializer(serializers.ModelSerializer):
 
 
 class YesNoQuestionSerializer(serializers.ModelSerializer):
-    items = ItemQuestionSerializer(many=True, read_only=True)
-    yes_no_answers = YesNoAnswersSerializer(many=True, read_only=True)
-    attached_type = YesNoAttachedTypeSerializer(many=True, read_only=True)
+    items = ItemQuestionSerializer(many=True, required=False)
+    yes_no_answers = YesNoAnswersSerializer(many=True, required=False)
+    attached_type = YesNoAttachedTypeSerializer(many=True, required=False)
 
     class Meta:
         model = YesNoQuestion
@@ -293,6 +293,7 @@ class FinalQuestionSerializer(BaseQuestionSerializer):
     button_text = serializers.CharField(required=False)
     button_url = serializers.CharField(required=False)
     reopen = serializers.BooleanField(required=False)
+    poll = serializers.CharField(required=True)
 
     class Meta:
         model = FinalQuestion
