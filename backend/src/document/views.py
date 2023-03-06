@@ -3,7 +3,7 @@ from common.permissions import IsOwner, IsOwnerOrIsInvited
 from django.shortcuts import get_object_or_404
 from document.models import Document
 from document.serializers import DocumentLogoSerializer, ProjectSerializer, DocumentSerializer, \
-    TextGenerationSerializer, TextRephraseSerializer
+    TextGenerationSerializer, TextRephraseSerializer, ImageGenerationSerializer
 from rest_framework import generics, viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
@@ -13,10 +13,6 @@ from settings import MEDIA_URL
 from rest_framework import views
 from document import utils
 from . import ai_translator
-import openai
-import settings
-
-openai.api_key = settings.api_key
 
 
 class ChangeDocumentLogoView(generics.UpdateAPIView):
@@ -106,3 +102,33 @@ class TextRephrase(views.APIView):
         if result.choices[0].text != "":
             result.choices[0].text = ai_translator.rephrase_postprocess(result.choices[0].text)
         return Response(result, status=200)
+
+
+class ImageGeneration(views.APIView):
+    permission_classes = [IsAuthenticated, IsActivated, IsOwnerOrIsInvited]
+    serializer_class = ImageGenerationSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Создает изображения по описанию prompt. Изображения сохраняютя в PATH_IMAGES.\n
+        param:\n
+            prompt (str): описание желаемого изображения, максимальная длина 1000 символов\n
+            n (int): количество генерируемых изображений на основе описания prompt, от 1 до 10\n
+            size (int): размер генерируемых изображений: 0, 1 или 2
+        """
+        # проверка валидности полей
+        serializer = ImageGenerationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        # извлечение знач переменных
+        prompt = request.data.get('prompt')
+        n = int(request.data.get('n'))
+        size = int(request.data.get('size'))
+
+        # формирование изображений
+        fnames = utils.image_generator(prompt, n, size)
+        answer = dict()
+        web_server = request.META['HTTP_HOST']
+        for i in range(len(fnames)):
+            answer[i] = f"http://{web_server}{MEDIA_URL}{fnames[i]}"
+
+        return Response(answer)
