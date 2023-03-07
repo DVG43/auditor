@@ -88,13 +88,9 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = ("id", "documents")
 
-class TextRephraseSerializer(serializers.Serializer):
-    """Ввод текста для перефразирования"""
+class TextGenerationSerializer(serializers.Serializer):
+    """ Ввод текста темы для генерации абзаца """
     source = serializers.CharField()
-    max_tokens = serializers.IntegerField(required=False)
-
-class TextGenerationSerializer(TextRephraseSerializer):
-    """Ввод текста для генерации"""
     tone = serializers.ChoiceField(choices={
             "grateful",
             "excited",
@@ -116,10 +112,15 @@ class TextGenerationSerializer(TextRephraseSerializer):
     keywords = serializers.CharField(required=False)
 
 
+class TextRephraseSerializer(serializers.Serializer):
+    """ Ввод текста для перефразирования """
+    source = serializers.CharField()
+
+
 def is_right_n(value):
     if not value in {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}:
         raise serializers.ValidationError('недопустимое число')
-    
+
 def is_right_size(value):
     if not value in {0, 1, 2}:
         raise serializers.ValidationError('недопустимое число')

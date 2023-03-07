@@ -1,10 +1,8 @@
 import os, random, string, urllib3, shutil
 from hashlib import md5
 import openai
-from settings import OPENAI_API_KEY
 
 
-openai.api_key = OPENAI_API_KEY
 PATH_IMAGES = "/app/backend/src/share/auditor-v2_media/images/"
 
 
@@ -42,19 +40,6 @@ def organize_data_row_sort_arrays(instance):
             field.auto_now = True
 
     return instance
-
-
-def text_generator(prompt, model, max_tokens):
-    response = openai.Completion.create(
-        model=model,
-        prompt=prompt,
-        temperature=0.7,
-        max_tokens=max_tokens,
-        top_p=1,
-        frequency_penalty=0.0,
-        presence_penalty=0.0
-    )
-    return response
 
 
 def gen_unique_filename(ext):
