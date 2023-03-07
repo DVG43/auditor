@@ -12,7 +12,7 @@ from projects.models import Project
 from settings import MEDIA_URL
 from rest_framework import views
 from document import utils
-from . import ai_translator
+from . import ai
 
 
 class ChangeDocumentLogoView(generics.UpdateAPIView):
@@ -59,25 +59,22 @@ class TextGeneration(views.APIView):
     serializer_class = TextGenerationSerializer
 
     def post(self, request, *args, **kwargs):
-        # проверка валидности полей
+        # 1. Проверка валидности полей
         if request.data.get('tone') == "null":
             request.data['tone'] = None
         serializer = TextGenerationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # извлечение знач переменных
+
+        # 2. Извлечение значений переменных из HTTP запроса
         source = request.data.get('source')
         language = request.data.get('language')
         tone = request.data.get('tone')
         keywords = request.data.get('keywords')
-        max_tokens = 1500
-        # if request.data.get('max_tokens'):
-        #     max_tokens = request.data.get('max_tokens')
 
-        # формирование ответа
-        model = "text-davinci-003"
-        prompt = ai_translator.theme_to_paragraph_prompt(theme=source, len_words=96, lang=language, tone=tone, keywords=keywords)
-        result = utils.text_generator(prompt, model, max_tokens)
-        result.choices[0].text = ai_translator.theme_to_paragraph_postprocess(result.choices[0].text)
+        # 3. Получение ответа от AI
+        result = ai.theme_to_text(theme=source, tone=tone, lang=language,
+            keywords=keywords, include_debug=False)
+
         return Response(result, status=200)
 
 
@@ -86,21 +83,16 @@ class TextRephrase(views.APIView):
     serializer_class = TextRephraseSerializer
 
     def post(self, request, *args, **kwargs):
-        # проверка валидности полей
+        # 1. Проверка валидности полей
         serializer = TextRephraseSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # извлечение знач переменных
-        source = request.data.get('source')
-        max_tokens = 500
-        # if request.data.get('max_tokens'):
-        #     max_tokens = request.data.get('max_tokens')
 
-        # формирование ответа
-        model = "text-davinci-003"
-        prompt = ai_translator.rephrase_prompt(source)
-        result = utils.text_generator(prompt, model, max_tokens)
-        if result.choices[0].text != "":
-            result.choices[0].text = ai_translator.rephrase_postprocess(result.choices[0].text)
+        # 2. Извлечение значений переменных из HTTP запроса
+        source = request.data.get('source')
+
+        # 3. Получение ответа от AI
+        result = ai.rephrase(source, include_debug=False)
+
         return Response(result, status=200)
 
 
