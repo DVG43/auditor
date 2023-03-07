@@ -156,15 +156,19 @@ class ManyFromListQuestionAttachedTypeSerializer(serializers.ModelSerializer):
 
 class ManyFromListQuestionSerializer(BaseQuestionSerializer):
     comment = serializers.CharField(max_length=512)
-
+    poll = serializers.CharField(max_length=64)
     answer_time = serializers.IntegerField(default=0, required=False)
     description_mode = serializers.BooleanField(required=False)
     count_of_answer = serializers.IntegerField(required=False)
     current_number_value = serializers.IntegerField(required=False)
     answer_from = serializers.IntegerField(required=False)
     answer_to = serializers.IntegerField(required=False)
-    attached_type = ManyFromListQuestionAttachedTypeSerializer(many=True)
+    attached_type = ManyFromListQuestionAttachedTypeSerializer(many=True, required=False)
     items = ItemQuestionSerializer(many=True, required=False)
+
+    class Meta:
+        model = ManyFromListQuestion
+        fields = '__all__'
 
     def create(self, validated_data):
         question_items = validated_data.pop('items', [])
@@ -249,6 +253,7 @@ class MediaQuestionSerializer(serializers.ModelSerializer):
 
 class RatingQuestionSerializer(BaseQuestionSerializer):
     rating = serializers.IntegerField()
+    poll = serializers.CharField(max_length=64)
 
     def create(self, validated_data):
         return RatingQuestion.objects.create(**validated_data)
@@ -268,6 +273,7 @@ class MediaFileSerializer(serializers.ModelSerializer):
 
 class TextQuestionSerializer(BaseQuestionSerializer):
     text = serializers.CharField(max_length=1024)
+    poll = serializers.CharField(max_length=64)
 
     def create(self, validated_data):
         return TextQuestion.objects.create(**validated_data)
@@ -333,9 +339,11 @@ class FinalQuestionSerializer(BaseQuestionSerializer):
 
 
 class HeadingQuestionSerializer(serializers.ModelSerializer):
+    poll = serializers.CharField(max_length=64)
+
     class Meta:
         model = HeadingQuestion
-        fields = ['caption', 'question_id', 'question_type', 'order_id']
+        fields = ['caption', 'question_id', 'question_type', 'order_id', 'poll']
 
 
 class ItemTagsFreeAnswerSerializer(serializers.ModelSerializer):
@@ -412,9 +420,10 @@ class TagsFreeAnswerSerializer(serializers.ModelSerializer):
 class FreeAnswerSerializer(BaseQuestionSerializer):
     answer_time = serializers.IntegerField(default=0)
     description_mode = serializers.BooleanField(required=False)
-    attached_type = FreeAnswerAttachedTypeSerializer(many=True)
-    items = ItemsFreeAnswerSerializer(many=True)
+    attached_type = FreeAnswerAttachedTypeSerializer(many=True, required=False)
+    items = ItemsFreeAnswerSerializer(many=True, required=False)
     tagsAnswerFree = TagsFreeAnswerSerializer(many=True, required=False, source='tags')
+    poll = serializers.CharField(max_length=64)
 
     class Meta:
         model = FreeAnswer

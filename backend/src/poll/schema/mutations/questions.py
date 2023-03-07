@@ -14,6 +14,75 @@ from poll.serializers import (
 )
 
 
+class CrtUpdHeadQuestions(SerializerMutation):
+
+    class Meta:
+        serializer_class = qstn_serializers.HeadingQuestionSerializer
+        model_operations = ['create', 'update']
+        lookup_field = 'question_id'
+        model_class = qstn_models.HeadingQuestion
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        PermissionClass.has_permission(info)
+
+        poll = poll_models.Poll.objects.get(id=input['poll'])
+        input.update({'poll': poll})
+
+        ret = qstn_models.HeadingQuestion(**input)
+        ret.save()
+
+        poll.normalize_questions_order_id()
+        return ret
+
+
+class CrtUpdRatingQuestions(SerializerMutation):
+
+    class Meta:
+        serializer_class = qstn_serializers.RatingQuestionSerializer
+        model_operations = ['create', 'update']
+        lookup_field = 'question_id'
+        model_class = qstn_models.RatingQuestion
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        PermissionClass.has_permission(info)
+
+        poll = poll_models.Poll.objects.get(id=input['poll'])
+        input.update({'poll': poll})
+
+        ret = qstn_models.RatingQuestion(**input)
+        ret.save()
+
+        poll.normalize_questions_order_id()
+        return ret
+
+
+class CrtUpdTextQuestions(SerializerMutation):
+
+    class Meta:
+        serializer_class = qstn_serializers.TextQuestionSerializer
+        model_operations = ['create', 'update']
+        lookup_field = 'question_id'
+        model_class = qstn_models.TextQuestion
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        PermissionClass.has_permission(info)
+
+        poll = poll_models.Poll.objects.get(id=input['poll'])
+        input.update({'poll': poll})
+
+        ret = qstn_models.TextQuestion(**input)
+        ret.save()
+
+        poll.normalize_questions_order_id()
+        return ret
+
+
 class CrtUpdFreeQuestions(SerializerMutation):
 
     class Meta:
@@ -50,6 +119,49 @@ class CrtUpdFreeQuestions(SerializerMutation):
         if attached_types:
             for attached_type in attached_types:
                 crt_attype = qstn_models.FreeAnswerAttachedType(**attached_type)
+                crt_attype.save()
+                ret.attached_type.add(crt_attype)
+
+        poll.normalize_questions_order_id()
+        return ret
+
+
+class CrtUpdMediaQuestions(SerializerMutation):
+
+    class Meta:
+        serializer_class = qstn_serializers.MediaQuestionSerializer
+        model_operations = ['create', 'update']
+        lookup_field = 'question_id'
+        model_class = qstn_models.MediaQuestion
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        PermissionClass.has_permission(info)
+
+        poll = poll_models.Poll.objects.get(id=input['poll'])
+        input.update({'poll': poll})
+
+        items, attached_types = [], []
+        if 'items' in input:
+            items = input['items']
+            del input['items']
+        if 'attached_type' in input:
+            attached_types = input['attached_type']
+            del input['attached_type']
+
+        ret = qstn_models.MediaQuestion(**input)
+        ret.save()
+
+        if items:
+            for item in items:
+                crt_item = qstn_models.MediaItemQuestion(**item)
+                crt_item.save()
+                ret.items.add(crt_item)
+
+        if attached_types:
+            for attached_type in attached_types:
+                crt_attype = qstn_models.MediaAttachedType(**attached_type)
                 crt_attype.save()
                 ret.attached_type.add(crt_attype)
 
@@ -221,7 +333,11 @@ class CrtUpdItemQuestions(SerializerMutation):
 
 
 class QstnMutation(graphene.ObjectType):
+    crt_upd_head_question = CrtUpdHeadQuestions.Field()
+    crt_upd_rating_question = CrtUpdRatingQuestions.Field()
+    crt_upd_text_question = CrtUpdTextQuestions.Field()
     crt_upd_free_question = CrtUpdFreeQuestions.Field()
+    crt_upd_media_question = CrtUpdMediaQuestions.Field()
     crt_upd_many_question = CrtUpdManyQuestions.Field()
     crt_upd_yes_no_question = CrtUpdYesNoQuestions.Field()
     crt_upd_final_question = CrtUpdFinalQuestions.Field()
