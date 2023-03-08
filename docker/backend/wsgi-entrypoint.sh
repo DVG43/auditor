@@ -7,13 +7,24 @@ do
     if [ "$counter" -gt 3 ];
     then
         echo "Exiting loop!"
+
         exit 1
     else
         counter=$((counter+1))
         sleep 1
     fi
 done
+if [ "$ENVIRONMENT" != "local" ];
+then
+    mkdir -p ./backend/src/share \
+         ./backend/src/share/auditor-v2_media \
+         ./backend/src/share/auditor-v2_media/images \
+         ./backend/src/share/auditor-v2_media/video \
+         ./backend/src/share/auditor-v2_media/audio \
+         ./backend/src/share/auditor-v2_statics
 
+    touch "${APP_API_LOG}"
+fi
 counter=0
 until python3 ./manage.py showmigrations && python3 ./manage.py migrate
 do
@@ -31,13 +42,6 @@ if [ "$ENVIRONMENT" = "local" ]
 then
   DEBUG=True python3 ./manage.py runserver 0.0.0.0:8000
 else
-  mkdir -p ./backend/src/share \
-  mkdir -p ./backend/src/share/auditor-v2_media \
-  mkdir -p ./backend/src/share/auditor-v2_media/images \
-  mkdir -p ./backend/src/share/auditor-v2_media/video \
-  mkdir -p ./backend/src/share/auditor-v2_media/audio \
-  mkdir -p ./backend/src/share/auditor-v2_statics \
-  touch "${APP_API_LOG}"
   python3 ./manage.py collectstatic --noinput
 
   gunicorn asgi:application \

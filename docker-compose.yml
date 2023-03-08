@@ -14,8 +14,8 @@ services:
     entrypoint: /app/docker/backend/wsgi-entrypoint.sh
     env_file:
       - .env.local
-    # volumes:
-      # - .:/app/
+    volumes:
+      - .:/app/
     depends_on:
       - auditor-v2-postgres
     ports:
@@ -65,8 +65,8 @@ services:
     entrypoint: /app/docker/backend/celery-entrypoint.sh
     env_file:
       - .env.local
-    # volumes:
-      # - .:/app/
+    volumes:
+      - .:/app/
     depends_on:
       - auditor-v2-redis
 
