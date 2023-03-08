@@ -16,13 +16,12 @@ do
 done
 if [ "$ENVIRONMENT" != "local" ];
 then
-    mkdir -p ./backend/src/share \
-         ./backend/src/share/auditor-v2_media \
-         ./backend/src/share/auditor-v2_media/images \
-         ./backend/src/share/auditor-v2_media/video \
-         ./backend/src/share/auditor-v2_media/audio \
-         ./backend/src/share/auditor-v2_statics
-
+    mkdir -p ./backend/src/share
+    mkdir -p ./backend/src/share/auditor-v2_media
+    mkdir -p ./backend/src/share/auditor-v2_media/images
+    mkdir -p ./backend/src/share/auditor-v2_media/video
+    mkdir -p ./backend/src/share/auditor-v2_media/audio
+    mkdir -p ./backend/src/share/auditor-v2_statics
     touch "${APP_API_LOG}"
 fi
 counter=0
