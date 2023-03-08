@@ -414,3 +414,5 @@ REL_DOCS = [
     'folders',
     'polls'
 ]
+
+APP_API_LOG = os.environ.get('APP_API_LOG', os.path.join(STATIC_ROOT,'apilog.log'))

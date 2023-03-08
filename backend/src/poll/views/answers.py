@@ -5,6 +5,7 @@ from http import HTTPStatus
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.conf import settings
 
 # from integration.service import survey_passing_event_finish
 # from integration.externalapi import externalAPI
@@ -15,7 +16,7 @@ from poll.serializers.answer import AnswerSerializer, UserAnswerSerializer
 from poll.serializers.surveypassing import SurveyPassingSerializer
 # from user.views import user
 
-logging.basicConfig(filename='apilog.log', level=logging.INFO)
+logging.basicConfig(filename=settings.APP_API_LOG, level=logging.INFO)
 
 
 class AnswerCollectionSet(APIView):

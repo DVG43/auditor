@@ -9,11 +9,13 @@ services:
     build:
       context: .
       dockerfile: ./docker/backend/Dockerfile
+      args:
+        APP_API_LOG: /app/backend/src/logs/apilog.log
     entrypoint: /app/docker/backend/wsgi-entrypoint.sh
     env_file:
       - .env.local
-    volumes:
-      - .:/app/
+    # volumes:
+      # - .:/app/
     depends_on:
       - auditor-v2-postgres
     ports:
@@ -58,11 +60,13 @@ services:
     build:
       context: .
       dockerfile: ./docker/backend/Dockerfile
+      args:
+        APP_API_LOG: /app/backend/src/logs/apilog.log
     entrypoint: /app/docker/backend/celery-entrypoint.sh
     env_file:
       - .env.local
-    volumes:
-      - .:/app/
+    # volumes:
+      # - .:/app/
     depends_on:
       - auditor-v2-redis
 

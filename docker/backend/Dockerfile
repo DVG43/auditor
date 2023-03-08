@@ -1,13 +1,13 @@
 FROM registry.gitlab.com/auditor2/devops/images/opencv/core:22.10.080723
-
+ARG APP_API_LOG=./backend/src/share/auditor-v2_statics/apilog.log
 WORKDIR /app/
 COPY Pipfile  /app/backend/
 COPY Pipfile.lock /app/backend/
-
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV PIPENV_VENV_IN_PROJECT=1
 ENV IMAGEIO_FFMPEG_EXE=/usr/bin/ffmpeg
+
 
 WORKDIR /app/backend
 RUN apk update \
@@ -20,13 +20,15 @@ RUN apk update \
     && apk del build-deps
 WORKDIR /app/
 COPY . /app/
-RUN addgroup app && adduser -S app -G app \
-    && mkdir -p /app/backend/src/share/ \
-    /app/backend/src/share/auditor-v2_media \
-    /app/backend/src/share/auditor-v2_media/images \
-    /app/backend/src/share/auditor-v2_media/video \
-    /app/backend/src/share/auditor-v2_media/audio \
-    /app/backend/src/share/auditor-v2_statics \
+
+RUN mkdir -p ./backend/src/share \
+    ./backend/src/share/auditor-v2_media \
+    ./backend/src/share/auditor-v2_media/images \
+    ./backend/src/share/auditor-v2_media/video \
+    ./backend/src/share/auditor-v2_media/audio \
+    ./backend/src/share/auditor-v2_statics \
+    && touch "${APP_API_LOG}" \
+    && addgroup app && adduser -S app -G app \
     && chown -R app:app /app/backend/
 
 USER app
