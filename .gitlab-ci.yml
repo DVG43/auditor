@@ -30,7 +30,6 @@ core dev build:
       --context .
       --dockerfile ./docker/backend/Dockerfile
       --destination $CI_REGISTRY_IMAGE/core:$CI_COMMIT_SHA
-      --build-arg APP_API_LOG=${APP_API_LOG}
       --use-new-run=true
   tags:
     - group-docker-build-runner
@@ -51,8 +50,8 @@ core dev deploy:
     - docker pull $CI_REGISTRY_IMAGE/core:$CI_COMMIT_SHA
     - docker-compose -f docker-compose-dev.yml up -d
     - docker-compose -f docker-compose-dev.yml exec -T auditor-v2-api sh -c "python src/manage.py showmigrations"
-    - docker-compose -f docker-compose-dev.yml exec -T auditor-v2-api sh -c "python src/manage.py migrate --noinput"
-    - docker-compose -f docker-compose-dev.yml exec -T auditor-v2-api sh -c "python src/manage.py collectstatic --noinput"
+    # - docker-compose -f docker-compose-dev.yml exec -T auditor-v2-api sh -c "python src/manage.py migrate --noinput"
+    # - docker-compose -f docker-compose-dev.yml exec -T auditor-v2-api sh -c "python src/manage.py collectstatic --noinput"
     - docker restart main_nginx
     - echo 'y' | docker system prune
   tags:
@@ -77,7 +76,6 @@ core prod build:
       --context .
       --dockerfile ./docker/backend/Dockerfile
       --destination $CI_REGISTRY_IMAGE/prod/core:$CI_COMMIT_SHA
-      --build-arg APP_API_LOG=${APP_API_LOG}
       --use-new-run=true
   tags:
     - group-docker-build-runner
@@ -98,8 +96,8 @@ core prod deploy:
     - docker pull $CI_REGISTRY_IMAGE/prod/core:$CI_COMMIT_SHA
     - docker-compose -f docker-compose-prod.yml up -d
     - docker-compose -f docker-compose-prod.yml exec -T auditor-v2-api sh -c "python src/manage.py showmigrations"
-    - docker-compose -f docker-compose-prod.yml exec -T auditor-v2-api sh -c "python src/manage.py migrate --noinput"
-    - docker-compose -f docker-compose-prod.yml exec -T auditor-v2-api sh -c "python src/manage.py collectstatic --noinput"
+    # - docker-compose -f docker-compose-prod.yml exec -T auditor-v2-api sh -c "python src/manage.py migrate --noinput"
+    # - docker-compose -f docker-compose-prod.yml exec -T auditor-v2-api sh -c "python src/manage.py collectstatic --noinput"
     - docker restart server-a-nginx
     - echo 'y' | docker system prune
   when: manual

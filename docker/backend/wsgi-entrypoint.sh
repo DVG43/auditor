@@ -32,12 +32,12 @@ then
   DEBUG=True python3 ./manage.py runserver 0.0.0.0:8000
 else
   mkdir -p ./backend/src/share \
-    && mkdir -p ./backend/src/share/auditor-v2_media \
-    && mkdir -p ./backend/src/share/auditor-v2_media/images \
-    && mkdir -p ./backend/src/share/auditor-v2_media/video \
-    && mkdir -p ./backend/src/share/auditor-v2_media/audio \
-    && mkdir -p ./backend/src/share/auditor-v2_statics \
-    && touch "${APP_API_LOG}" 
+  mkdir -p ./backend/src/share/auditor-v2_media \
+  mkdir -p ./backend/src/share/auditor-v2_media/images \
+  mkdir -p ./backend/src/share/auditor-v2_media/video \
+  mkdir -p ./backend/src/share/auditor-v2_media/audio \
+  mkdir -p ./backend/src/share/auditor-v2_statics \
+  touch "${APP_API_LOG}"
   python3 ./manage.py collectstatic --noinput
 
   gunicorn asgi:application \
