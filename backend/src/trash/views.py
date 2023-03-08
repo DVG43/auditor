@@ -167,7 +167,7 @@ class TrashViewSet(GenericViewSet):
                                     doc.deleted_since = None
                                     doc.save()
             elif isinstance(instance, (Storyboard, Document)):
-                folder = instance.host_project
+                folder = instance.folder
                 if folder.deleted_id:
                     folder.deleted_id = None
                     folder.deleted_since = None
@@ -178,12 +178,6 @@ class TrashViewSet(GenericViewSet):
                         inst_sb_new.deleted_id = uuid4()
                         inst_sb_new.deleted_since = timezone.now()
                         inst_sb_new.save()
-                elif isinstance(instance, Document):
-                    inst_doc_new = folder.documents.filter(deleted_id__isnull=True).first()
-                    if inst_doc_new:
-                        inst_doc_new.deleted_id = uuid4()
-                        inst_doc_new.deleted_since = timezone.now()
-                        inst_doc_new.save()
             instance.deleted_id = None
             instance.deleted_since = None
             instance.save()
