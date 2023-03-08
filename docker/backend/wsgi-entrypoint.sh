@@ -31,8 +31,15 @@ if [ "$ENVIRONMENT" = "local" ]
 then
   DEBUG=True python3 ./manage.py runserver 0.0.0.0:8000
 else
+  mkdir -p ./backend/src/share \
+    ./backend/src/share/auditor-v2_media \
+    ./backend/src/share/auditor-v2_media/images \
+    ./backend/src/share/auditor-v2_media/video \
+    ./backend/src/share/auditor-v2_media/audio \
+    ./backend/src/share/auditor-v2_statics \
+    && touch "${APP_API_LOG}" \
   python3 ./manage.py collectstatic --noinput
-  
+
   gunicorn asgi:application \
   -k uvicorn.workers.UvicornWorker \
   --bind 0.0.0.0:8000 \
