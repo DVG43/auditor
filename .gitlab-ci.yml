@@ -49,7 +49,7 @@ core dev deploy:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
     - docker pull $CI_REGISTRY_IMAGE/core:$CI_COMMIT_SHA
     - docker-compose -f docker-compose-dev.yml up -d
-    - docker-compose -f docker-compose-dev.yml exec -T auditor-v2-api sh -c "python src/manage.py showmigrations"
+    # - docker-compose -f docker-compose-dev.yml exec -T auditor-v2-api sh -c "python src/manage.py showmigrations"
     # - docker-compose -f docker-compose-dev.yml exec -T auditor-v2-api sh -c "python src/manage.py migrate --noinput"
     # - docker-compose -f docker-compose-dev.yml exec -T auditor-v2-api sh -c "python src/manage.py collectstatic --noinput"
     - docker restart main_nginx
@@ -95,7 +95,7 @@ core prod deploy:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
     - docker pull $CI_REGISTRY_IMAGE/prod/core:$CI_COMMIT_SHA
     - docker-compose -f docker-compose-prod.yml up -d
-    - docker-compose -f docker-compose-prod.yml exec -T auditor-v2-api sh -c "python src/manage.py showmigrations"
+    # - docker-compose -f docker-compose-prod.yml exec -T auditor-v2-api sh -c "python src/manage.py showmigrations"
     # - docker-compose -f docker-compose-prod.yml exec -T auditor-v2-api sh -c "python src/manage.py migrate --noinput"
     # - docker-compose -f docker-compose-prod.yml exec -T auditor-v2-api sh -c "python src/manage.py collectstatic --noinput"
     - docker restart server-a-nginx
