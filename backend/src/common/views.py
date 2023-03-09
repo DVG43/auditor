@@ -90,10 +90,10 @@ class FilterQuerySetMixin(viewsets.ReadOnlyModelViewSet):
                 raise ValidationError({'error': 'no storyboard in project'})
 
         filter_kw = {}
-        # Фильтр по родительскому документу
-        if base not in ['project', 'contact', 'trash', 'usercell',
-                        'usercolumn', 'folder']:
-            filter_kw = {f"host_{kw['host']}": kw['host_pk']}
+        # # Фильтр по родительскому документу
+        # if base not in ['project', 'contact', 'trash', 'usercell',
+        #                 'usercolumn', 'folder']:
+        #     filter_kw = {f"host_{kw['host']}": kw['host_pk']}
 
         # Фильтр userfields для всех frames
         if base == 'usercell' and kw['parent'] in ['storyboard']:
