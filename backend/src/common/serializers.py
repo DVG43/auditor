@@ -45,8 +45,7 @@ class PpmDocSerializer(serializers.ModelSerializer):
                 elif 'user' in self.context:
                     owner = self.context['user'].user
                     validated_data.update(
-                        {'owner': owner,
-                         'last_modified_user': owner.email}
+                        {'owner': owner}
                     )
             except AttributeError:
                 if 'request' in self.context:
@@ -128,7 +127,7 @@ class UserColumnSerializer(WritableNestedModelSerializer, PpmDocSerializer):
             'column_id',
             'column_name',
             'column_type',
-            'choices',
+            'choices'
         ]
 
     def run_validation(self, data=None):

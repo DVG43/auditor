@@ -48,7 +48,7 @@ class DefaultTableFrame(PpmDocModel):
         related_name='table_frames',
         verbose_name=_('Table'))
     userfields = models.ManyToManyField(
-        'common.UserCell',
+        'table.DefaultTableUsercell',
         related_name='of_table_frame',
         blank=True)
 
@@ -101,5 +101,5 @@ class DefaultTableUsercell(models.Model):
 
 
 register(DefaultTableModel, permissions)
-register(DefaultTableFrame, permissions)
 register(DefaultTableUsercell, permissions)
+register(DefaultTableFrame, permissions)

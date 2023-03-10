@@ -2,7 +2,7 @@ from common.models import UserChoice
 from common.serializers import UserColumnSerializer
 
 
-def create_default_table_frame_columns(table, user):
+def create_default_table_frame_columns(table, context):
     column_data = [
         {'column_name': 'Одиночный выбор', 'column_type': 'select'},
         {'column_name': 'Текст', 'column_type': 'text'},
@@ -16,7 +16,7 @@ def create_default_table_frame_columns(table, user):
         {'column_name': 'Ссылка на таблицу', 'column_type': 'tablelink'},
     ]
     serializer = UserColumnSerializer(
-        data=column_data, many=True, context={'user': user})
+        data=column_data, many=True, context={'user': context})
     serializer.is_valid(raise_exception=True)
     usercolumns = serializer.create(serializer.validated_data)
     for usercolumn in usercolumns:
@@ -28,7 +28,7 @@ def create_default_table_frame_columns(table, user):
             ]
             for choice in choices:
                 UserChoice.objects.create(
-                    **choice, host_usercolumn=usercolumn, owner=user)
+                    **choice, host_usercolumn=usercolumn, owner=context.user)
 
         elif usercolumn.column_type == 'multiselect':
             choices = [
@@ -37,4 +37,4 @@ def create_default_table_frame_columns(table, user):
                 ]
             for choice in choices:
                 UserChoice.objects.create(
-                    **choice, host_usercolumn=usercolumn, owner=user)
+                    **choice, host_usercolumn=usercolumn, owner=context.user)

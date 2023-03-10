@@ -25,6 +25,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='defaulttablemodel',
             name='order_id',
-            field=models.UUIDField(default=uuid.uuid4, null=True, unique=True),
+            field=models.UUIDField(default=uuid.uuid4, null=True),
         ),
     ]

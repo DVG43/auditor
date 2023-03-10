@@ -183,7 +183,7 @@ class CreateDefaultTable(SerializerMutation):
             change_disk_space(host_folder.owner, disk_space)
 
         table = DefaultTableModel.objects.get(pk=response.__dict__['id'])
-        create_default_table_frame_columns(table, info.context.user)
+        create_default_table_frame_columns(table, info.context)
 
         return response
 
@@ -393,19 +393,6 @@ class CreateUpdateFrame(SerializerMutation):
         model_operations = ['create', 'update']
         model_class = DefaultTableFrame
         lookup_field = 'id'
-
-    def mutate_and_get_payload(cls, root, info, **input):
-        table_instance = DefaultTableModel.objects.filter(id=input["host_default_table"]).first()
-        if table_instance.host_document:
-            folder_id = table_instance.host_document.folder.id
-        else:
-            folder_id = table_instance.host_folder.id
-
-        PermissionClass.has_permission(info)
-        PermissionClass.has_mutate_object_permission(info, folder_id)
-        input.update({'owner': info.context.user.pkid,
-                      'last_modified_user': info.context.user.email})
-        return super().mutate_and_get_payload(root, info, **input)
 
 
 class DeleteFrame(graphene.Mutation):
