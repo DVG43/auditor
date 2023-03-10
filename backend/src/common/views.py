@@ -90,10 +90,10 @@ class FilterQuerySetMixin(viewsets.ReadOnlyModelViewSet):
                 raise ValidationError({'error': 'no storyboard in project'})
 
         filter_kw = {}
-        # Фильтр по родительскому документу
-        if base not in ['project', 'contact', 'trash', 'usercell',
-                        'usercolumn', 'folder']:
-            filter_kw = {f"host_{kw['host']}": kw['host_pk']}
+        # # Фильтр по родительскому документу
+        # if base not in ['project', 'contact', 'trash', 'usercell',
+        #                 'usercolumn', 'folder']:
+        #     filter_kw = {f"host_{kw['host']}": kw['host_pk']}
 
         # Фильтр userfields для всех frames
         if base == 'usercell' and kw['parent'] in ['storyboard']:
@@ -160,11 +160,7 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
             kwargs['document_logo'] = files.File(ContentFile(response.content), filename)
 
         if request.FILES:
-            if base in ['project']:
-                disk_space = check_file_size(request, request.user)
-            else:
-                host_prj = find_host_project(kw)
-                disk_space = check_file_size(request, host_prj.owner)
+            disk_space = check_file_size(request, request.user)
             # проверяем, что для загружаемого файла достаточно места на диске
             if not disk_space:
                 return Response({'file': 'Not enough space on disk for file'},
@@ -209,10 +205,7 @@ class PpmViewSet(ModelViewSet, FilterQuerySetMixin):
 
         # обновляем место на диске после сохранения нового файла
         if request.FILES:
-            if base in ['project']:
-                change_disk_space(request.user, disk_space)
-            else:
-                change_disk_space(host_prj.owner, disk_space)
+            change_disk_space(request.user, disk_space)
 
         # обновляем время и юзера последнего изменения сториборда, вызывного или шутингплана,
         # при изменении дочерних объектов
