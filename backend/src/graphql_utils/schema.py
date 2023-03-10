@@ -10,13 +10,27 @@ from timing.schema import Mutation as MutationTiming
 from timing.schema import Subscription as SubscriptionTiming
 from table.schema import Query as DefaultQueryTable
 from table.schema import Mutation as MutationDefaultTable
+from projects.schema.query import Query as QueryLinkText
+from projects.schema.mutations import Mutation as MutationLinkText
 
 
-class Query(QueryDocument, QueryTiming, DefaultQueryTable, QueryPoll):
+class Query(
+    QueryDocument,
+    QueryTiming,
+    DefaultQueryTable,
+    QueryPoll,
+    QueryLinkText
+):
     pass
 
 
-class Mutation(MutationDocument, MutationTiming, MutationDefaultTable, MutationPoll):
+class Mutation(
+    MutationDocument,
+    MutationTiming,
+    MutationDefaultTable,
+    MutationPoll,
+    MutationLinkText
+):
     pass
 
 

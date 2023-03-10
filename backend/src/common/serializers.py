@@ -28,22 +28,56 @@ class PpmDocSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         print(validated_data)
         if 'owner' not in validated_data:
-            if ('request' in self.context and
-            'owner' in self.context['request'].data.keys()):
-                validated_data.update({
-                    'owner': self.context['request'].data.get('owner')
-                })
-            elif 'request' in self.context:
-                validated_data.update(
-                    {'owner': self.context['request'].user})
-            elif 'user' in self.context:
-                validated_data.update(
-                    {'owner': self.context['user']})
+            try:
+                if ('request' in self.context and
+                'owner' in self.context['request'].data.keys()):
+                    owner = self.context['request'].data.get('owner')
+                    validated_data.update({
+                        'owner': owner,
+                        'last_modified_user': owner.email
+                    })
+                elif 'request' in self.context:
+                    owner = self.context['request'].user
+                    validated_data.update(
+                        {'owner': owner,
+                         'last_modified_user': owner.email}
+                    )
+                elif 'user' in self.context:
+                    owner = self.context['user'].user
+                    validated_data.update(
+                        {'owner': owner,
+                         'last_modified_user': owner.email}
+                    )
+            except AttributeError:
+                if 'request' in self.context:
+                    owner = self.context['request'].user
+                    validated_data.update(
+                        {'owner': owner,
+                         'last_modified_user': owner.email}
+                    )
+                elif 'user' in self.context:
+                    owner = self.context['user'].user
+                    validated_data.update(
+                        {'owner': owner,
+                         'last_modified_user': owner.email}
+                    )
         instance = super().create(validated_data)
 
         if hasattr(instance, "perms"):
             instance.owner.grant_object_perm(instance, 'own')
         return instance
+
+    def update(self, instance, validated_data):
+        print(validated_data)
+        if 'request' in self.context:
+            validated_data.update(
+                {'last_modified_user': self.context['request'].user.email}
+            )
+        elif 'user' in self.context:
+            validated_data.update(
+                {'last_modified_user': self.context['user'].user.email}
+            )
+        return super().update(instance, validated_data)
 
     def get_invites(self, obj):
         user = self.context['request'].user

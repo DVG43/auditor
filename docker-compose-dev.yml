@@ -48,6 +48,8 @@ services:
      restart: unless-stopped
      entrypoint: /app/docker/backend/celery-entrypoint.sh
      env_file: .env
+     volumes:
+      - shared_web_root:/app/backend/src/share/
      networks:
        - devserver_default
      depends_on:

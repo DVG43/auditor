@@ -43,19 +43,6 @@ def organize_data_row_sort_arrays(instance):
     return instance
 
 
-def text_generator(prompt, model, max_tokens):
-    response = openai.Completion.create(
-        model=model,
-        prompt=prompt,
-        temperature=0.7,
-        max_tokens=max_tokens,
-        top_p=1,
-        frequency_penalty=0.0,
-        presence_penalty=0.0
-    )
-    return response
-
-
 def gen_unique_filename(ext):
     s = ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits) for _ in range(10))
     return md5(s.encode('utf8')).hexdigest() + ext

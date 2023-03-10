@@ -9,6 +9,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/backend/Dockerfile
+      args:
+        APP_API_LOG: /app/backend/src/logs/apilog.log
     entrypoint: /app/docker/backend/wsgi-entrypoint.sh
     env_file:
       - .env.local
@@ -58,6 +60,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/backend/Dockerfile
+      args:
+        APP_API_LOG: /app/backend/src/logs/apilog.log
     entrypoint: /app/docker/backend/celery-entrypoint.sh
     env_file:
       - .env.local
@@ -68,3 +72,5 @@ services:
 
 volumes:
   pgdata: {}
+  shared_web_root:
+    external: true

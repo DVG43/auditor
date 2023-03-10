@@ -415,4 +415,4 @@ REL_DOCS = [
     'polls'
 ]
 
-api_key = os.environ.get('API_KEY')
+APP_API_LOG = os.environ.get('APP_API_LOG', os.path.join(STATIC_ROOT,'apilog.log'))

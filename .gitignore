@@ -2,7 +2,7 @@
 logs
 *.log
 .idea
-*/src/share/**
+# */src/share/**
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -131,4 +131,4 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-backend/src/share
+# backend/src/share

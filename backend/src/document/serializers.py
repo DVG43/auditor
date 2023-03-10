@@ -45,8 +45,8 @@ class DocumentSerializer(serializers.ModelSerializer):
     children = RecursiveSerializer(many=True)
     perm = serializers.SerializerMethodField()
     document_logo = serializers.SerializerMethodField()
-    project_id = serializers.IntegerField(source='host_project.id')
-    project_name = serializers.CharField(source='host_project.name')
+    folder_id = serializers.IntegerField(source='folder.id')
+    folder_name = serializers.CharField(source='folder.name')
 
     class Meta:
         list_serializer_class = FilterReviewListSerializer
@@ -60,9 +60,9 @@ class DocumentSerializer(serializers.ModelSerializer):
             "perm",
             "order_id",
             "data_row_order",
-            "project_id",
-            "project_name",
-            'folder',
+            "folder_id",
+            "folder_name",
+            'host_project',
             'content',
         )
 
@@ -88,13 +88,9 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = ("id", "documents")
 
-class TextRephraseSerializer(serializers.Serializer):
-    """Ввод текста для перефразирования"""
+class TextGenerationSerializer(serializers.Serializer):
+    """ Ввод текста темы для генерации абзаца """
     source = serializers.CharField()
-    max_tokens = serializers.IntegerField(required=False)
-
-class TextGenerationSerializer(TextRephraseSerializer):
-    """Ввод текста для генерации"""
     tone = serializers.ChoiceField(choices={
             "grateful",
             "excited",
@@ -116,10 +112,15 @@ class TextGenerationSerializer(TextRephraseSerializer):
     keywords = serializers.CharField(required=False)
 
 
+class TextRephraseSerializer(serializers.Serializer):
+    """ Ввод текста для перефразирования """
+    source = serializers.CharField()
+
+
 def is_right_n(value):
     if not value in {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}:
         raise serializers.ValidationError('недопустимое число')
-    
+
 def is_right_size(value):
     if not value in {0, 1, 2}:
         raise serializers.ValidationError('недопустимое число')
@@ -129,4 +130,3 @@ class ImageGenerationSerializer(serializers.Serializer):
     prompt = serializers.CharField()
     n = serializers.IntegerField(required=False, default=1, validators=[is_right_n])
     size = serializers.IntegerField(required=False, default=2, validators=[is_right_size])
-    
