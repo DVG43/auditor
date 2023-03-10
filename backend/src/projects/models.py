@@ -48,7 +48,6 @@ class Project(PpmDocModel, ResizeImageMixin):
 
 
 class Link(PpmDocModel):
-    host_project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='links')
     url = models.URLField(_('Url'), max_length=255)
     order_id = models.UUIDField(null=True, unique=True, default=uuid.uuid4)
     document_logo = ImageField(upload_to=get_doc_upload_path,
@@ -72,7 +71,6 @@ class Link(PpmDocModel):
 
 
 class File(PpmDocModel):
-    host_project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='files')
     file = models.FileField(_('File'), upload_to=get_doc_upload_path)
     slugged_name = models.SlugField(_('Filename'), null=True)
     order_id = models.UUIDField(null=True, unique=True, default=uuid.uuid4)
@@ -99,11 +97,9 @@ class File(PpmDocModel):
 
     class Meta:
         ordering = ['id']
-        unique_together = ['name', 'file', 'host_project']
 
 
 class Text(PpmDocModel):
-    host_project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='texts')
     text = models.CharField(_('Text'), max_length=1000)
     order_id = models.UUIDField(null=True, unique=True, default=uuid.uuid4)
     document_logo = ImageField(upload_to=get_doc_upload_path,
@@ -127,3 +123,6 @@ class Text(PpmDocModel):
 
 
 register(Project, permissions)
+register(Link, permissions)
+register(Text, permissions)
+register(File, permissions)

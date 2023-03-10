@@ -1,18 +1,13 @@
 import graphene
 from graphene_django.types import ObjectType
 from graphql_jwt.decorators import login_required
+from rest_framework.generics import get_object_or_404
 
 from graphql_utils.utils_graphql import PermissionClass
 from poll.schema import types
 from poll.models import (
     poll as poll_models,
-    # questions as questions_models
 )
-# from poll.serializers import (
-#     poll as poll_serializers,
-#     questions as questions_serializers
-# )
-from rest_framework.generics import get_object_or_404
 
 
 class QueryPoll(ObjectType):
@@ -39,7 +34,6 @@ class QueryPoll(ObjectType):
         ret = poll_models.PollTags.objects.filter(
             poll=poll_id).all()
         return ret
-
 
     @login_required
     def resolve_poll_by_id(self, info, poll_id=None):

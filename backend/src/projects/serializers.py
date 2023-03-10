@@ -20,20 +20,14 @@ class LastModifiedMixin(metaclass=serializers.SerializerMetaclass):
         * last_modified_name(str): first and last name
           of the user who made the last changes to the document;
         * last_modified_date(str): date of last change;
-        * last_modified_time(str): time of last change;
     """
     last_modified_date = serializers.SerializerMethodField()
-    # last_modified_time = serializers.SerializerMethodField()
     last_modified_name = serializers.SerializerMethodField()
 
     class Meta:
         fields = [
             'last_modified_name', 'last_modified_date'
         ]
-
-    # def get_last_modified_time(self, instance) -> str:
-    #     """Returns the time of the last document change in string format."""
-    #     return datetime.strftime(instance.last_modified_date, '%H-%M')
 
     def get_last_modified_date(self, instance) -> str:
         """Returns the date of the last document change in string format."""
@@ -56,24 +50,6 @@ class FilteredListSerializer(serializers.ListSerializer):
         if data.model == Document:
             data = data.filter(parent=None)
         return super(FilteredListSerializer, self).to_representation(data)
-
-
-# class RevStoryboardSerializer(serializers.ModelSerializer, LastModifiedMixin):
-#     model = serializers.SerializerMethodField()
-#
-#     class Meta:
-#         model = Storyboard
-#         list_serializer_class = FilteredListSerializer
-#         fields = ['id', 'model', 'name', 'tag_color', 'doc_uuid',
-#                   'order_id', 'document_logo',
-#                   'last_modified_name',
-#                   'last_modified_date',
-#                   'folder'
-#                   # 'last_modified_time',
-#                   ]
-#
-#     def get_model(self, obj):
-#         return 'storyboard'
 
 
 class RevPollSerializer(serializers.ModelSerializer, LastModifiedMixin):
@@ -146,18 +122,17 @@ class RevTimingSerializer(serializers.ModelSerializer, LastModifiedMixin):
 
 class LinkSerializer(PpmDocSerializer, LastModifiedMixin):
     model = serializers.SerializerMethodField()
-    host_project = serializers.PrimaryKeyRelatedField(
-        queryset=Project.objects.all(), write_only=True)
     perm = None
     invites = None
 
     class Meta:
         model = Link
         list_serializer_class = FilteredListSerializer
-        fields = ['id', 'model', 'name', 'url', 'tag_color', 'host_project',
+        fields = ['id', 'model', 'name', 'url',
                   'order_id', 'document_logo',
                   'last_modified_name',
                   'last_modified_date',
+                  'last_modified_name',
                   'folder'
                   ]
 
@@ -167,8 +142,6 @@ class LinkSerializer(PpmDocSerializer, LastModifiedMixin):
 
 class FileSerializer(PpmDocSerializer, LastModifiedMixin):
     model = serializers.SerializerMethodField()
-    host_project = serializers.PrimaryKeyRelatedField(
-        queryset=Project.objects.all(), write_only=True)
     perm = None
     invites = None
 
@@ -176,7 +149,7 @@ class FileSerializer(PpmDocSerializer, LastModifiedMixin):
         model = File
         list_serializer_class = FilteredListSerializer
         fields = ['id', 'model', 'name', 'slugged_name',
-                  'file', 'tag_color', 'host_project',
+                  'file',
                   'order_id', 'document_logo',
                   'last_modified_name',
                   'last_modified_date',
@@ -189,15 +162,13 @@ class FileSerializer(PpmDocSerializer, LastModifiedMixin):
 
 class TextSerializer(PpmDocSerializer, LastModifiedMixin):
     model = serializers.SerializerMethodField()
-    host_project = serializers.PrimaryKeyRelatedField(
-        queryset=Project.objects.all(), write_only=True)
     perm = None
     invites = None
 
     class Meta:
         model = Text
         list_serializer_class = FilteredListSerializer
-        fields = ['id', 'model', 'text', 'tag_color', 'host_project',
+        fields = ['id', 'model', 'text',
                   'order_id', 'document_logo',
                   'last_modified_name',
                   'last_modified_date',
