@@ -75,9 +75,6 @@ class IsOwnerOrIsProjectAccess(BasePermission):
                     if not request.user.has_object_perm(obj, ['edit', 'own']):
                         raise PermissionDenied(
                             {'error': 'You don`t have access to this object'})
-                else:
-                    raise PermissionDenied(
-                        {'error': 'You don`t have access to this object'})
 
         # проверяем подписку
         ### Временное отключение требования к подписке
