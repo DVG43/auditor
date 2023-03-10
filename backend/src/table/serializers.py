@@ -2,11 +2,11 @@ from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework.exceptions import ValidationError
 
 from accounts.models import User
-from common.models import UserColumn, UserChoice, UserCell
+from common.models import UserColumn, UserChoice
 from common.serializers import PpmDocSerializer
 from document.models import Document
 from folders.models import Folder
-from table.models import DefaultTableModel, DefaultTableFrame
+from table.models import DefaultTableModel, DefaultTableFrame, DefaultTableUsercell
 from rest_framework import serializers
 
 
@@ -24,10 +24,6 @@ class DefaultTableFrameSerializer(PpmDocSerializer):
 class UserColumnSerializer(WritableNestedModelSerializer, PpmDocSerializer):
     column_id = serializers.IntegerField(source='id', required=False)
     column_type = serializers.CharField(max_length=11, required=False)
-    host_folder = serializers.PrimaryKeyRelatedField(
-        queryset=Folder.objects.all(), write_only=True, required=False)
-    host_document = serializers.PrimaryKeyRelatedField(
-        queryset=Document.objects.all(), write_only=True, required=False)
     host_table = serializers.PrimaryKeyRelatedField(
         queryset=DefaultTableModel.objects.all(), write_only=True, required=False)
     owner = serializers.PrimaryKeyRelatedField(
@@ -39,15 +35,11 @@ class UserColumnSerializer(WritableNestedModelSerializer, PpmDocSerializer):
             'column_id',
             'column_name',
             'column_type',
-            #'choices',
-            'host_folder',
-            'host_document',
             'owner',
             'host_table'
         ]
 
     def run_validation(self, data=None):
-        print(data)
         userfield_types = dict(UserColumn.USERCOLUMN_TYPES)
         if 'column_type' in data and data['column_type'] not in userfield_types:
             raise ValidationError({
@@ -101,11 +93,11 @@ class UserCellSerializer(WritableNestedModelSerializer, PpmDocSerializer):
         queryset=User.objects.all(), write_only=True, required=False)
 
     class Meta:
-        model = UserCell
+        model = DefaultTableUsercell
         fields = [
             'cell_id', 'cell_content',
             'id', 'host_usercolumn', 'choice_id',
-            'choices_id', 'owner'
+            'choices_id', 'owner', 'frame_id'
         ]
 
     def update(self, instance, validated_data):

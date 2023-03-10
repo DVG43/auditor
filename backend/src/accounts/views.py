@@ -40,6 +40,7 @@ from subscription.utils import check_or_create_subscription_objects
 
 import requests
 
+from table.models import DefaultTableModel
 from timing.models import Timing
 
 User = get_user_model()
@@ -63,12 +64,16 @@ def check_obj_class(doc_uuid):
         doc_uuid=doc_uuid).first()
     timing_obj = Timing.objects.filter(
         doc_uuid=doc_uuid).first()
+    table_obj = DefaultTableModel.objects.filter(
+        doc_uuid=doc_uuid).first()
     if storyboard_obj:
         return storyboard_obj
     elif document_obj:
         return document_obj
     elif timing_obj:
         return timing_obj
+    elif table_obj:
+        return table_obj
     else:
         return None
 

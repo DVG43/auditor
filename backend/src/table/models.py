@@ -1,10 +1,15 @@
-from common.models import PpmDocModel, permissions
+import uuid
+
+from django.contrib.postgres.fields import ArrayField
+
+from common.models import PpmDocModel, permissions, UserCell, UserColumn, UserChoice
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from document.models import Document
 from folders.models import Folder
 from objectpermissions.registration import register
+from utils import get_doc_upload_path
 
 
 class DefaultTableModel(PpmDocModel):
@@ -19,6 +24,12 @@ class DefaultTableModel(PpmDocModel):
         related_name='of_default_table',
         verbose_name=_('Frame columns')
     )
+    doc_uuid = models.UUIDField(editable=False, unique=True,
+                                null=True)
+    document_logo = models.ImageField(upload_to=get_doc_upload_path,
+                               null=True, blank=True,
+                               verbose_name=_('Document logo'))
+    order_id = models.UUIDField(null=True, unique=True, default=uuid.uuid4)
 
     class Meta:
         db_table = "default_table"
@@ -51,5 +62,44 @@ class DefaultTableFrame(PpmDocModel):
         return f'Table frame#{self.id}'
 
 
+class DefaultTableUsercell(models.Model):
+    frame_id = models.ForeignKey(
+        DefaultTableFrame,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name=_('Frame')
+    )
+    owner = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name=_('Owner'))
+    host_usercolumn = models.ForeignKey(
+        UserColumn,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name='table_cells',
+        verbose_name=_('User column'))
+    cell_content = models.TextField(_('Content'), blank=True, default="", max_length=1000)
+    choice_id = models.ForeignKey(
+        UserChoice,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name=_('Choice id')
+    )
+    choices_id = ArrayField(
+        models.IntegerField(blank=True),
+        blank=True,
+        default=list,
+        verbose_name=_('Choices id')
+    )
+
+    class Meta:
+        db_table = 'table_usercolumns_contents'
+        ordering = ['id']
+        verbose_name = _('Table usercolumn data')
+        verbose_name_plural = _('Table usercolumn data')
+
+    def __str__(self):
+        return f'CELL#{self.id}'
+
+
 register(DefaultTableModel, permissions)
 register(DefaultTableFrame, permissions)
+register(DefaultTableUsercell, permissions)

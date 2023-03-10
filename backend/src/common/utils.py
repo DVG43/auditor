@@ -15,11 +15,13 @@ from rest_framework.exceptions import ValidationError
 import settings
 from accounts.models import User
 from common.models import UserCell
+from document.models import Document
 from projects import models
 from projects.models import Project
 from rest_framework.response import Response
 from storyboards.models import Frame
 from storyboards.serializers import ChronoframeSerializer
+from table.models import DefaultTableModel
 from timing.models import TimingGroup, Timing
 from folders.models import Folder
 
@@ -372,6 +374,24 @@ def duplicate_object(parent_object, project_id, host=None):
         parent_object.pk = None
         parent_object.name += " копия"
         parent_object.host_project = models.Project.objects.filter(pk=project_id).first()
+        parent_object.order_id = uuid.uuid4()
+        parent_object.doc_uuid = None
+
+        # Copying the document logo
+        copy_document_logo(parent_object, old_parent_obj_pk)
+
+        parent_object.save()
+
+    elif isinstance(parent_object, DefaultTableModel):
+        # Keep the original pk of the copied object
+        old_parent_obj_pk = parent_object.pk
+
+        parent_object.pk = None
+        parent_object.name += " копия"
+        if parent_object.host_folder:
+            parent_object.host_folder = Folder.objects.filter(pk=project_id).first()
+        else:
+            parent_object.host_document = Document.objects.filter(pk=project_id).first()
         parent_object.order_id = uuid.uuid4()
         parent_object.doc_uuid = None
 

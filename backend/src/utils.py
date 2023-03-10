@@ -31,7 +31,8 @@ def get_host_id_model(obj):
                                          'Text',
                                          'Link',
                                          'Timing',
-                                         'Document']:
+                                         'Document',
+                                         'DefaultTableModel']:
         return [obj.id, obj.__class__.__name__.lower()]
 
 
