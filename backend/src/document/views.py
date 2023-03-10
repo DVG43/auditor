@@ -127,8 +127,8 @@ class ImageGeneration(views.APIView):
         # формирование изображений
         fnames = utils.image_generator(prompt, n, size)
         answer = dict()
-        web_server = request.META['HTTP_HOST']
+        web_server = request.META['HTTP_HOST'].split(':')[0]
         for i in range(len(fnames)):
-            answer[i] = f"http://{web_server}{MEDIA_URL}{fnames[i]}"
+            answer[i] = f"http://{web_server}{MEDIA_URL}images/{fnames[i]}"
 
         return Response(answer)
