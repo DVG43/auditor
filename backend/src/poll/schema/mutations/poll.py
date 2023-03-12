@@ -156,9 +156,9 @@ class DeletePoll(graphene.Mutation):
             poll.deleted_since = timezone.now()
 
             poll.save()
-            return CreatePollTag(ok=True)
+            return DeletePoll(ok=True)
         else:
-            return CreatePollTag(ok=False)
+            return DeletePoll(ok=False)
 
 
 class CreatePollTagInput(graphene.InputObjectType):
