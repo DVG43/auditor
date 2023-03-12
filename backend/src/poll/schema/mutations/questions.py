@@ -3,8 +3,8 @@ from graphql_jwt.decorators import login_required
 from graphene_django.rest_framework.mutation import SerializerMutation
 
 from graphql_utils.utils_graphql import PermissionClass
-
-# from poll.schema import types
+from common.utils import get_model
+from poll.utils import ITEM_MODELS, QUESTION_MODELS
 from poll.models import (
     poll as poll_models,
     questions as qstn_models,
@@ -332,6 +332,63 @@ class CrtUpdItemQuestions(SerializerMutation):
         return ret
 
 
+class DeleteItemQuestions(graphene.Mutation):
+    """
+    Удаляет вариант ответа из вопроса.
+    Принимает {item_id: int, item_type: string}, где
+    qstn_type == "ManyFromListQuestion"|"YesNoQuestion"|"MediaQuestion"
+    |"FinalQuestion"|"FreeAnswer"
+    """
+
+    class Arguments:
+        item_id = graphene.ID()
+        item_type = graphene.String()
+
+    ok = graphene.Boolean()
+
+    @staticmethod
+    @login_required
+    def mutate(cls, root, item_id, item_type):
+        PermissionClass.has_permission(root)
+        if item_type in ITEM_MODELS:
+            item = ITEM_MODELS(item_type).objects.filter(
+                id=item_id
+            ).first()
+            if item:
+                item.delete()
+                return DeleteItemQuestions(ok=True)
+        return DeleteItemQuestions(ok=False)
+
+
+class DeleteQuestion(graphene.Mutation):
+    """
+    Удаляет вопрос из чеклиста.
+    Принимает {qstn_id: int, qstn_type: string}, где
+    qstn_type == "DivisionQuestion"|"ManyFromListQuestion"|"YesNoQuestion"
+    |"RatingQuestion"|"TextQuestion"|"MediaQuestion"
+    |"FinalQuestion"|"HeadingQuestion"|"FreeAnswer"
+    """
+
+    class Arguments:
+        qstn_id = graphene.ID()
+        qstn_type = graphene.String()
+
+    ok = graphene.Boolean()
+
+    @staticmethod
+    @login_required
+    def mutate(cls, root, qstn_id, qstn_type):
+        PermissionClass.has_permission(root)
+        if qstn_type in QUESTION_MODELS:
+            question = QUESTION_MODELS(qstn_type).objects.filter(
+                id=qstn_id
+            ).first()
+            if question:
+                question.delete()
+                return DeleteQuestion(ok=True)
+        return DeleteQuestion(ok=False)
+
+
 class QstnMutation(graphene.ObjectType):
     crt_upd_head_question = CrtUpdHeadQuestions.Field()
     crt_upd_rating_question = CrtUpdRatingQuestions.Field()
@@ -343,3 +400,5 @@ class QstnMutation(graphene.ObjectType):
     crt_upd_final_question = CrtUpdFinalQuestions.Field()
     crt_upd_division_question = CrtUpdDivisionQuestions.Field()
     crt_upd_item_question = CrtUpdItemQuestions.Field()
+    delete_item_question = DeleteItemQuestions.Field()
+    delete_question = DeleteQuestion.Field()
