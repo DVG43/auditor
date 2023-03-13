@@ -100,7 +100,7 @@ class File(PpmDocModel):
 
 
 class Text(PpmDocModel):
-    text = models.CharField(_('Text'), max_length=1000)
+    text = models.CharField(_('Text'), null=True, blank=True, max_length=1000)
     order_id = models.UUIDField(null=True, unique=True, default=uuid.uuid4)
     document_logo = ImageField(upload_to=get_doc_upload_path,
                                null=True, blank=True,

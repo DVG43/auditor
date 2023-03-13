@@ -68,8 +68,8 @@ class JSONWebTokenMiddleware:
 
         if (
             _authenticate(context) or token_argument is not None
-        ) and self.authenticate_context(info, **kwargs):
-
+        ) and self.authenticate_context(info, **kwargs) and not hasattr(context, "session_auth"):
+            context.session_auth = True
             user = authenticate(request=context, **kwargs)
 
             if user is not None:
