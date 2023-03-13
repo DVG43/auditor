@@ -13,7 +13,7 @@ class PermissionClass:
         if user.is_invited:
             return user
 
-        ### Временное отключение требования к подписке
+        # Временное отключение требования к подписке
         # subs_end = user.subscription.end_datetime
         # if subs_end.astimezone(tz=timezone.utc) < timezone.now():
         #     raise PermissionDenied({'error': 'you subscription is over'})
@@ -24,13 +24,25 @@ class PermissionClass:
         folder = Folder.objects.filter(pk=folder_id).first()
         user = info.context.user
         if not user.has_object_perm(folder, ['read', 'edit', 'own']) and not user.is_invited:
-            raise PermissionDenied(
-                {'error': 'You don`t have access to this object'})
+            folder = folder.parent_folder
+            while folder:
+                if user.has_object_perm(folder, ['read', 'edit', 'own']):
+                    break
+                folder = folder.parent_folder
+            if not folder:
+                raise PermissionDenied(
+                    {'error': 'You don`t have access to this object'})
 
     @classmethod
     def has_mutate_object_permission(cls, info, folder_id):
         folder = Folder.objects.filter(pk=folder_id).first()
         user = info.context.user
         if not user.has_object_perm(folder, ['edit', 'own']):
-            raise PermissionDenied(
-                {'error': 'You don`t have access to this object'})
+            folder = folder.parent_folder
+            while folder:
+                if user.has_object_perm(folder, ['edit', 'own']):
+                    break
+                folder = folder.parent_folder
+            if not folder:
+                raise PermissionDenied(
+                    {'error': 'You don`t have access to this object'})
