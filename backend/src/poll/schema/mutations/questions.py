@@ -1,9 +1,9 @@
 import graphene
+from rest_framework.generics import get_object_or_404
 from graphql_jwt.decorators import login_required
 from graphene_django.rest_framework.mutation import SerializerMutation
 
-from graphql_utils.utils_graphql import PermissionClass
-from common.utils import get_model
+from poll.permissions import PermissionPollClass
 from poll.utils import ITEM_MODELS, QUESTION_MODELS
 from poll.models import (
     poll as poll_models,
@@ -25,9 +25,10 @@ class CrtUpdHeadQuestions(SerializerMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
-        PermissionClass.has_permission(info)
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        PermissionPollClass.has_mutate_object_permission(info, poll)
 
-        poll = poll_models.Poll.objects.get(id=input['poll'])
         input.update({'poll': poll})
 
         ret = qstn_models.HeadingQuestion(**input)
@@ -48,9 +49,10 @@ class CrtUpdRatingQuestions(SerializerMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
-        PermissionClass.has_permission(info)
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        PermissionPollClass.has_mutate_object_permission(info, poll)
 
-        poll = poll_models.Poll.objects.get(id=input['poll'])
         input.update({'poll': poll})
 
         ret = qstn_models.RatingQuestion(**input)
@@ -71,9 +73,10 @@ class CrtUpdTextQuestions(SerializerMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
-        PermissionClass.has_permission(info)
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        PermissionPollClass.has_mutate_object_permission(info, poll)
 
-        poll = poll_models.Poll.objects.get(id=input['poll'])
         input.update({'poll': poll})
 
         ret = qstn_models.TextQuestion(**input)
@@ -94,9 +97,10 @@ class CrtUpdFreeQuestions(SerializerMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
-        PermissionClass.has_permission(info)
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        PermissionPollClass.has_mutate_object_permission(info, poll)
 
-        poll = poll_models.Poll.objects.get(id=input['poll'])
         input.update({'poll': poll})
 
         items, attached_types = [], []
@@ -137,9 +141,10 @@ class CrtUpdMediaQuestions(SerializerMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
-        PermissionClass.has_permission(info)
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        PermissionPollClass.has_mutate_object_permission(info, poll)
 
-        poll = poll_models.Poll.objects.get(id=input['poll'])
         input.update({'poll': poll})
 
         items, attached_types = [], []
@@ -180,9 +185,10 @@ class CrtUpdManyQuestions(SerializerMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
-        PermissionClass.has_permission(info)
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        PermissionPollClass.has_mutate_object_permission(info, poll)
 
-        poll = poll_models.Poll.objects.get(id=input['poll'])
         input.update({'poll': poll})
 
         items, attached_types = [], []
@@ -222,9 +228,10 @@ class CrtUpdYesNoQuestions(SerializerMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
-        PermissionClass.has_permission(info)
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        PermissionPollClass.has_mutate_object_permission(info, poll)
 
-        poll = poll_models.Poll.objects.get(id=input['poll'])
         input.update({'poll': poll})
 
         items, attached_types, yes_no_answers = [], [], []
@@ -273,9 +280,10 @@ class CrtUpdFinalQuestions(SerializerMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
-        PermissionClass.has_permission(info)
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        PermissionPollClass.has_mutate_object_permission(info, poll)
 
-        poll = poll_models.Poll.objects.get(id=input['poll'])
         input.update({'poll': poll})
         items = []
         if 'items' in input:
@@ -305,9 +313,10 @@ class CrtUpdDivisionQuestions(SerializerMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
-        PermissionClass.has_permission(info)
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        PermissionPollClass.has_mutate_object_permission(info, poll)
 
-        poll = poll_models.Poll.objects.get(id=input['poll'])
         input.update({'poll': poll})
         ret = qstn_models.DivisionQuestion(**input)
         ret.save()
@@ -325,7 +334,7 @@ class CrtUpdItemQuestions(SerializerMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
-        PermissionClass.has_permission(info)
+        PermissionPollClass.has_permission(info)
 
         ret = qstn_models.ItemQuestion(**input)
         ret.save()
@@ -349,7 +358,7 @@ class DeleteItemQuestions(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(cls, root, item_id, item_type):
-        PermissionClass.has_permission(root)
+        PermissionPollClass.has_permission(root)
         if item_type in ITEM_MODELS:
             item = ITEM_MODELS(item_type).objects.filter(
                 id=item_id
@@ -377,14 +386,19 @@ class DeleteQuestion(graphene.Mutation):
 
     @staticmethod
     @login_required
-    def mutate(cls, root, qstn_id, qstn_type):
-        PermissionClass.has_permission(root)
-        if qstn_type in QUESTION_MODELS:
-            question = QUESTION_MODELS(qstn_type).objects.filter(
-                id=qstn_id
+    def mutate(cls, info, qstn_id, qstn_type):
+        PermissionPollClass.has_permission(info)
+        if qstn_type in QUESTION_MODELS.keys():
+            question = QUESTION_MODELS[qstn_type].objects.filter(
+                question_id=qstn_id
             ).first()
             if question:
+                PermissionPollClass.has_mutate_object_permission(
+                    info,
+                    question.poll
+                )
                 question.delete()
+                question.poll.normalize_questions_order_id()
                 return DeleteQuestion(ok=True)
         return DeleteQuestion(ok=False)
 
