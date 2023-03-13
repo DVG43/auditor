@@ -97,19 +97,19 @@ class TextGenerationSerializer(serializers.Serializer):
     """ Ввод текста темы для генерации абзаца """
     source = serializers.CharField()
     tone = serializers.ChoiceField(choices={
-            "grateful",
-            "excited",
-            "rude",
-            "sad",
-            "informative",
-            "witty",
-            "negative",
-            "neutral",
-            "positive",
-            "professional",
-            "convincing",
-            "engaging",
-            "humorous"
+            "Grateful",      # Благодарный
+            "Excited",       # Восхищенный
+            "Rude",          # Грубый
+            "Sad",           # Грустный
+            "Informative",   # Информативный
+            "Witty",         # Остроумный
+            "Negative",      # Негативный
+            "Neutral",       # Естественный
+            "Positive",      # Позитивный
+            "Professional",  # Формальный
+            "Convincing",    # Убедительный
+            "Engaging",      # Развлекательный
+            "Humorous",      # Юмористический
         },
         required=False,
         allow_null=True)
@@ -119,6 +119,16 @@ class TextGenerationSerializer(serializers.Serializer):
 
 class TextRephraseSerializer(serializers.Serializer):
     """ Ввод текста для перефразирования """
+    source = serializers.CharField()
+
+
+class TextShorterSerializer(serializers.Serializer):
+    """ Ввод текста для сокращения """
+    source = serializers.CharField()
+
+
+class TextContinueSerializer(serializers.Serializer):
+    """ Ввод текста для продолжения """
     source = serializers.CharField()
 
 

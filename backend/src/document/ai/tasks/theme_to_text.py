@@ -67,7 +67,7 @@ def get_prompt(
     Example
     -------
 
-    >>> preprocess("Искусственный интеллект")
+    >>> get_prompt("Искусственный интеллект")
     Write a paragraph of text given the following parameters.
     Theme: "Искусственный интеллект"
     Length: no more than 35 words
