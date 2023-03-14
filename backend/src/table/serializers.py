@@ -12,6 +12,8 @@ from rest_framework import serializers
 
 class DefaultTableFrameSerializer(PpmDocSerializer):
     model = serializers.SerializerMethodField()
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), write_only=True, required=False)
 
     class Meta:
         model = DefaultTableFrame
