@@ -25,8 +25,11 @@ class QueryLink(graphene.ObjectType):
     def resolve_link_by_id(self, info, link_id=None):
         PermissionClass.has_permission(info)
 
-        ret = get_object_or_404(Link, id=link_id)
-
+        ret = get_object_or_404(
+            Link,
+            id=link_id,
+            deleted_id__isnull=True
+        )
         return ret
 
 
@@ -47,7 +50,11 @@ class QueryText(graphene.ObjectType):
     def resolve_text_by_id(self, info, text_id=None):
         PermissionClass.has_permission(info)
 
-        ret = get_object_or_404(Text, id=text_id)
+        ret = get_object_or_404(
+            Text,
+            id=text_id,
+            deleted_id__isnull=True
+        )
 
         return ret
 

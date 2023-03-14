@@ -1,9 +1,10 @@
 import os, random, string, urllib3, shutil
 from hashlib import md5
 import openai
+from settings import OPENAI_API_KEY, MEDIA_ROOT
 
 
-PATH_IMAGES = "/app/backend/src/share/auditor-v2_media/images/"
+openai.api_key = OPENAI_API_KEY
 
 
 def organize_data_row_sort_arrays(instance):
@@ -61,7 +62,7 @@ def image_generator(prompt, n=1, size=2):
     images = list()
 
     try:
-        os.chdir(PATH_IMAGES)
+        os.chdir(f"{MEDIA_ROOT}/images/")
         response = openai.Image.create(prompt=prompt, n=n, size=size_dict[size])
 
         http = urllib3.PoolManager()

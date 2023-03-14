@@ -3,6 +3,7 @@ from document.models import Document
 from rest_framework import serializers
 from settings import MEDIA_URL
 from projects.models import Project
+from folders.models import Folder
 
 
 class DocumentLogoSerializer(serializers.ModelSerializer):
@@ -39,14 +40,19 @@ class RecursiveSerializer(serializers.Serializer):
         serializer = self.parent.parent.__class__(value, context=self.context)
         return serializer.data
 
+class FolderSerializer(serializers.ModelSerializer):
+    """Вывод папок"""
+
+    class Meta:
+        model = Folder
+        fields = ("id", "name")
 
 class DocumentSerializer(serializers.ModelSerializer):
     """Вывод документа"""
     children = RecursiveSerializer(many=True)
     perm = serializers.SerializerMethodField()
     document_logo = serializers.SerializerMethodField()
-    folder_id = serializers.IntegerField(source='folder.id')
-    folder_name = serializers.CharField(source='folder.name')
+    folder = FolderSerializer()
 
     class Meta:
         list_serializer_class = FilterReviewListSerializer
@@ -60,8 +66,7 @@ class DocumentSerializer(serializers.ModelSerializer):
             "perm",
             "order_id",
             "data_row_order",
-            "folder_id",
-            "folder_name",
+            "folder",
             'host_project',
             'content',
         )
