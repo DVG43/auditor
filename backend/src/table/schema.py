@@ -14,7 +14,7 @@ from . import serializers
 from graphql_utils.utils_graphql import PermissionClass, check_disk_space, download_logo
 from folders.models import Folder
 from table.models import DefaultTableModel, DefaultTableFrame, DefaultTableUsercell
-from .utils import create_default_table_frame_columns
+from .utils import create_default_table_frame_columns, add_userfields, organize_data_row_sort_arrays
 
 
 class UserColumnType(DjangoObjectType):
@@ -107,10 +107,11 @@ class Query(ObjectType):
             PermissionClass.has_query_object_permission(info, table.host_folder.id)
         else:
             host_project_id = Document.objects.filter(
-                pk=table.host_document).first().folder.id
+                pk=table.host_document.id).first().folder.id
             PermissionClass.has_query_object_permission(info, host_project_id)
-
-        return DefaultTableModel.objects.filter(pk=table_pk).first()
+        instance = DefaultTableModel.objects.filter(pk=table_pk).first()
+        organize_data_row_sort_arrays(instance)
+        return instance
 
     @login_required
     def resolve_all_frames(self, info, host_default_table=None):
@@ -120,7 +121,7 @@ class Query(ObjectType):
             PermissionClass.has_query_object_permission(info, table.host_folder.id)
         else:
             host_project_id = Document.filter(
-                pk=table.table.host_document).first().folder.id
+                pk=table.table.host_document.id).first().folder.id
             PermissionClass.has_query_object_permission(info, host_project_id)
         return DefaultTableFrame.objects.filter(host_default_table=host_default_table).all()
 
@@ -132,9 +133,11 @@ class Query(ObjectType):
             PermissionClass.has_query_object_permission(info, table.host_folder.id)
         else:
             host_project_id = Document.filter(
-                pk=table.table.host_document).first().folder.id
+                pk=table.table.host_document.id).first().folder.id
             PermissionClass.has_query_object_permission(info, host_project_id)
-        return DefaultTableFrame.objects.filter(pk=frame_pk).first()
+        instance = DefaultTableFrame.objects.filter(pk=frame_pk).first()
+        organize_data_row_sort_arrays(instance)
+        return instance
 
 
 class CreateDefaultTable(SerializerMutation):
@@ -149,7 +152,7 @@ class CreateDefaultTable(SerializerMutation):
         if "host_folder" in input:
             folder_id = input["host_folder"]
         else:
-            folder_id = Document.objects.filter(host_project=input["host_document"]).first().folder.id
+            folder_id = Document.objects.filter(pk=input["host_document"]).first().folder.id
 
         PermissionClass.has_permission(info)
         PermissionClass.has_mutate_object_permission(info, folder_id)
@@ -303,6 +306,7 @@ class CreateTableColumn(SerializerMutation):
 
         obj = DefaultTableModel.objects.filter(pk=int(host)).first()
         obj.frame_columns.add(response.column_id)
+        obj.col_order.append(response.column_id)
         obj.save()
 
         frames_attr = None
@@ -368,31 +372,79 @@ class UpdateTableColumn(SerializerMutation):
 class DeleteTableColumn(graphene.Mutation):
     class Arguments:
         id = graphene.ID(required=True)
+        host_table = graphene.ID(required=True)
 
     ok = graphene.Boolean()
 
     @staticmethod
     @login_required
-    def mutate(root, info, id, input=None):
+    def mutate(root, info, id, host_table, input=None):
         ok = False
         PermissionClass.has_permission(info)
+        PermissionClass.has_mutate_object_permission(info, host_table)
         column_instance = UserColumn.objects.filter(pk=id).first()
         if column_instance:
             ok = True
+            pk = column_instance.id
             if column_instance.column_type == "image":
                 column_instance.delete()
                 recount_disk_space(info.context.user)
             else:
                 column_instance.delete()
+            table = DefaultTableModel.objects.filter(pk=host_table).first()
+            table.col_order.remove(pk)
+            table.save()
         return DeleteTableColumn(ok=ok)
 
 
-class CreateUpdateFrame(SerializerMutation):
+class CreateFrame(SerializerMutation):
     class Meta:
         serializer_class = serializers.DefaultTableFrameSerializer
-        model_operations = ['create', 'update']
+        model_operations = ['create']
         model_class = DefaultTableFrame
         lookup_field = 'id'
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        table_instance = DefaultTableModel.objects.filter(id=input["host_default_table"]).first()
+        if table_instance.host_document:
+            folder_id = table_instance.host_document.folder.id
+        else:
+            folder_id = table_instance.host_folder.id
+
+        PermissionClass.has_permission(info)
+        PermissionClass.has_mutate_object_permission(info, folder_id)
+        input.update({'owner': info.context.user.pkid,
+                      'last_modified_user': info.context.user.email})
+        response = super().mutate_and_get_payload(root, info, **input)
+
+        new_obj = DefaultTableFrame.objects.filter(id=response.__dict__["id"]).first()
+        add_userfields(info.context.user, table_instance, new_obj)
+        return response
+
+
+class UpdateFrame(SerializerMutation):
+    class Meta:
+        serializer_class = serializers.DefaultTableFrameSerializer
+        model_operations = ['update']
+        model_class = DefaultTableFrame
+        lookup_field = 'id'
+
+    @staticmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        table_instance = DefaultTableFrame.objects.filter(id=input["id"]).first().host_table
+        if table_instance.host_document:
+            folder_id = table_instance.host_document.folder.id
+        else:
+            folder_id = table_instance.host_folder.id
+
+        PermissionClass.has_permission(info)
+        PermissionClass.has_mutate_object_permission(info, folder_id)
+        input.update({'owner': info.context.user.pkid,
+                      'last_modified_user': info.context.user.email})
+        return super().mutate_and_get_payload(root, info, **input)
 
 
 class DeleteFrame(graphene.Mutation):
@@ -596,7 +648,8 @@ class Mutation(graphene.ObjectType):
     delete_table_column = DeleteTableColumn.Field()
     create_or_update_column_choice = CreateUpdateColumnChoice.Field()
     delete_column_choice = DeleteColumnChoice.Field()
-    create_or_update_frame = CreateUpdateFrame.Field()
+    create_frame = CreateFrame.Field()
+    update_frame = UpdateFrame.Field()
     delete_frame = DeleteFrame.Field()
     create_or_update_usercell = UpdateUserCell.Field()
     delete_user_cell = DeleteUserCell.Field()
