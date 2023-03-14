@@ -25,7 +25,7 @@ from . import ai
 
 class ChangeDocumentLogoView(generics.UpdateAPIView):
     serializer_class = DocumentLogoSerializer
-    permission_classes = [IsAuthenticated, IsActivated, IsOwner]
+    permission_classes = [IsAuthenticated, IsOwner]
     queryset = Document.objects.all()
 
     def patch(self, request, *args, **kwargs):
@@ -41,7 +41,7 @@ class ChangeDocumentLogoView(generics.UpdateAPIView):
 
 
 class DicumentViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [IsAuthenticated, IsActivated, IsOwnerOrIsInvited]
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
 
     def get_queryset(self):
         document = Document.objects.select_related('host_project').all()
@@ -52,7 +52,7 @@ class DicumentViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [IsAuthenticated, IsActivated, IsOwnerOrIsInvited]
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
 
     def get_queryset(self):
         project = Project.objects.prefetch_related('documents').all()
@@ -63,7 +63,7 @@ class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class TextGeneration(views.APIView):
-    permission_classes = [IsAuthenticated, IsActivated, IsOwnerOrIsInvited]
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
     serializer_class = TextGenerationSerializer
 
     def post(self, request, *args, **kwargs):
@@ -101,7 +101,7 @@ class TextGeneration(views.APIView):
 
 
 class TextRephrase(views.APIView):
-    permission_classes = [IsAuthenticated, IsActivated, IsOwnerOrIsInvited]
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
     serializer_class = TextRephraseSerializer
 
     def post(self, request, *args, **kwargs):
@@ -134,7 +134,7 @@ class TextRephrase(views.APIView):
 
 
 class TextShorter(views.APIView):
-    permission_classes = [IsAuthenticated, IsActivated, IsOwnerOrIsInvited]
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
     serializer_class = TextShorterSerializer
 
     def post(self, request, *args, **kwargs):
@@ -158,7 +158,7 @@ class TextShorter(views.APIView):
 
 
 class TextContinue(views.APIView):
-    permission_classes = [IsAuthenticated, IsActivated, IsOwnerOrIsInvited]
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
     serializer_class = TextContinueSerializer
 
     def post(self, request, *args, **kwargs):
@@ -182,7 +182,7 @@ class TextContinue(views.APIView):
 
 
 class ImageGeneration(views.APIView):
-    permission_classes = [IsAuthenticated, IsActivated, IsOwnerOrIsInvited]
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
     serializer_class = ImageGenerationSerializer
 
     def post(self, request, *args, **kwargs):
