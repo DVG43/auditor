@@ -75,7 +75,7 @@ class UpdatePoll(graphene.Mutation):
         poll = poll_models.Poll.objects.filter(id=poll_id)
         if poll:
 
-            PermissionPollClass.has_mutate_object_permission(info, poll)
+            PermissionPollClass.has_mutate_object_permission(info, poll.first())
             poll.update(**input['poll_input'])
 
             return UpdatePoll(ok=True, poll=poll.first())
