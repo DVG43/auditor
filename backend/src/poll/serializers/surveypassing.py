@@ -9,6 +9,7 @@ from poll.utils import QUESTION_SERIALIZERS_V1
 class SurveyPassingSerializer(serializers.ModelSerializer):
     class Meta:
         model = SurveyPassing
+        fields = '__all__'
 
     def __init__(self, *args, **kwargs):
         super(SurveyPassingSerializer, self).__init__()
