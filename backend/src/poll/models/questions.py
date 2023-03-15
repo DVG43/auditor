@@ -1,3 +1,5 @@
+import uuid
+
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django.utils import timezone
@@ -17,6 +19,7 @@ class ItemBase:
 class Question(models.Model):
     question_id = models.AutoField(primary_key=True)
     question_type = models.CharField(max_length=100, default='Question')
+    parent_id = models.UUIDField(null=True, blank=True)
     order_id = models.IntegerField(default=0)
     description = models.CharField(max_length=512)
     poll = models.ForeignKey('Poll', on_delete=models.CASCADE, default='1')
@@ -69,6 +72,42 @@ class Question(models.Model):
             v.order_id = i
             v.save()
         return query_set
+
+
+class PageQuestion(Question):
+    """
+    Section
+    """
+    page_id = models.UUIDField(default=uuid.uuid4())
+
+    def __init__(self, *args, **kwargs):
+        super(PageQuestion, self).__init__(*args, **kwargs)
+        self.question_type = __class__.__name__
+
+    class Meta:
+        db_table = 'poll_question_page'
+        verbose_name_plural = 'poll_pages'
+        indexes = [
+            models.Index(fields=['poll'])
+        ]
+
+
+class SectionQuestion(Question):
+    """
+    Section
+    """
+    section_id = models.UUIDField(default=uuid.uuid4())
+
+    def __init__(self, *args, **kwargs):
+        super(SectionQuestion, self).__init__(*args, **kwargs)
+        self.question_type = __class__.__name__
+
+    class Meta:
+        db_table = 'poll_question_section'
+        verbose_name_plural = 'poll_sections'
+        indexes = [
+            models.Index(fields=['poll'])
+        ]
 
 
 class DivisionQuestion(Question):
@@ -383,6 +422,7 @@ class HeadingQuestion(models.Model):
     caption = models.CharField(max_length=100)
     order_id = models.IntegerField(default=0)
     poll = models.ForeignKey('Poll', on_delete=models.CASCADE)
+    parent_id = models.UUIDField(null=True, blank=True)
 
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(default=timezone.now)

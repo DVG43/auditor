@@ -26,8 +26,6 @@ class Poll(PpmDocModel):
     Poll
     """
     id = models.AutoField(primary_key=True)
-    # user = models.ForeignKey(User, on_delete=models.CASCADE)
-    # title = models.CharField(max_length=200, default='')
     image = models.CharField(max_length=200, default='')
     test_mode_global = models.BooleanField(default=False)
     count_answers = models.PositiveIntegerField(default=0)
@@ -114,6 +112,10 @@ class Poll(PpmDocModel):
             questions.extend(list(self.freeanswer_set.all()))
         if self.finalquestion_set:
             questions.extend(list(self.finalquestion_set.all()))
+        if self.pagequestion_set:
+            questions.extend(list(self.pagequestion_set.all()))
+        if self.sectionquestion_set:
+            questions.extend(list(self.sectionquestion_set.all()))
 
         if sort:
             questions = sorted(questions, key=attrgetter('order_id'))

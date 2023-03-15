@@ -3,7 +3,7 @@ from rest_framework import serializers
 from poll.models.questions import DivisionQuestion, ItemQuestion, ManyFromListQuestion, YesNoQuestion, \
     RatingQuestion, MediaFile, MediaQuestion, TextQuestion, MediaItemQuestion, MediaAttachedType, FinalQuestion, \
     YesNoAnswers, YesNoAttachedType, HeadingQuestion, FreeAnswer, ItemsFreeAnswer, FreeAnswerAttachedType, \
-    TagsFreeAnswer, ItemTagsFreeAnswer, ManyFromListAttachedType
+    TagsFreeAnswer, ItemTagsFreeAnswer, ManyFromListAttachedType, PageQuestion, SectionQuestion
 
 
 def max_min_validator(value):
@@ -21,6 +21,7 @@ class BaseQuestionSerializer(serializers.Serializer):
     order_id = serializers.IntegerField(default=0)
     description = serializers.CharField(max_length=512)
     caption = serializers.CharField(max_length=512)
+    parent_id = serializers.UUIDField(required=False)
 
     require = serializers.BooleanField(required=False)
     mix_answers = serializers.BooleanField(required=False)
@@ -343,7 +344,47 @@ class HeadingQuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = HeadingQuestion
-        fields = ['caption', 'question_id', 'question_type', 'order_id', 'poll']
+        fields = [
+            'caption',
+            'question_id',
+            'question_type',
+            'order_id',
+            'poll',
+            'parent_id'
+        ]
+
+
+class PageQuestionSerializer(serializers.ModelSerializer):
+    poll = serializers.CharField(max_length=64)
+
+    class Meta:
+        model = PageQuestion
+        fields = [
+            'caption',
+            'question_id',
+            'question_type',
+            'order_id',
+            'poll',
+            'parent_id',
+            'page_id'
+        ]
+
+
+class SectionQuestionSerializer(serializers.ModelSerializer):
+    poll = serializers.CharField(max_length=64)
+
+    class Meta:
+        model = SectionQuestion
+        fields = [
+            'caption',
+            'question_id',
+            'question_type',
+            'order_id',
+            'poll',
+            'parent_id',
+            'section_id'
+        ]
+
 
 
 class ItemTagsFreeAnswerSerializer(serializers.ModelSerializer):
@@ -430,7 +471,7 @@ class FreeAnswerSerializer(BaseQuestionSerializer):
         fields = [
             'question_type', 'order_id', 'description', 'poll', 'caption',
             'require', 'mix_answers', 'time_for_answer', 'type_for_show', 'title_image', 'resize_image', 'test_mode',
-            'answer_time', 'description_mode', 'attached_type', 'items', 'tagsAnswerFree'
+            'answer_time', 'description_mode', 'attached_type', 'items', 'tagsAnswerFree', 'parent_id'
         ]
 
     def create(self, validated_data):
