@@ -14,6 +14,54 @@ from poll.serializers import (
 )
 
 
+class CrtUpdPageQuestions(SerializerMutation):
+
+    class Meta:
+        serializer_class = qstn_serializers.PageQuestionSerializer
+        model_operations = ['create', 'update']
+        lookup_field = 'question_id'
+        model_class = qstn_models.PageQuestion
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        PermissionPollClass.has_mutate_object_permission(info, poll)
+
+        input.update({'poll': poll})
+
+        ret = qstn_models.PageQuestion(**input)
+        ret.save()
+
+        poll.normalize_questions_order_id()
+        return ret
+
+
+class CrtUpdSectionQuestions(SerializerMutation):
+
+    class Meta:
+        serializer_class = qstn_serializers.SectionQuestionSerializer
+        model_operations = ['create', 'update']
+        lookup_field = 'question_id'
+        model_class = qstn_models.SectionQuestion
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        PermissionPollClass.has_mutate_object_permission(info, poll)
+
+        input.update({'poll': poll})
+
+        ret = qstn_models.SectionQuestion(**input)
+        ret.save()
+
+        poll.normalize_questions_order_id()
+        return ret
+
+
 class CrtUpdHeadQuestions(SerializerMutation):
 
     class Meta:
@@ -346,7 +394,7 @@ class DeleteItemQuestions(graphene.Mutation):
     Удаляет вариант ответа из вопроса.
     Принимает {item_id: int, item_type: string}, где
     qstn_type == "ManyFromListQuestion"|"YesNoQuestion"|"MediaQuestion"
-    |"FinalQuestion"|"FreeAnswer"
+    |"FinalQuestion"|"FreeAnswer"|"PageQuestion"|"SectionQuestion"
     """
 
     class Arguments:
@@ -404,6 +452,8 @@ class DeleteQuestion(graphene.Mutation):
 
 
 class QstnMutation(graphene.ObjectType):
+    crt_upd_page_question = CrtUpdPageQuestions.Field()
+    crt_upd_section_question = CrtUpdSectionQuestions.Field()
     crt_upd_head_question = CrtUpdHeadQuestions.Field()
     crt_upd_rating_question = CrtUpdRatingQuestions.Field()
     crt_upd_text_question = CrtUpdTextQuestions.Field()

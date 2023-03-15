@@ -59,6 +59,16 @@ class PollThemeType(DjangoObjectType):
 
 
 # Questions
+class PageQuestionType(DjangoObjectType):
+    class Meta:
+        model = questions_models.PageQuestion
+
+
+class SectionQuestionType(DjangoObjectType):
+    class Meta:
+        model = questions_models.SectionQuestion
+
+
 class DivisionQuestionType(DjangoObjectType):
     class Meta:
         model = questions_models.DivisionQuestion

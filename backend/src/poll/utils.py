@@ -1,6 +1,7 @@
 from poll.models.questions import DivisionQuestion, ManyFromListQuestion, YesNoQuestion, RatingQuestion, TextQuestion, \
     MediaQuestion, FinalQuestion, HeadingQuestion, FreeAnswer, ItemQuestion, MediaItemQuestion, ItemsFreeAnswer, \
-    TagsFreeAnswer, YesNoAttachedType, MediaAttachedType, FreeAnswerAttachedType, YesNoAnswers, ManyFromListAttachedType
+    TagsFreeAnswer, YesNoAttachedType, MediaAttachedType, FreeAnswerAttachedType, YesNoAnswers, ManyFromListAttachedType, \
+    SectionQuestion, PageQuestion
 from poll.serializers import questions as questions_serializers_v1
 from poll.serializers_v2 import questions as questions_serializers_v2
 
@@ -18,6 +19,8 @@ USER_ACCESS_TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 # QUESTIONS CLASSES
 
 QUESTION_MODELS = {
+    'PageQuestion': PageQuestion,
+    'SectionQuestion': SectionQuestion,
     'DivisionQuestion': DivisionQuestion,
     'ManyFromListQuestion': ManyFromListQuestion,
     'YesNoQuestion': YesNoQuestion,
@@ -30,6 +33,8 @@ QUESTION_MODELS = {
 }
 
 QUESTION_SERIALIZERS_V1 = {
+    'PageQuestion': questions_serializers_v1.PageQuestionSerializer,
+    'SectionQuestion': questions_serializers_v1.SectionQuestionSerializer,
     'DivisionQuestion': questions_serializers_v1.DivisionQuestionSerializer,
     'ManyFromListQuestion': questions_serializers_v1.ManyFromListQuestionSerializer,
     'YesNoQuestion': questions_serializers_v1.YesNoQuestionSerializer,

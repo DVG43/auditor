@@ -192,9 +192,10 @@ class CreatePollTag(graphene.Mutation):
 
 class AllPollQuestions(graphene.Mutation):
     class Arguments:
-        # The input arguments for this mutation
         poll_id = graphene.ID(required=True)
 
+    page_questions = graphene.List(types.PageQuestionType)
+    section_questions = graphene.List(types.SectionQuestionType)
     division_questions = graphene.List(types.DivisionQuestionType)
     yesno_questions = graphene.List(types.YesNoQuestionType)
     manyfromlist_questions = graphene.List(types.ManyFromListQuestionType)
@@ -212,6 +213,8 @@ class AllPollQuestions(graphene.Mutation):
         poll = get_object_or_404(poll_models.Poll, id=poll_id)
         PermissionPollClass.has_mutate_object_permission(info, poll)
 
+        page = qstn_models.PageQuestion.objects.filter(poll_id=poll_id).all()
+        section = qstn_models.SectionQuestion.objects.filter(poll_id=poll_id).all()
         division = qstn_models.DivisionQuestion.objects.filter(poll_id=poll_id).all()
         yes_no = qstn_models.YesNoQuestion.objects.filter(poll_id=poll_id).all()
         manyfromlist = qstn_models.ManyFromListQuestion.objects.filter(poll_id=poll_id).all()
@@ -222,6 +225,8 @@ class AllPollQuestions(graphene.Mutation):
         free_answer = qstn_models.FreeAnswer.objects.filter(poll_id=poll_id).all()
 
         return AllPollQuestions(
+            page_questions=page,
+            section_questions=section,
             division_questions=division,
             yesno_questions=yes_no,
             manyfromlist_questions=manyfromlist,

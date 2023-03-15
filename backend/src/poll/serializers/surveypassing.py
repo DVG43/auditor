@@ -51,6 +51,10 @@ class SurveyPassingSerializer(serializers.ModelSerializer):
         questions = []
         questions_get = Poll.objects.get(poll_id=validated_data['poll_id'])
 
+        if questions_get.pagequestion_set:
+            questions.extend(list(questions_get.pagequestion_set.values_list('question_id', 'question_type')))
+        if questions_get.sectionquestion_set:
+            questions.extend(list(questions_get.sectionquestion_set.values_list('question_id', 'question_type')))
         if questions_get.divisionquestion_set:
             questions.extend(list(questions_get.divisionquestion_set.values_list('question_id', 'question_type')))
         if questions_get.yesnoquestion_set:
