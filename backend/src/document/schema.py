@@ -106,6 +106,7 @@ class DocumentInput(graphene.InputObjectType):
     project_id = graphene.ID(required=False)
     parent = graphene.ID(required=False)
     data_row_order = graphene.List(graphene.Int, required=False)
+    doc_order = graphene.List(graphene.String, required=False)
     document_logo_url = graphene.String(required=False)
     content = graphene.String(required=False)
     folder_id = graphene.ID(required=False)
@@ -147,7 +148,6 @@ class CreateDocumen(graphene.Mutation):
         # присвоение родителя или создание поддокумента по умолчанию для корневого документа
         if input.parent:
             document_instance.parent = Document.objects.get(pk=input.parent)
-            document_instance.save()
         else:
             children_document_instance = Document.objects.create(
                 name="Без названия",
@@ -159,6 +159,9 @@ class CreateDocumen(graphene.Mutation):
             )
             if hasattr(children_document_instance, "perms"):
                 children_document_instance.owner.grant_object_perm(children_document_instance, 'own')
+            children_document_instance.refresh_from_db()
+            document_instance.doc_order = [children_document_instance.order_id]
+        document_instance.save()
 
         # добавление логотипа
         if input.document_logo_url:
@@ -204,13 +207,15 @@ class UpdateDocumen(graphene.Mutation):
                 document_instance.folder = folder
             if input.parent and (int(input.parent) != document_instance.id):
                 document_instance.parent = Document.objects.get(pk=input.parent)
+            if input.doc_order:
+                document_instance.doc_order = input.doc_order
             if input.document_logo_url:
                 document_instance.document_logo = download_logo(
                     url=input.document_logo_url,
                     project=document_instance.folder
                 )
-            # document_instance.save()
-            organize_data_row_sort_arrays(document_instance)
+            document_instance.save()
+            # organize_data_row_sort_arrays(document_instance)
             ok = True
             return UpdateDocumen(ok=ok, document=document_instance)
 

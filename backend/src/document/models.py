@@ -35,6 +35,9 @@ class Document(PpmDocModel):
         verbose_name=_('Folder'),
         blank=True, null=True
     )
+    doc_order = ArrayField(
+        models.UUIDField(null=True), blank=True,
+        default=list, verbose_name=_('Document order'))
     content = models.TextField(verbose_name=_("Контент"), default="")
 
     def __str__(self):
