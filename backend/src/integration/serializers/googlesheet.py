@@ -29,7 +29,7 @@ class GoogleSheetIntegrationSerializer(serializers.ModelSerializer):
         google_sheet_integration = GoogleSheetIntegration.objects.create(
             user=self.context['SESSION']['user'],
             id=validated_data['id'])
-        sheet_name = google_sheet_integration.user.email + '_' + str(validated_data['id'].poll_id)
+        sheet_name = google_sheet_integration.user.email + '_' + str(validated_data['id'].id)
 
         credentials = Credentials.from_authorized_user_info(
             json.loads(self.context['request'].session['gs_credentials']))
@@ -47,9 +47,8 @@ class GoogleSheetIntegrationSerializer(serializers.ModelSerializer):
         poll = Poll.objects.prefetch_related(
             "yesnoquestion_set__items",
             "manyfromlistquestion_set__items",
-            "freeanswer_set__items",
-            "surveypassing_set__user__secretguestprofile")\
-            .get(pk=google_sheet_integration.id.poll_id)
+            "freeanswer_set__items")\
+            .get(pk=google_sheet_integration.id.id)
 
         questions = sheet_service.get_poll_questions(poll=poll)
         spreadsheet_data = sheet_service.get_caption(questions=questions)
@@ -75,7 +74,7 @@ class GoogleSheetIntegrationSerializer(serializers.ModelSerializer):
             [""],
             ["Ссылка на форму"],
             [self.context['request'].build_absolute_uri(
-                f"/constructor/{validated_data['id'].poll_id}")]
+                f"/constructor/{validated_data['id'].id}")]
         ]
 
         spreadsheet_data.extend(list_with_form_link)
@@ -137,7 +136,7 @@ class GoogleSheetIntegrationSerializer(serializers.ModelSerializer):
             }
         )
 
-        sheet_name = instance.user.email + '_' + str(validated_data['id'].poll_id)
+        sheet_name = instance.user.email + '_' + str(validated_data['id'].id)
 
         gs_service.add_information_to_spreadsheet(
             sheet_name=sheet_name,

@@ -38,14 +38,14 @@ class GoogleSheetIntegrationViewSet(viewsets.ModelViewSet):
         credentials = get_object_or_404(GoogleSheetCredentials, user=instance.user)
         credentials.refresh_token(request)
 
-        if credentials.google_sheet_credetials == '':
+        if credentials.google_sheet_credentials == '':
             instance.delete()
             credentials.delete()
             return Response(
                 {'detail': 'The refresh token of GS API is dead. Make the new integration.'},
                 status=HTTPStatus.SERVICE_UNAVAILABLE)
 
-        request.session['gs_credentials'] = credentials.google_sheet_credetials
+        request.session['gs_credentials'] = credentials.google_sheet_credentials
 
         return super(GoogleSheetIntegrationViewSet, self).update(request, pk, *args, **kwargs)
 
@@ -81,12 +81,12 @@ class CreateGoogleSheetView(APIView):
         credentials, created = GoogleSheetCredentials.objects.get_or_create(user=SESSION['user'])
         credentials.create_connection(request, settings.CREDENTIALS_FILE_NAME)
 
-        if credentials.google_sheet_credetials == '':
+        if credentials.google_sheet_credentials == '':
             return Response(
                 {'detail': 'The connection with GS API is absent. Contact to the administrstor.'},
                 status=HTTPStatus.SERVICE_UNAVAILABLE)
 
-        request.session['gs_credentials'] = credentials.google_sheet_credetials
+        request.session['gs_credentials'] = credentials.google_sheet_credentials
         serializer = GoogleSheetIntegrationSerializer(
             context={'request': request, 'SESSION': SESSION},
             data=SESSION['data'])

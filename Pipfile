@@ -48,6 +48,8 @@ jsonfield = "==3.1.0"
 drf-base64 = "==2.0"
 google-auth-oauthlib = "*"
 python-telegram-bot = "*"
+google-api-python-client = "*"
+google-auth-httplib2 = "*"
 
 [dev-packages]
 
