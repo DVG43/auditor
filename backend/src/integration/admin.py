@@ -26,7 +26,7 @@ class PollModelAdmin(admin.ModelAdmin):
 
 class GoogleSheetCredentialsModelAdmin(admin.ModelAdmin):
     list_display = [
-        'id', 'user', 'google_sheet_credetials']
+        'id', 'user', 'google_sheet_credentials']
     list_display_links = ['id']
     list_filter = ['user']
     search_fields = ['id', 'user']

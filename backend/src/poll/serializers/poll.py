@@ -150,7 +150,7 @@ class PollSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         poll = Poll()
         poll_setting = validated_data.pop('setting', {})
-        poll.owner = validated_data.get('owner')
+        poll.owner = self.owner
         poll.name = validated_data.get('name')
         poll.image = validated_data.get('image', '')
         poll.test_mode_global = validated_data.get('test_mode_global', False) in ['true', 'True', True]
