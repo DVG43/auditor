@@ -17,7 +17,7 @@ class GoogleSheetIntegrationModelAdmin(admin.ModelAdmin):
 
 class PollModelAdmin(admin.ModelAdmin):
     list_display = [
-        'poll_id', 'user', 'title', 'image', 'test_mode_global',
+        'id', 'owner', 'name', 'image', 'test_mode_global',
         'count_answers', 'last_open']
 
     class Meta:

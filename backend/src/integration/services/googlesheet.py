@@ -10,7 +10,7 @@ from integration.models.googlesheet import GoogleSheetCredentials, GoogleSheetIn
 from poll.models.questions import ItemQuestion
 from google.oauth2.credentials import Credentials
 
-from accounts.models import User, SecretGuestProfile
+from accounts.models import User
 
 
 class GoogleSheetIntegrationService:
@@ -27,7 +27,7 @@ class GoogleSheetIntegrationService:
         return service
 
     def google_sheet_service(self, user):
-        google_credentials = GoogleSheetCredentials.objects.get(user=user).google_sheet_credetials
+        google_credentials = GoogleSheetCredentials.objects.get(user=user).google_sheet_credentials
         credentials = Credentials.from_authorized_user_info(json.loads(google_credentials))
         return self.connect_to_google_sheet_api(credentials=credentials)
 
@@ -205,15 +205,15 @@ class SheetService:
         Get base row data which using in each answer row
         """
         try:
-            name = survey.user.secretguestprofile.full_name
-        except SecretGuestProfile.DoesNotExist:
-            name = survey.user.email
+            email = survey.owner.email
+        except:
+            email = "anonymous"
         return [
             survey.created_at.strftime("%d.%m.%Y"),  # date
             survey.created_at.strftime("%H:%M:%S"),  # time
             survey.poll.title,  # poll title
             survey.obj_report_url(request),  # report answer url
-            name,  # full name user who gave answer
+            email,  # email of user who gave answer
             str(round(count_answers / count_question * 100, 2)) + "%",  # completed percentage
         ]
 

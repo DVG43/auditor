@@ -73,7 +73,7 @@ class TelegramIntegration(models.Model):
             message = message.replace('{{ Ссылка на отчет }}', survey_passing.obj_report_url(request))
             message = message.replace('{{ Дата }}',
                                       str(timezone.localtime(survey_passing.created_at).strftime("%d.%m.%Y %H:%M:%S")))
-            message = message.replace('{{ Название формы }}', str(self.poll.title))
+            message = message.replace('{{ Название формы }}', str(self.poll.name))
 
             try:
                 message = message.replace('{{ Автор }}', survey_passing.user.secretguestprofile.full_name)

@@ -37,7 +37,7 @@ class GoogleSheetIntegration(models.Model):
 
 class GoogleSheetCredentials(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    google_sheet_credetials = JSONField(default='', blank=True, null=True)
+    google_sheet_credentials = JSONField(default='', blank=True, null=True)
 
     REQUIRED_FIELDS = []
 
@@ -72,7 +72,7 @@ class GoogleSheetCredentials(models.Model):
                     'https://www.googleapis.com/auth/userinfo.profile',
                     'openid'], )
 
-        flow.redirect_uri = f'{settings.DOMAIN}/v1/googleauth/creategooglesheet/'
+        flow.redirect_uri = f'{settings.DOMAIN}/api/v1/googleauth/creategooglesheet/'
 
         authorization_response = request.build_absolute_uri('/') + request.get_full_path()
 
@@ -81,22 +81,22 @@ class GoogleSheetCredentials(models.Model):
 
         flow.fetch_token(authorization_response=authorization_response)
         credentials = flow.credentials
-        self.google_sheet_credetials = credentials.to_json()
+        self.google_sheet_credentials = credentials.to_json()
 
         self.save()
-        return self.google_sheet_credetials
+        return self.google_sheet_credentials
 
     def refresh_token(self, request):
 
         credentials = Credentials.from_authorized_user_info(
-            json.loads(self.google_sheet_credetials))
+            json.loads(self.google_sheet_credentials))
         request_auth = google.auth.transport.requests.Request()
 
         try:
             credentials.refresh(request_auth)
-            self.google_sheet_credetials = credentials.to_json()
+            self.google_sheet_credentials = credentials.to_json()
         except google.auth.exceptions.RefreshError:
-            self.google_sheet_credetials = ''
+            self.google_sheet_credentials = ''
 
         self.save()
-        return self.google_sheet_credetials
+        return self.google_sheet_credentials
