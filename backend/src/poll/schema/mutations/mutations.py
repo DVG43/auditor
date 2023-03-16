@@ -2,7 +2,7 @@ import graphene
 
 from .poll import PollMutation
 from .questions import QstnMutation
-from .sirveypassing import SurveyPassingMutation
+from .surveypassing import SurveyPassingMutation
 
 
 class Mutation(
