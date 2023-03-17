@@ -19,6 +19,9 @@ from poll.serializers import (
 
 
 class CreatePoll(SerializerMutation):
+    """
+    Create Poll (Check list)
+    """
     class Meta:
         serializer_class = poll_serializers.PollSerializer
         model_operations = ['create']
@@ -59,6 +62,9 @@ class UpdatePollInput(graphene.InputObjectType):
 
 
 class UpdatePoll(graphene.Mutation):
+    """
+    Update Poll (Check list) by poll_id
+    """
     class Arguments:
         # The input arguments for this mutation
         poll_id = graphene.ID(required=True)
@@ -110,6 +116,9 @@ class UpdatePollSettingInput(graphene.InputObjectType):
 
 
 class UpdatePollSetting(graphene.Mutation):
+    """
+    Update Poll (Check list) settings by poll_id
+    """
     class Arguments:
         # The input arguments for this mutation
         poll_id = graphene.ID(required=True)
@@ -135,6 +144,9 @@ class UpdatePollSetting(graphene.Mutation):
 
 
 class DeletePoll(graphene.Mutation):
+    """
+    Delete Poll (Check list) settings by poll_id
+    """
     class Arguments:
         # The input arguments for this mutation
         poll_id = graphene.ID()
@@ -164,6 +176,9 @@ class CreatePollTagInput(graphene.InputObjectType):
 
 
 class CreatePollTag(graphene.Mutation):
+    """
+    MultiCreate Poll (Check list) Tag settings by poll_id
+    """
     class Arguments:
         # The input arguments for this mutation
         polls = graphene.List(graphene.Int)
@@ -191,6 +206,9 @@ class CreatePollTag(graphene.Mutation):
 
 
 class AllPollQuestions(graphene.Mutation):
+    """
+    Resolve all Poll (Check list) questions by poll_id
+    """
     class Arguments:
         poll_id = graphene.ID(required=True)
 

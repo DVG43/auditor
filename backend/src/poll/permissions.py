@@ -100,7 +100,7 @@ class PermissionPollClass(PermissionClass):
         if not user.has_object_perm(instance, ['read', 'edit', 'own']) and not user.is_invited:
             folder = instance.parent_folder if isinstance(instance, Folder) else instance.folder
             while folder:
-                if user.has_object_perm(folder, ['edit', 'own']):
+                if user.has_object_perm(folder, ['read', 'edit', 'own']):
                     break
                 folder = instance.parent_folder
             if not folder:

@@ -76,7 +76,7 @@ class Migration(migrations.Migration):
                 ('test_mode', models.BooleanField(default=False)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('created_at', models.DateTimeField(default=django.utils.timezone.now)),
-                ('section_id', models.UUIDField(default=uuid.UUID('53a1886a-0f24-498f-92e0-be4746eb5a50'))),
+                ('section_id', models.UUIDField(default=uuid.uuid4)),
                 ('poll', models.ForeignKey(default='1', on_delete=django.db.models.deletion.CASCADE, to='poll.poll')),
             ],
             options={
@@ -102,7 +102,7 @@ class Migration(migrations.Migration):
                 ('test_mode', models.BooleanField(default=False)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('created_at', models.DateTimeField(default=django.utils.timezone.now)),
-                ('page_id', models.UUIDField(default=uuid.UUID('fe1edb15-8a9d-4c3d-8a95-4abc388a12a4'))),
+                ('page_id', models.UUIDField(default=uuid.uuid4)),
                 ('poll', models.ForeignKey(default='1', on_delete=django.db.models.deletion.CASCADE, to='poll.poll')),
             ],
             options={
