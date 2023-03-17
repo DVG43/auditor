@@ -57,7 +57,8 @@ class GoogleSheetCredentials(models.Model):
                     'https://www.googleapis.com/auth/userinfo.email',
                     'https://www.googleapis.com/auth/userinfo.profile',
                     'openid'])
-        flow.redirect_uri = f'{settings.DOMAIN}/v1/googleauth/creategooglesheet/'
+
+        flow.redirect_uri = f'{settings.DOMAIN}/api/v1/googleauth/creategooglesheet/'
 
         return flow.authorization_url(access_type='offline',
                                       prompt='consent',

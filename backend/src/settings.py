@@ -257,6 +257,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 TEMPLATED_EMAIL_BACKEND = 'templated_email.backends.vanilla_django'
 
+DOMAIN = os.environ.get("DOMAIN")
 CREDENTIALS_FILE_NAME = os.path.join(BASE_DIR, os.environ.get('GOOGLE_SECRET_FILE_NAME'))
 
 AUTHENTICATION_BACKENDS = (
