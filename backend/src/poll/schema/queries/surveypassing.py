@@ -9,8 +9,11 @@ from rest_framework.generics import get_object_or_404
 
 
 class QuerySurveyPassing(ObjectType):
+    """
+    Query for getting SurveyPassing
+    """
     all_sp = graphene.List(types.SurveyPassingType)
-    surverpassing_by_id = graphene.Field(types.SurveyPassingType, sp_id=graphene.Int())
+    surverpassing_by_id = graphene.Field(types.SurveyPassingType, id=graphene.Int())
 
     @login_required
     def resolve_all_sp(self, info):
@@ -36,7 +39,5 @@ class QuerySurveyPassing(ObjectType):
         PermissionClass.has_permission(info)
 
         ret = get_object_or_404(surveypassing.SurveyPassing, id=id)
-        prj_id = ret.host_project.id
-        PermissionClass.has_query_object_permission(info, prj_id)
 
         return ret

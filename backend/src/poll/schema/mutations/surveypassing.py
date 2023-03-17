@@ -37,8 +37,10 @@ class CreateSurveyPassing(SerializerMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
 
-        user = UserModel.objects.get(pk=input["user"])
         poll = poll_models.Poll.objects.filter(id=input["poll"])
+        PermissionPollClass.has_query_object_permission(poll)
+
+        user = UserModel.objects.get(pk=input["user"])
         input.update({"user": user, "poll": poll})
         instance = surveypassing_serializers.SurveyPassingSerializer.create(
             surveypassing_serializers.SurveyPassingSerializer(),
@@ -66,5 +68,5 @@ class MultipleDeleteSurveyPassing(graphene.Mutation):
 
 
 class SurveyPassingMutation(graphene.ObjectType):
-    create_surveypassung = CreateSurveyPassing.Field()
+    create_surveypassing = CreateSurveyPassing.Field()
     multipledelete_surveypassing = MultipleDeleteSurveyPassing.Field()
