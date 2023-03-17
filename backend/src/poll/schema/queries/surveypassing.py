@@ -39,5 +39,6 @@ class QuerySurveyPassing(ObjectType):
         PermissionClass.has_permission(info)
 
         ret = get_object_or_404(surveypassing.SurveyPassing, id=id)
+        PermissionPollClass.has_query_object_permission(ret.poll)
 
         return ret
