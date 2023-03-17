@@ -94,5 +94,7 @@ class CreateGoogleSheetView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         poll_id = SESSION['data']['id']
-        redirect_url = f'https://auditorpro.info/constructor/{poll_id}/?closed=true'
+        # redirect_url = f'https://auditorpro.info/poll/{poll_id}/?closed=true'
+        redirect_url = f'{settings.DOMAIN}/api/v1/poll/my/list/'
+
         return HttpResponseRedirect(redirect_url)
