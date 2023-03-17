@@ -9,9 +9,9 @@ from projects.models import Project
 
 
 class CopyAndMoveDocMixin(ViewSet):
-    allowed_move_models = ['file', 'text', 'link']
+    allowed_move_models = ['file', 'text', 'link', 'document', 'poll']
 
-    allowed_copy_models = ['file', 'text', 'link']
+    allowed_copy_models = ['file', 'text', 'link', 'document', 'poll']
 
     @action(methods=["PATCH"], detail=True, url_path='copy')
     def copy_document(self, request, **kwargs):

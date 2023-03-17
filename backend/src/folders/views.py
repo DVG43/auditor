@@ -1,10 +1,10 @@
-from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from common.views import PpmViewSet
 from folders.models import Folder
+from folders.utils import get_user_folders_own_or_with_perm
 from folders.serializers import\
     FolderSerializer,\
     FolderListSerializer
@@ -12,7 +12,6 @@ from shared_access.mixins import ShareMixin
 from shared_access.serializers import\
     ShareFolderSerializer,\
     ShareDeleteSerializer
-from objectpermissions.models import UserPermission
 
 
 class FolderViewSet(PpmViewSet, ShareMixin):
@@ -31,14 +30,6 @@ class FolderViewSet(PpmViewSet, ShareMixin):
 
     @action(methods=["GET"], detail=False, url_path='tree')
     def get_folders_tree(self, request):
-        q_own_folders = Q(owner=request.user, parent_folder=None)
-        objects = UserPermission.objects.filter(
-            user=request.user,
-            content_type__model='folder'
-        ).exclude(permission=4)
-        folders_perms_id = []
-        for object in objects:
-            folders_perms_id.append(object.object_id)
-        folders = Folder.objects.filter(q_own_folders | Q(id__in=folders_perms_id))
+        folders = get_user_folders_own_or_with_perm(request)
         serializer = self.get_serializer(folders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

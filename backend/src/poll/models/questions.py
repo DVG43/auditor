@@ -78,7 +78,7 @@ class PageQuestion(Question):
     """
     Section
     """
-    page_id = models.UUIDField(default=uuid.uuid4())
+    page_id = models.UUIDField(default=uuid.uuid4)
 
     def __init__(self, *args, **kwargs):
         super(PageQuestion, self).__init__(*args, **kwargs)
@@ -96,7 +96,7 @@ class SectionQuestion(Question):
     """
     Section
     """
-    section_id = models.UUIDField(default=uuid.uuid4())
+    section_id = models.UUIDField(default=uuid.uuid4)
 
     def __init__(self, *args, **kwargs):
         super(SectionQuestion, self).__init__(*args, **kwargs)
