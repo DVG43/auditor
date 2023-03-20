@@ -148,6 +148,9 @@ class CreateDocumen(graphene.Mutation):
         # присвоение родителя или создание поддокумента по умолчанию для корневого документа
         if input.parent:
             document_instance.parent = Document.objects.get(pk=input.parent)
+            # добавляем orderId в список для сортировки в родит-ий докум-т
+            document_instance.parent.doc_order.append(document_instance.order_id)
+            document_instance.parent.save()
         else:
             children_document_instance = Document.objects.create(
                 name="Без названия",
