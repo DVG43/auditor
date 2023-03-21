@@ -3,7 +3,7 @@ from graphene_django.types import ObjectType
 from graphql_jwt.decorators import login_required
 from rest_framework.generics import get_object_or_404
 
-from graphql_utils.utils_graphql import PermissionClass
+from poll.permissions import PermissionPollClass
 from poll.schema import types
 from poll.models import (
     poll as poll_models,
@@ -19,8 +19,10 @@ class QueryPoll(ObjectType):
 
     @login_required
     def resolve_all_polls(self, info):
-        PermissionClass.has_permission(info)
-        # PermissionClass.has_query_object_permission(info, prj_id)
+        """
+        Resolve all poll user
+        """
+        PermissionPollClass.has_permission(info)
         ret = poll_models.Poll.objects.filter(
             owner=info.context.user,
             deleted_id__isnull=True,
@@ -29,40 +31,48 @@ class QueryPoll(ObjectType):
 
     @login_required
     def resolve_all_poll_tags(self, info, poll_id=None):
-        PermissionClass.has_permission(info)
-        # PermissionClass.has_query_object_permission(info, prj_id)
+        """
+        Resolve all poll tags
+        """
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=poll_id)
+        PermissionPollClass.has_mutate_object_permission(info, poll)
         ret = poll_models.PollTags.objects.filter(
             poll=poll_id).all()
         return ret
 
     @login_required
     def resolve_poll_by_id(self, info, poll_id=None):
-        PermissionClass.has_permission(info)
-
+        """
+        Resolve Poll (check list) by poll_id
+        """
+        PermissionPollClass.has_permission(info)
         ret = get_object_or_404(poll_models.Poll, id=poll_id)
-        # prj_id = ret.host_project.id
-        # PermissionClass.has_query_object_permission(info, prj_id)
+        PermissionPollClass.has_mutate_object_permission(info, ret)
 
         return ret
 
     @login_required
     def resolve_poll_setting_by_id(self, info, poll_id=None):
-        PermissionClass.has_permission(info)
+        """
+        Resolve Poll (check list) settings by id
+        """
 
+        PermissionPollClass.has_permission(info)
         ret = poll_models.PollSettings.objects.get(id=poll_id)
-        prj_id = ret.poll.host_project.id
-        PermissionClass.has_query_object_permission(info, prj_id)
+        PermissionPollClass.has_mutate_object_permission(info, ret.poll)
 
         return ret
 
     @login_required
     def resolve_poll_tag_by_id(self, info, tag_id=None):
-        PermissionClass.has_permission(info)
-
+        """
+        Resolve Poll tag settings by id
+        """
+        PermissionPollClass.has_permission(info)
         ret = poll_models.PollTags.objects.get(tag_id=tag_id)
         polls = ret.poll_set.all()
         for poll in polls:
-            prj_id = poll.host_project.id
-            PermissionClass.has_query_object_permission(info, prj_id)
+            PermissionPollClass.has_mutate_object_permission(info, poll)
 
         return ret
