@@ -286,6 +286,34 @@ class TextQuestionSerializer(BaseQuestionSerializer):
         return instance
 
 
+class NumberQuestionSerializer(BaseQuestionSerializer):
+    number = serializers.FloatField()
+    poll = serializers.CharField(max_length=64)
+
+    def create(self, validated_data):
+        return TextQuestion.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        super(NumberQuestionSerializer, self).update(instance, validated_data)
+        instance.number = validated_data.get('number', instance.number)
+        instance.save()
+        return instance
+
+
+class DateQuestionSerializer(BaseQuestionSerializer):
+    date = serializers.DateTimeField()
+    poll = serializers.CharField(max_length=64)
+
+    def create(self, validated_data):
+        return TextQuestion.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        super(DateQuestionSerializer, self).update(instance, validated_data)
+        instance.date = validated_data.get('date', instance.date)
+        instance.save()
+        return instance
+
+
 class FinalQuestionSerializer(BaseQuestionSerializer):
     items = ItemQuestionSerializer(many=True)
     description_mode = serializers.BooleanField(required=False)
