@@ -50,7 +50,7 @@ class SurveyPassingSerializer(serializers.ModelSerializer):
 
     def create(self, user, validated_data):
         questions = []
-        questions_get = Poll.objects.get(poll_id=validated_data['poll_id'])
+        questions_get = Poll.objects.get(id=validated_data['poll_id'])
 
         if questions_get.pagequestion_set:
             questions.extend(list(questions_get.pagequestion_set.values_list('question_id', 'question_type')))
@@ -77,12 +77,11 @@ class SurveyPassingSerializer(serializers.ModelSerializer):
 
 
         survey = SurveyPassing()
-
         survey.user = user
         survey.age = validated_data['age']
         survey.sex = validated_data['sex']
         survey.platform = validated_data['platform']
-        survey.created_at = validated_data['createdAt']
+        survey.created_at = validated_data['created_at']
         survey.user_name = validated_data['user_name']
         survey.survey_title = validated_data['survey_title']
         survey.questions = questions
@@ -92,6 +91,6 @@ class SurveyPassingSerializer(serializers.ModelSerializer):
             event = validated_data['user_answers'][-1]['event']
 
         survey.status = event
-        survey.poll = Poll(poll_id=validated_data['poll_id'])
+        survey.poll = Poll(id=validated_data['poll_id'])
         survey.save()
         return survey
