@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        # ('document', '0014_alter_document_host_project'),
         ('folders', '0002_auto_20230227_1507'),
         ('table', '0001_initial'),
     ]
