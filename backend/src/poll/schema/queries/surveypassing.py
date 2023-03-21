@@ -13,10 +13,13 @@ class QuerySurveyPassing(ObjectType):
     Query for getting SurveyPassing
     """
     all_sp = graphene.List(types.SurveyPassingType)
-    surverpassing_by_id = graphene.Field(types.SurveyPassingType, id=graphene.Int())
+    surveypassing_by_id = graphene.Field(types.SurveyPassingType, id=graphene.Int())
 
     @login_required
     def resolve_all_sp(self, info):
+        """
+        Resolve all SurveyPassing
+        """
         PermissionPollClass.has_permission(info)
         ret = surveypassing.SurveyPassing.objects.all().select_related("user").prefetch_related(
             "useranswerquestion_set",
@@ -35,7 +38,10 @@ class QuerySurveyPassing(ObjectType):
         return ret
 
     @login_required
-    def resolve_surverpassing_by_id(self, info, id=None):
+    def resolve_surveypassing_by_id(self, info, id=None):
+        """
+        Resolve SurveyPassing by id
+        """
         PermissionPollClass.has_permission(info)
 
         ret = get_object_or_404(surveypassing.SurveyPassing, id=id)

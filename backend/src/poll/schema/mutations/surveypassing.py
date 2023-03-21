@@ -1,12 +1,9 @@
-import uuid
-
 import graphene
-from django.utils import timezone
 from django.contrib.auth import get_user_model
 from graphene_django.rest_framework.mutation import SerializerMutation
 from graphql_jwt.decorators import login_required
 
-from graphql_utils.utils_graphql import PermissionClass
+from poll.permissions import PermissionPollClass
 from poll.models import (
     surveypassing as surveypassing_models,
     poll as poll_models
@@ -35,13 +32,14 @@ class CreateSurveyPassing(SerializerMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
-        PermissionClass.has_permission(info)
+        PermissionPollClass.has_permission(info)
 
-        poll = poll_models.Poll.objects.filter(id=input["poll"])
-        PermissionPollClass.has_query_object_permission(poll)
+        poll = poll_models.Poll.objects.filter(id=input["poll"]).first()
+        PermissionPollClass.has_mutate_object_permission(info, poll)
 
         user = UserModel.objects.get(pk=input["user"])
-        input.update({"user": user, "poll": poll})
+        input.update({"user": user, "poll": poll, 'poll_id': poll.id})
+        print(input)
         instance = surveypassing_serializers.SurveyPassingSerializer.create(
             surveypassing_serializers.SurveyPassingSerializer(),
             validated_data=input, user=user
@@ -60,9 +58,11 @@ class MultipleDeleteSurveyPassing(graphene.Mutation):
 
     @staticmethod
     @login_required
-    def mutate(cls, root, ids):
-        PermissionClass.has_permission(root)
+    def mutate(cls, root, info, ids):
+        PermissionPollClass.has_permission(root)
         sp_list = surveypassing_models.SurveyPassing.objects.filter(id__in=ids).all()
+        for sp in sp_list:
+            PermissionPollClass.has_mutate_object_permission(root, sp.poll)
         sp_list.delete()
         return cls(ok=True)
 
