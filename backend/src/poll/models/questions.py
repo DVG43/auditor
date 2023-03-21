@@ -76,7 +76,7 @@ class Question(models.Model):
 
 class PageQuestion(Question):
     """
-    Section
+    Page
     """
     page_id = models.UUIDField(default=uuid.uuid4)
 
@@ -385,6 +385,42 @@ class TextQuestion(Question):
     class Meta:
         db_table = 'poll_question_text'
         verbose_name_plural = 'poll_text_questions'
+        indexes = [
+            models.Index(fields=['poll'])
+        ]
+
+
+class NumberQuestion(Question):
+    """
+    Just Number
+    """
+    number = models.FloatField(default='')
+
+    def __init__(self, *args, **kwargs):
+        super(NumberQuestion, self).__init__(*args, **kwargs)
+        self.question_type = __class__.__name__
+
+    class Meta:
+        db_table = 'poll_number_question'
+        verbose_name_plural = 'poll_number_questions'
+        indexes = [
+            models.Index(fields=['poll'])
+        ]
+
+
+class DateQuestion(Question):
+    """
+    Just Date
+    """
+    date = models.DateTimeField(default='')
+
+    def __init__(self, *args, **kwargs):
+        super(DateQuestion, self).__init__(*args, **kwargs)
+        self.question_type = __class__.__name__
+
+    class Meta:
+        db_table = 'poll_date_question'
+        verbose_name_plural = 'poll_date_questions'
         indexes = [
             models.Index(fields=['poll'])
         ]

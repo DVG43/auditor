@@ -15,7 +15,11 @@ from poll.serializers import (
 
 
 class CrtUpdPageQuestions(SerializerMutation):
-
+    """
+    Создание|Обновление страницы Чеклиста.
+    Для вложенных вопросов в поле <parent_id>
+    нужно указать <page_id> данной страницы
+    """
     class Meta:
         serializer_class = qstn_serializers.PageQuestionSerializer
         model_operations = ['create', 'update']
@@ -39,7 +43,11 @@ class CrtUpdPageQuestions(SerializerMutation):
 
 
 class CrtUpdSectionQuestions(SerializerMutation):
-
+    """
+    Создание|Обновление секции Чеклиста.
+    Для вложенных вопросов в поле <parent_id>
+    нужно указать <section_id> данной страницы
+    """
     class Meta:
         serializer_class = qstn_serializers.SectionQuestionSerializer
         model_operations = ['create', 'update']
@@ -63,6 +71,9 @@ class CrtUpdSectionQuestions(SerializerMutation):
 
 
 class CrtUpdHeadQuestions(SerializerMutation):
+    """
+    Создание|Обновление головного вопроса
+    """
 
     class Meta:
         serializer_class = qstn_serializers.HeadingQuestionSerializer
@@ -80,6 +91,60 @@ class CrtUpdHeadQuestions(SerializerMutation):
         input.update({'poll': poll})
 
         ret = qstn_models.HeadingQuestion(**input)
+        ret.save()
+
+        poll.normalize_questions_order_id()
+        return ret
+
+
+class CrtUpdNumberQuestions(SerializerMutation):
+    """
+    Создание|Обновление числового вопроса
+    """
+
+    class Meta:
+        serializer_class = qstn_serializers.NumberQuestionSerializer
+        model_operations = ['create', 'update']
+        lookup_field = 'question_id'
+        model_class = qstn_models.NumberQuestion
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        PermissionPollClass.has_mutate_object_permission(info, poll)
+
+        input.update({'poll': poll})
+
+        ret = qstn_models.NumberQuestion(**input)
+        ret.save()
+
+        poll.normalize_questions_order_id()
+        return ret
+
+
+class CrtUpdDateQuestions(SerializerMutation):
+    """
+    Создание|Обновление вопроса даты
+    """
+
+    class Meta:
+        serializer_class = qstn_serializers.DateQuestionSerializer
+        model_operations = ['create', 'update']
+        lookup_field = 'question_id'
+        model_class = qstn_models.DateQuestion
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        PermissionPollClass.has_mutate_object_permission(info, poll)
+
+        input.update({'poll': poll})
+
+        ret = qstn_models.DateQuestion(**input)
         ret.save()
 
         poll.normalize_questions_order_id()
@@ -111,7 +176,9 @@ class CrtUpdRatingQuestions(SerializerMutation):
 
 
 class CrtUpdTextQuestions(SerializerMutation):
-
+    """
+    Создание|Обновление текстового вопроса
+    """
     class Meta:
         serializer_class = qstn_serializers.TextQuestionSerializer
         model_operations = ['create', 'update']
@@ -135,7 +202,9 @@ class CrtUpdTextQuestions(SerializerMutation):
 
 
 class CrtUpdFreeQuestions(SerializerMutation):
-
+    """
+    Создание|Обновление FreeAnswer вопроса
+    """
     class Meta:
         serializer_class = qstn_serializers.FreeAnswerSerializer
         model_operations = ['create', 'update']
@@ -179,7 +248,9 @@ class CrtUpdFreeQuestions(SerializerMutation):
 
 
 class CrtUpdMediaQuestions(SerializerMutation):
-
+    """
+    Создание|Обновление Media вопроса
+    """
     class Meta:
         serializer_class = qstn_serializers.MediaQuestionSerializer
         model_operations = ['create', 'update']
@@ -223,6 +294,9 @@ class CrtUpdMediaQuestions(SerializerMutation):
 
 
 class CrtUpdManyQuestions(SerializerMutation):
+    """
+    Создание|Обновление вопроса с множественным выбором
+    """
 
     class Meta:
         serializer_class = qstn_serializers.ManyFromListQuestionSerializer
@@ -267,6 +341,10 @@ class CrtUpdManyQuestions(SerializerMutation):
 
 
 class CrtUpdYesNoQuestions(SerializerMutation):
+    """
+    Создание|Обновление вопроса с одиночным выбором
+    """
+
     class Meta:
         serializer_class = qstn_serializers.YesNoQuestionSerializer
         model_operations = ['create', 'update']
@@ -319,6 +397,9 @@ class CrtUpdYesNoQuestions(SerializerMutation):
 
 
 class CrtUpdFinalQuestions(SerializerMutation):
+    """
+    Создание|Обновление финального вопроса
+    """
     class Meta:
         serializer_class = qstn_serializers.FinalQuestionSerializer
         model_operations = ['create', 'update']
@@ -454,15 +535,13 @@ class DeleteQuestion(graphene.Mutation):
 class QstnMutation(graphene.ObjectType):
     crt_upd_page_question = CrtUpdPageQuestions.Field()
     crt_upd_section_question = CrtUpdSectionQuestions.Field()
-    crt_upd_head_question = CrtUpdHeadQuestions.Field()
-    crt_upd_rating_question = CrtUpdRatingQuestions.Field()
     crt_upd_text_question = CrtUpdTextQuestions.Field()
+    crt_upd_number_question = CrtUpdNumberQuestions.Field()
+    crt_upd_date_question = CrtUpdDateQuestions.Field()
     crt_upd_free_question = CrtUpdFreeQuestions.Field()
     crt_upd_media_question = CrtUpdMediaQuestions.Field()
     crt_upd_many_question = CrtUpdManyQuestions.Field()
     crt_upd_yes_no_question = CrtUpdYesNoQuestions.Field()
-    crt_upd_final_question = CrtUpdFinalQuestions.Field()
-    crt_upd_division_question = CrtUpdDivisionQuestions.Field()
     crt_upd_item_question = CrtUpdItemQuestions.Field()
     delete_item_question = DeleteItemQuestions.Field()
     delete_question = DeleteQuestion.Field()
