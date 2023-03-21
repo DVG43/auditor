@@ -12,6 +12,7 @@ from table.schema import Query as DefaultQueryTable
 from table.schema import Mutation as MutationDefaultTable
 from projects.schema.query import Query as QueryLinkText
 from projects.schema.mutations import Mutation as MutationLinkText
+from .add_logos import Mutation as LogoMutation
 
 
 class Query(
@@ -29,7 +30,8 @@ class Mutation(
     MutationTiming,
     MutationDefaultTable,
     MutationPoll,
-    MutationLinkText
+    MutationLinkText,
+    LogoMutation
 ):
     pass
 
