@@ -69,7 +69,7 @@ class UserChoiceSerializer(PpmDocSerializer):
 
 class DefaultTableSerializer(PpmDocSerializer):
     model = serializers.SerializerMethodField()
-    host_folder = serializers.PrimaryKeyRelatedField(
+    folder = serializers.PrimaryKeyRelatedField(
         queryset=Folder.objects.all(), write_only=True, required=False)
     host_document = serializers.PrimaryKeyRelatedField(
         queryset=Document.objects.all(), write_only=True, required=False)

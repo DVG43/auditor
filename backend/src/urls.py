@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include, re_path
+from graphene_file_upload.django import FileUploadGraphQLView
 from rest_framework.routers import SimpleRouter
 # from drf_yasg.views import get_schema_view
 # from drf_yasg import openapi
@@ -63,7 +64,7 @@ urlpatterns = [
         path('contact/search/',
              ContactSearchViewSet.as_view({'post': 'search'}),
              name='search_for_contact'),
-        path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
+        path('graphql/', csrf_exempt(FileUploadGraphQLView.as_view(graphiql=True))),
     ])),
     path('api/v2/', include([
         path('schema/', SpectacularAPIView.as_view(api_version='v2'), name='schema', ),

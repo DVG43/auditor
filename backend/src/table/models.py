@@ -2,6 +2,7 @@ import uuid
 
 from django.contrib.postgres.fields import ArrayField
 
+from accounts.models import ResizeImageMixin
 from common.models import PpmDocModel, permissions, UserCell, UserColumn, UserChoice
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -15,7 +16,7 @@ from utils import get_doc_upload_path
 class DefaultTableModel(PpmDocModel):
     host_document = models.ForeignKey(Document, related_name="tables", on_delete=models.CASCADE,
                                       null=True, blank=True)
-    host_folder = models.ForeignKey(Folder, related_name="tables", on_delete=models.CASCADE,
+    folder = models.ForeignKey(Folder, related_name="tables", on_delete=models.CASCADE,
                                     null=True, blank=True)
 
     frame_columns = models.ManyToManyField(
@@ -100,6 +101,24 @@ class DefaultTableUsercell(models.Model):
         return f'CELL#{self.id}'
 
 
+class UsercellFile(models.Model, ResizeImageMixin):
+    owner = models.ForeignKey('accounts.User', on_delete=models.CASCADE)
+    host_usercell = models.ForeignKey(
+        DefaultTableUsercell,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='files'
+    )
+    file = models.FileField(
+        upload_to='usercell_files/', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.pk is None and self.file:
+            self.resize(self.file, (1920, 1080))
+        super().save(*args, **kwargs)
+
+
 register(DefaultTableModel, permissions)
 register(DefaultTableUsercell, permissions)
 register(DefaultTableFrame, permissions)
+register(UsercellFile, permissions)
