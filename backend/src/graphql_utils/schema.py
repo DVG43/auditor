@@ -35,7 +35,6 @@ class Mutation(
     MutationPoll,
     MutationLinkText,
     # MutationIntegrations
-    MutationLinkText,
     LogoMutation
 ):
     pass
