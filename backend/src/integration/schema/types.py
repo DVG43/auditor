@@ -7,6 +7,7 @@ from integration.models import telegram as telegram_models
 class GoogleSheetIntegrationType(DjangoObjectType):
     class Meta:
         model = gs_models.GoogleSheetIntegration
+        fields = ("id", "user")
 
 
 class GoogleSheetCredentialsType(DjangoObjectType):

@@ -9,7 +9,7 @@ from integration.models.telegram import TelegramIntegration
 from integration.models.googlesheet import GoogleSheetIntegration
 
 
-class AllintegrationsIsActiveView(APIView):
+class AllIntegrationsIsActiveView(APIView):
 
     def get(self, request, pk, format=None):
 

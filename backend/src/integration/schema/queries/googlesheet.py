@@ -10,20 +10,25 @@ from integration.models.googlesheet import GoogleSheetCredentials, GoogleSheetIn
 class QueryGoogleSheet(ObjectType):
     all_credentials = graphene.List(types.GoogleSheetCredentialsType)
     all_integrations = graphene.List(types.GoogleSheetIntegrationType)
-    credentials_by_user_id = graphene.Field(types.GoogleSheetCredentialsType, user_id=graphene.Int())
     integration_by_survey_id = graphene.Field(types.GoogleSheetIntegrationType, survey_id=graphene.Int())
 
     @login_required
     def resolve_all_credentials(self, info):
         PermissionClass.has_permission(info)
-        ret = GoogleSheetCredentials.objects.filter(
+        result = GoogleSheetCredentials.objects.filter(
             user=info.context.user
         ).all()
-        return ret
+        return result
 
     @login_required
     def resolve_all_integrations(self, info):
         PermissionClass.has_permission(info)
-        ret = GoogleSheetIntegration.objects.filter(
+        result = GoogleSheetIntegration.objects.filter(
             user=info.context.user).all()
-        return ret
+        return result
+
+    @login_required
+    def resolve_integration_by_survey_id(self, info, survey_id):
+        PermissionClass.has_permission(info)
+        result = GoogleSheetIntegration.objects.get(survey_id=survey_id)
+        return result

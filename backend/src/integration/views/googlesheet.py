@@ -50,6 +50,15 @@ class GoogleSheetIntegrationViewSet(viewsets.ModelViewSet):
         return super(GoogleSheetIntegrationViewSet, self).update(request, pk, *args, **kwargs)
 
     def create(self, request):
+        """
+        Returns the authorization URL that redirects and continues the integration build.
+
+        ---
+        Request body:
+        - id: poll_id
+          required: true
+          type: integer
+        """
         if GoogleSheetIntegration.objects.filter(id=request.data['id']).exists():
             return Response({'detail': 'The GS Integration object is already exist.'},
                             status=HTTPStatus.BAD_REQUEST)
@@ -78,7 +87,14 @@ class CreateGoogleSheetView(APIView):
     permission_classes = [permissions.AllowAny, ]
 
     def get(self, request, **kwargs):
-        credentials, created = GoogleSheetCredentials.objects.get_or_create(user=SESSION['user'])
+        user = SESSION.get('user', '')
+
+        if user == '':
+            return Response(
+                {'detail': 'Need to authenticate before accessing this functional.'},
+                status=HTTPStatus.UNAUTHORIZED)
+
+        credentials, created = GoogleSheetCredentials.objects.get_or_create(user=user)
         credentials.create_connection(request, settings.CREDENTIALS_FILE_NAME)
 
         if credentials.google_sheet_credentials == '':
