@@ -12,6 +12,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from accounts.views import SocialComplete, SocialDisconnect, ShareDocView, GetSharedDoc
 from common.views import CalendarView, GetOpenGraphTagsView, StandardIconViewSet
 from contacts.views import ContactViewSet, ContactSearchViewSet
+from integration.urls import all_integrations_endpoints, google_auth_endpoints
+from integration.views.googlesheet import GoogleSheetIntegrationViewSet
 from projects.views import ProjectViewSet
 from trash.views import TrashViewSet
 from django.views.decorators.csrf import csrf_exempt
@@ -23,6 +25,7 @@ router.register(r'contacts', ContactViewSet)
 router.register(r'projects', ProjectViewSet)
 router.register(r'trash', TrashViewSet)
 router.register(r'icons', StandardIconViewSet)
+router.register(r'googlesheetintegration', GoogleSheetIntegrationViewSet, 'googlesheetintegration')
 
 urlpatterns = [
     path('api/v1/', include([
@@ -37,6 +40,8 @@ urlpatterns = [
         path('oauth/', include('social_django.urls', namespace='social')),
         path('calendar/<str:from>/<str:to>/', CalendarView.as_view()),
         path('poll/', include(poll_endpoints)),
+        path('integrations/', include(all_integrations_endpoints)),
+        path('googleauth/', include(google_auth_endpoints)),
         path('url_opengraph/', GetOpenGraphTagsView.as_view()),
         path('', include(router.urls)),
         path('', include('projects.urls')),

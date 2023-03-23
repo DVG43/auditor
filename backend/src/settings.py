@@ -59,6 +59,7 @@ PROJECT_APPS = [
     'folders',
     'poll',
     'table',
+    'integration',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
@@ -256,6 +257,9 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 TEMPLATED_EMAIL_BACKEND = 'templated_email.backends.vanilla_django'
 
+DOMAIN = os.environ.get("DOMAIN")
+CREDENTIALS_FILE_NAME = os.path.join(BASE_DIR, os.environ.get('GOOGLE_SECRET_FILE_NAME'))
+
 AUTHENTICATION_BACKENDS = (
     # 'drf_social_oauth2.backends.DjangoOAuth2',
     'social_core.backends.vk.VKOAuth2',
@@ -415,4 +419,4 @@ REL_DOCS = [
     'polls'
 ]
 
-APP_API_LOG = os.environ.get('APP_API_LOG', os.path.join(STATIC_ROOT,'apilog.log'))
+APP_API_LOG = os.environ.get('APP_API_LOG', os.path.join(STATIC_ROOT, 'apilog.log'))
