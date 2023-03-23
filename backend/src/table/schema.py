@@ -164,6 +164,7 @@ class CreateDefaultTable(SerializerMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         if "folder" in input:
             folder_id = input["folder"]
+            del input["host_document"]
         else:
             folder_id = Document.objects.filter(pk=input["host_document"]).first().folder.id
 

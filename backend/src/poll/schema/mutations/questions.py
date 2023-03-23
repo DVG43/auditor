@@ -474,8 +474,9 @@ class DeleteItemQuestions(graphene.Mutation):
     """
     Удаляет вариант ответа из вопроса.
     Принимает {item_id: int, item_type: string}, где
-    qstn_type == "ManyFromListQuestion"|"YesNoQuestion"|"MediaQuestion"
-    |"FinalQuestion"|"FreeAnswer"|"PageQuestion"|"SectionQuestion"
+    qstn_type == "PageQuestion"|"ManyFromListQuestion"|"YesNoQuestion"
+    |"SectionQuestion"|"TextQuestion"|"MediaQuestion"
+    |"DateQuestion"|"NumberQuestion"|"FreeAnswer"
     """
 
     class Arguments:
@@ -502,9 +503,9 @@ class DeleteQuestion(graphene.Mutation):
     """
     Удаляет вопрос из чеклиста.
     Принимает {qstn_id: int, qstn_type: string}, где
-    qstn_type == "DivisionQuestion"|"ManyFromListQuestion"|"YesNoQuestion"
-    |"RatingQuestion"|"TextQuestion"|"MediaQuestion"
-    |"FinalQuestion"|"HeadingQuestion"|"FreeAnswer"
+    qstn_type == "PageQuestion"|"ManyFromListQuestion"|"YesNoQuestion"
+    |"SectionQuestion"|"TextQuestion"|"MediaQuestion"
+    |"DateQuestion"|"NumberQuestion"|"FreeAnswer"
     """
 
     class Arguments:

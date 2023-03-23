@@ -36,7 +36,7 @@ class QueryPoll(ObjectType):
         """
         PermissionPollClass.has_permission(info)
         poll = get_object_or_404(poll_models.Poll, id=poll_id)
-        PermissionPollClass.has_mutate_object_permission(info, poll)
+        PermissionPollClass.has_query_object_permission(info, poll)
         ret = poll_models.PollTags.objects.filter(
             poll=poll_id).all()
         return ret
@@ -48,7 +48,7 @@ class QueryPoll(ObjectType):
         """
         PermissionPollClass.has_permission(info)
         ret = get_object_or_404(poll_models.Poll, id=poll_id)
-        PermissionPollClass.has_mutate_object_permission(info, ret)
+        PermissionPollClass.has_query_object_permission(info, ret)
 
         return ret
 
@@ -60,7 +60,7 @@ class QueryPoll(ObjectType):
 
         PermissionPollClass.has_permission(info)
         ret = poll_models.PollSettings.objects.get(id=poll_id)
-        PermissionPollClass.has_mutate_object_permission(info, ret.poll)
+        PermissionPollClass.has_query_object_permission(info, ret.poll)
 
         return ret
 
@@ -73,6 +73,6 @@ class QueryPoll(ObjectType):
         ret = poll_models.PollTags.objects.get(tag_id=tag_id)
         polls = ret.poll_set.all()
         for poll in polls:
-            PermissionPollClass.has_mutate_object_permission(info, poll)
+            PermissionPollClass.has_query_object_permission(info, poll)
 
         return ret
