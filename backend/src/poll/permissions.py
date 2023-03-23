@@ -102,11 +102,10 @@ class PermissionPollClass(PermissionClass):
             while folder:
                 if user.has_object_perm(folder, ['read', 'edit', 'own']):
                     break
-                folder = instance.parent_folder
+                folder = folder.parent_folder
             if not folder:
                 raise PermissionDenied(
                     {'error': f'You don`t have access to this object: {instance}'})
-
 
     @classmethod
     def has_mutate_object_permission(cls, info, instance):
@@ -117,7 +116,7 @@ class PermissionPollClass(PermissionClass):
             while folder:
                 if user.has_object_perm(folder, ['edit', 'own']):
                     break
-                folder = instance.parent_folder
+                folder = folder.parent_folder
             if not folder:
                 raise PermissionDenied(
                     {'error': f'You don`t have access to this object: {instance}'})
