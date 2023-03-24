@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework import serializers
 
 from poll.models.poll import Poll
@@ -10,6 +12,9 @@ class SurveyPassingSerializer(serializers.ModelSerializer):
     class Meta:
         model = SurveyPassing
         fields = '__all__'
+        optional_fields = ['sex', 'platform', 'age', 'user_name',
+                           'survey_title', 'status', 'questions']
+        read_only_fields = ('created_at', )
 
     def __init__(self, *args, **kwargs):
         super(SurveyPassingSerializer, self).__init__()
@@ -75,15 +80,14 @@ class SurveyPassingSerializer(serializers.ModelSerializer):
         if questions_get.freeanswer_set:
             questions.extend(list(questions_get.freeanswer_set.values_list('question_id',  'question_type')))
 
-
         survey = SurveyPassing()
         survey.user = user
-        survey.age = validated_data['age']
-        survey.sex = validated_data['sex']
-        survey.platform = validated_data['platform']
-        survey.created_at = validated_data['created_at']
-        survey.user_name = validated_data['user_name']
-        survey.survey_title = validated_data['survey_title']
+        survey.age = validated_data.get('age', None)
+        survey.sex = validated_data.get('sex', None)
+        survey.platform = validated_data.get('platform', None)
+        survey.created_at = validated_data.get('created_at', datetime.datetime.utcnow())
+        survey.user_name = validated_data.get('user_name', 'Anonymous')
+        survey.survey_title = validated_data.get('survey_title', 'Untitled')
         survey.questions = questions
 
         event = 'new'
