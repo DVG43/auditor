@@ -5,40 +5,10 @@ from graphql_jwt.decorators import login_required
 from poll.permissions import PermissionPollClass
 from poll.models import (
     answer as answer_models,
-    surveypassing as surveypassing_models,
     poll as poll_models
 )
 from poll.schema import types
 from poll.serializers import answer as answer_serializers
-from poll.serializers import surveypassing as surveypassing_serializers
-
-
-class CreateUserAnswer(SerializerMutation):
-    """
-    Mutation for creating UserAnswerQuestion instance
-    """
-    class Meta:
-        serializer_class = answer_serializers.UserAnswerSerializer
-        model_operations = ['create']
-        lookup_field = 'id'
-        model_class = answer_models.UserAnswerQuestion
-        convert_choices_to_enum = True
-
-    @classmethod
-    @login_required
-    def mutate_and_get_payload(cls, root, info, **input):
-        PermissionPollClass.has_permission(info)
-
-        # sp = surveypassing_models.SurveyPassing.objects.filter(id=input["survey_id"]).first()
-        # PermissionPollClass.has_mutate_object_permission(info, sp.poll)
-
-        # input.update({"user": user, "poll": poll, 'poll_id': poll.id})
-        print(input)
-        instance = answer_serializers.UserAnswerSerializer.create(
-            answer_serializers.UserAnswerSerializer(),
-            validated_data=input
-        )
-        return instance
 
 
 class EventChoice(graphene.Enum):
