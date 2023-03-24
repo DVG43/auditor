@@ -94,7 +94,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = ("id", "documents")
 
-class TextGenerationSerializer(serializers.Serializer):
+class ThemeToTextSerializer(serializers.Serializer):
     """ Ввод текста темы для генерации абзаца """
     source = serializers.CharField()
     tone = serializers.ChoiceField(choices={
@@ -129,8 +129,14 @@ class TextShorterSerializer(serializers.Serializer):
 
 
 class TextContinueSerializer(serializers.Serializer):
-    """ Ввод текста для продолжения """
+    """ Ввод текста для увеличения объема текста """
     source = serializers.CharField()
+
+
+class QueryAiSerializer(serializers.Serializer):
+    """ Ввод произвольного запроса к AI с опциональным контекстом """
+    source = serializers.CharField()
+    context = serializers.CharField(required=False)
 
 
 def is_right_n(value):

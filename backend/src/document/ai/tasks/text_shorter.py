@@ -33,7 +33,8 @@ def get_prompt(text: str) -> str:
 
     <text to shorten>
     """
-    return f'Make this text less verbose:\n\n{text.strip()}'
+    return (f'Make this text less verbose. The output must be in '
+            f'the same language as the original text:\n\n{text.strip()}')
 
 
 def generate(

@@ -6,10 +6,11 @@ from document.serializers import (
     DocumentLogoSerializer,
     ProjectSerializer,
     DocumentSerializer,
-    TextGenerationSerializer,
+    ThemeToTextSerializer,
     TextRephraseSerializer,
     TextShorterSerializer,
     TextContinueSerializer,
+    QueryAiSerializer,
     ImageGenerationSerializer,
 )
 from rest_framework import generics, viewsets
@@ -62,9 +63,9 @@ class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
         return ProjectSerializer
 
 
-class TextGeneration(views.APIView):
+class ThemeToText(views.APIView):
     permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
-    serializer_class = TextGenerationSerializer
+    serializer_class = ThemeToTextSerializer
 
     def post(self, request, *args, **kwargs):
         """
@@ -84,7 +85,7 @@ class TextGeneration(views.APIView):
         # 1. Проверка валидности полей
         if request.data.get('tone') == "null":
             request.data['tone'] = None
-        serializer = TextGenerationSerializer(data=request.data)
+        serializer = ThemeToTextSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         # 2. Извлечение значений переменных из HTTP запроса
@@ -128,7 +129,7 @@ class TextRephrase(views.APIView):
         source = request.data.get('source')
 
         # 3. Получение ответа от AI
-        result = ai.rephrase(source, include_debug=False)
+        result = ai.text_rephrase(source, include_debug=False)
 
         return Response(result, status=200)
 
@@ -153,7 +154,7 @@ class TextShorter(views.APIView):
         serializer.is_valid(raise_exception=True)
         source = request.data.get('source')
 
-        result = ai.shorter(source, include_debug=False)
+        result = ai.text_shorter(source, include_debug=False)
         return Response(result, status=200)
 
 
@@ -177,7 +178,33 @@ class TextContinue(views.APIView):
         serializer.is_valid(raise_exception=True)
         source = request.data.get('source')
 
-        result = ai.continue_text(source, include_debug=False)
+        result = ai.text_continue(source, include_debug=False)
+        return Response(result, status=200)
+
+
+class QueryAi(views.APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
+    serializer_class = QueryAiSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Генерирует текст согласно запросу пользователя. Можно
+        использовать дополнительный контекст.
+
+        Пример ответа:
+        ```json
+        {
+            "payload": "... ответ ИИ ...",
+            "error": null
+        }
+        ```
+        """
+        serializer = QueryAiSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        source = request.data.get('source')
+        context = request.data.get('context')
+
+        result = ai.query_ai(source, context, include_debug=False)
         return Response(result, status=200)
 
 

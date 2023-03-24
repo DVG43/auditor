@@ -1,8 +1,9 @@
 
 from .tasks.theme_to_text import generate as theme_to_text
-from .tasks.rephrase import generate as rephrase
-from .tasks.shorter import generate as shorter
-from .tasks.continue_text import generate as continue_text
+from .tasks.text_rephrase import generate as text_rephrase
+from .tasks.text_shorter import generate as text_shorter
+from .tasks.text_continue import generate as text_continue
+from .tasks.query_ai import generate as query_ai
 
 
 def set_openai_api_key(api_key):
