@@ -1,5 +1,5 @@
 
-from ..engines import chat_3_5_turbo_0301 as engine
+from ..engines import gpt_3_5_turbo_0301 as engine
 
 ENGINE_CONFIG = {
     'max_tokens': 1500,

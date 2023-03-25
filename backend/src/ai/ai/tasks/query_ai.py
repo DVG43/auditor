@@ -1,8 +1,6 @@
 
-from ..engines import chat_3_5_turbo_0301 as engine
+from ..engines import gpt_3_5_turbo_0301 as engine
 
-# Целевое число слов для генерируемого текста
-LEN_WORDS = 30
 
 ENGINE_CONFIG = {
     'max_tokens': 1500,
@@ -10,43 +8,6 @@ ENGINE_CONFIG = {
     # Set to `0` during development for determined answers from GPT
     'temperature': 0,
 }
-
-def get_prompt(text: str, len_words: int) -> str:
-    """
-    Сформировать промт для генерации продолжения входного текста.
-
-    Parameters
-    ----------
-
-    text : str
-        Входной текст. Если последнее предложение не оканчивается точкой,
-        то будет сгенерировано продолжение, иначе будет сгенерировано
-        следующее предложение.
-
-    len_words : int
-        Примерная длина продолжения в словах. Языковая модель
-        далеко не всегда идеально следует инстукциям, поэтому итоговая длина
-        может варьироваться.
-
-
-    Return
-    ------
-    str
-        Строка-промт (prompt) для языковой модели.
-
-
-    Example
-    -------
-    >>> get_prompt("<text to continue>", len_words=30)
-    Continue the text. Use no more then 30 words:
-
-    <text to continue>
-    """
-    if len_words < 1:
-        raise ValueError(f'len_words expected to be >= 1, got: {len_words}')
-
-    prompt = f'Continue the text. Use no more then {len_words} words:\n\n{text.strip()}'
-    return prompt
 
 
 def generate(

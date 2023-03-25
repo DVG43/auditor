@@ -1,5 +1,5 @@
 
-from ..engines import chat_3_5_turbo_0301 as engine
+from ..engines import gpt_3_5_turbo_0301 as engine
 
 # Целевое число слов для генерируемого текста
 LEN_WORDS = 80
