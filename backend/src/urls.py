@@ -50,6 +50,7 @@ urlpatterns = [
         # path('pay/', include('tinkoff_pay.urls')),
         path('', include('subscription.urls')),
         path('', include('document.urls')),
+        path('', include('ai.urls')),
         path('', include('folders.urls')),
         path('document/share/', include([
             path('', ShareDocView.as_view({
