@@ -106,6 +106,8 @@ class Poll(PpmDocModel):
             questions.extend(list(self.datequestion_set.all()))
         if self.numberquestion_set:
             questions.extend(list(self.numberquestion_set.all()))
+        if self.checkquestion_set:
+            questions.extend(list(self.checkquestion_set.all()))
         if self.freeanswer_set:
             questions.extend(list(self.freeanswer_set.all()))
         if self.pagequestion_set:
