@@ -60,6 +60,7 @@ PROJECT_APPS = [
     'poll',
     'table',
     'integration',
+    'catalog_templates',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
@@ -420,3 +421,4 @@ REL_DOCS = [
 ]
 
 APP_API_LOG = os.environ.get('APP_API_LOG', os.path.join(STATIC_ROOT, 'apilog.log'))
+TAGGIT_STRIP_UNICODE_WHEN_SLUGIFYING = True
