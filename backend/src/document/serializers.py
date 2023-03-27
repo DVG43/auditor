@@ -146,3 +146,21 @@ class ImageGenerationSerializer(serializers.Serializer):
     prompt = serializers.CharField()
     n = serializers.IntegerField(required=False, default=1, validators=[is_right_n])
     size = serializers.IntegerField(required=False, default=2, validators=[is_right_size])
+
+def is_right_lang(value):
+    if not value in {'ru-RU', 'en-US', 'kk-KK', 'de-DE', 'uz-UZ'}:
+        raise serializers.ValidationError('недопустимое значение')
+
+def is_right_voice(value):
+    if not value in {'alena', 'filipp', 'ermil', 'jane', 'madirus', 'omazh', 'zahar', 'oksana', 'nigora', 'lea', 'amira', 'madi'}:
+        raise serializers.ValidationError('недопустимое значение')
+
+def is_right_speed(value):
+    if not (0.1 <= float(value) <= 3.0):
+        raise serializers.ValidationError('недопустимое число')
+
+class AudioGenerationSerializer(serializers.Serializer):
+    """ Проверка полей передаваемых в фукнцию генерации речи """
+    lang = serializers.CharField(required=False, validators=[is_right_lang])
+    voice = serializers.CharField(required=False, validators=[is_right_voice])
+    speed = serializers.CharField(required=False, validators=[is_right_speed])

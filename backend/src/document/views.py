@@ -1,3 +1,4 @@
+from json import loads
 from accounts.permissions import IsActivated
 from common.permissions import IsOwner, IsOwnerOrIsInvited
 from django.shortcuts import get_object_or_404
@@ -11,6 +12,7 @@ from document.serializers import (
     TextShorterSerializer,
     TextContinueSerializer,
     ImageGenerationSerializer,
+    AudioGenerationSerializer,
 )
 from rest_framework import generics, viewsets
 from rest_framework.exceptions import PermissionDenied
@@ -208,4 +210,45 @@ class ImageGeneration(views.APIView):
         for i in range(len(fnames)):
             answer[i] = f"http://{web_server}{MEDIA_URL}images/{fnames[i]}"
 
+        return Response(answer)
+
+def get_text(lst, txt = ''):
+  for elm in lst:
+    if 'children' in elm.keys():
+      txt += get_text(elm['children'])
+    else:
+      txt += elm['text'] + ' ' if elm['text'] != '/' else ''
+  return txt
+
+class Text2Speech(views.APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
+    serializer_class = AudioGenerationSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Генерирует речь из текста документа и сохраняет её в файл формата mp3 в {MEDIA_URL}audio/\n
+        param:\n
+            id (int): id документа
+            lang (str): язык, приемлемые значения ['ru-RU', 'en-US', 'kk-KK', 'de-DE', 'uz-UZ'], по умолчанию ru-RU
+            voice (str): предпочтительный голос синтеза речи из списка ['alena', 'filipp', 'ermil', 'jane', 'madirus', 'omazh', 'zahar', 'oksana', 'nigora', 'lea', 'amira', 'madi'], значение по умолчанию: Оксана
+            speed (str): темп (скорость) синтезированной речи, скорость речи задается десятичным числом в диапазоне от 0,1 до 3,0. Где:
+                3.0 — Самая высокая скорость.
+                1.0 (по умолчанию) — средняя скорость речи человека.
+                0,1 — самая низкая скорость речи.
+        """
+        # проверка валидности полей
+        serializer = AudioGenerationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        content = get_object_or_404(Document, pk=kwargs['pk']).content.replace("null", '""')
+        text = get_text(loads(content)["root"]["children"])
+
+        # извлечение знач переменных
+        lang = request.data.get('lang')
+        voice = request.data.get('voice')
+        speed = request.data.get('speed')
+
+        # формируем речь и возвращаем ссылку на файл
+        fname = utils.text2speech(text, lang, voice, speed)
+        answer = f"https://{request.META['HTTP_HOST']}{MEDIA_URL}audio/{fname}"
         return Response(answer)
