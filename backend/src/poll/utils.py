@@ -1,7 +1,7 @@
 from poll.models.questions import DivisionQuestion, ManyFromListQuestion, YesNoQuestion, RatingQuestion, TextQuestion, \
     MediaQuestion, FinalQuestion, HeadingQuestion, FreeAnswer, ItemQuestion, MediaItemQuestion, ItemsFreeAnswer, \
     TagsFreeAnswer, YesNoAttachedType, MediaAttachedType, FreeAnswerAttachedType, YesNoAnswers, ManyFromListAttachedType, \
-    SectionQuestion, PageQuestion
+    SectionQuestion, PageQuestion, NumberQuestion, DateQuestion, CheckQuestion
 from poll.serializers import questions as questions_serializers_v1
 from poll.serializers_v2 import questions as questions_serializers_v2
 
@@ -22,6 +22,9 @@ QUESTION_MODELS = {
     'PageQuestion': PageQuestion,
     'SectionQuestion': SectionQuestion,
     'DivisionQuestion': DivisionQuestion,
+    'NumberQuestion': NumberQuestion,
+    'DateQuestion': DateQuestion,
+    'CheckQuestion': CheckQuestion,
     'ManyFromListQuestion': ManyFromListQuestion,
     'YesNoQuestion': YesNoQuestion,
     'RatingQuestion': RatingQuestion,
@@ -35,6 +38,9 @@ QUESTION_MODELS = {
 QUESTION_SERIALIZERS_V1 = {
     'PageQuestion': questions_serializers_v1.PageQuestionSerializer,
     'SectionQuestion': questions_serializers_v1.SectionQuestionSerializer,
+    'NumberQuestion': questions_serializers_v1.NumberQuestionSerializer,
+    'DateQuestion': questions_serializers_v1.DateQuestionSerializer,
+    'CheckQuestion': questions_serializers_v1.CheckQuestionSerializer,
     'DivisionQuestion': questions_serializers_v1.DivisionQuestionSerializer,
     'ManyFromListQuestion': questions_serializers_v1.ManyFromListQuestionSerializer,
     'YesNoQuestion': questions_serializers_v1.YesNoQuestionSerializer,

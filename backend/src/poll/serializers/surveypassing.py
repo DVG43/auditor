@@ -61,24 +61,22 @@ class SurveyPassingSerializer(serializers.ModelSerializer):
             questions.extend(list(questions_get.pagequestion_set.values_list('question_id', 'question_type')))
         if questions_get.sectionquestion_set:
             questions.extend(list(questions_get.sectionquestion_set.values_list('question_id', 'question_type')))
-        if questions_get.divisionquestion_set:
-            questions.extend(list(questions_get.divisionquestion_set.values_list('question_id', 'question_type')))
         if questions_get.yesnoquestion_set:
             questions.extend(list(questions_get.yesnoquestion_set.values_list('question_id', 'question_type')))
         if questions_get.manyfromlistquestion_set:
             questions.extend(list(questions_get.manyfromlistquestion_set.values_list('question_id', 'question_type')))
         if questions_get.textquestion_set:
             questions.extend(list(questions_get.textquestion_set.values_list('question_id',  'question_type')))
-        if questions_get.ratingquestion_set:
-            questions.extend(list(questions_get.ratingquestion_set.values_list('question_id', 'question_type')))
         if questions_get.mediaquestion_set:
             questions.extend(list(questions_get.mediaquestion_set.values_list('question_id',  'question_type')))
-        if questions_get.finalquestion_set:
-            questions.extend(list(questions_get.finalquestion_set.values_list('question_id',  'question_type')))
-        if questions_get.headingquestion_set:
-            questions.extend(list(questions_get.headingquestion_set.values_list('question_id',  'question_type')))
         if questions_get.freeanswer_set:
             questions.extend(list(questions_get.freeanswer_set.values_list('question_id',  'question_type')))
+        if questions_get.datequestion_set:
+            questions.extend(list(questions_get.datequestion_set.values_list('question_id',  'question_type')))
+        if questions_get.numberquestion_set:
+            questions.extend(list(questions_get.numberquestion_set.values_list('question_id',  'question_type')))
+        if questions_get.checkquestion_set:
+            questions.extend(list(questions_get.checkquestion_set.values_list('question_id',  'question_type')))
 
         survey = SurveyPassing()
         survey.user = user

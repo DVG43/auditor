@@ -286,6 +286,20 @@ class TextQuestionSerializer(BaseQuestionSerializer):
         return instance
 
 
+class CheckQuestionSerializer(BaseQuestionSerializer):
+    checked = serializers.BooleanField()
+    poll = serializers.CharField(max_length=64)
+
+    def create(self, validated_data):
+        return TextQuestion.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        super(CheckQuestionSerializer, self).update(instance, validated_data)
+        instance.text = validated_data.get('text', instance.text)
+        instance.save()
+        return instance
+
+
 class NumberQuestionSerializer(BaseQuestionSerializer):
     number = serializers.FloatField()
     poll = serializers.CharField(max_length=64)
@@ -412,7 +426,6 @@ class SectionQuestionSerializer(serializers.ModelSerializer):
             'parent_id',
             'section_id'
         ]
-
 
 
 class ItemTagsFreeAnswerSerializer(serializers.ModelSerializer):
