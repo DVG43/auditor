@@ -6,6 +6,7 @@ from document.views import (
     DicumentViewSet,
     ProjectViewSet,
     ImageGeneration,
+    Text2Speech,
 )
 
 
@@ -16,4 +17,6 @@ urlpatterns = [
 
     ## Image generation
     path('projects/document/image_generator/', ImageGeneration.as_view()),
+    ## Text to speech
+    path('projects/document/text2speech/<int:pk>/', Text2Speech.as_view()),
 ]
