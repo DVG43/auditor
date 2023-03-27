@@ -94,44 +94,6 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = ("id", "documents")
 
-class TextGenerationSerializer(serializers.Serializer):
-    """ Ввод текста темы для генерации абзаца """
-    source = serializers.CharField()
-    tone = serializers.ChoiceField(choices={
-            "Grateful",      # Благодарный
-            "Excited",       # Восхищенный
-            "Rude",          # Грубый
-            "Sad",           # Грустный
-            "Informative",   # Информативный
-            "Witty",         # Остроумный
-            "Negative",      # Негативный
-            "Neutral",       # Естественный
-            "Positive",      # Позитивный
-            "Professional",  # Формальный
-            "Convincing",    # Убедительный
-            "Engaging",      # Развлекательный
-            "Humorous",      # Юмористический
-        },
-        required=False,
-        allow_null=True)
-    language = serializers.CharField(required=False)
-    keywords = serializers.CharField(required=False)
-
-
-class TextRephraseSerializer(serializers.Serializer):
-    """ Ввод текста для перефразирования """
-    source = serializers.CharField()
-
-
-class TextShorterSerializer(serializers.Serializer):
-    """ Ввод текста для сокращения """
-    source = serializers.CharField()
-
-
-class TextContinueSerializer(serializers.Serializer):
-    """ Ввод текста для продолжения """
-    source = serializers.CharField()
-
 
 def is_right_n(value):
     if not value in {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}:

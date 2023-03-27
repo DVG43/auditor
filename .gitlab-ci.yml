@@ -25,6 +25,7 @@ core dev build:
     - echo $CI_REGISTRY_USER
     - echo $CI_REGISTRY_PASSWORD
     - cp $API_PG_SSLROOTCERT_DATA ./backend/src/postgres_ssl.crt
+    - cp $DEV_GOOGLE_CRED ./backend/src/credentials.json
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor
       --context .

@@ -426,6 +426,24 @@ class DateQuestion(Question):
         ]
 
 
+class CheckQuestion(Question):
+    """
+    Just bool Checkbox question
+    """
+    checked = models.BooleanField(default=False)
+
+    def __init__(self, *args, **kwargs):
+        super(CheckQuestion, self).__init__(*args, **kwargs)
+        self.question_type = __class__.__name__
+
+    class Meta:
+        db_table = 'poll_check_question'
+        verbose_name_plural = 'poll_check_questions'
+        indexes = [
+            models.Index(fields=['poll'])
+        ]
+
+
 class FinalQuestion(Question):
     description_mode = models.BooleanField(default=False)
     max_video_duration = models.IntegerField(default=0, blank=False, null=False)

@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 
 import openai
 
@@ -110,7 +110,7 @@ def openai_error_to_dict(e: Union[Exception, None]) -> dict:
 
 
 def complete(
-        user_prompt: str,
+        user_prompts: Union[str, List[str]],
         system_prompt: str = None,
         config: dict = {},
         include_debug: bool = False,
@@ -193,7 +193,12 @@ def complete(
     messages = []
     if system_prompt:
         messages.append(chat_role(CHAT_ROLE_SYSTEM, system_prompt))
-    messages.append(chat_role(CHAT_ROLE_USER, user_prompt))
+
+    if type(user_prompts) is str:
+        user_prompts = [user_prompts]
+
+    for user_prompt in user_prompts:
+        messages.append(chat_role(CHAT_ROLE_USER, user_prompt))
 
     payload = response = openai_error = None
     try:

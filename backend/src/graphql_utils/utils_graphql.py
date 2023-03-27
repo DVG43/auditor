@@ -62,17 +62,25 @@ class PermissionClassFolder(PermissionClass):
     def has_query_object_permission(cls, info, folder_id):
         fold = Folder.objects.filter(pk=folder_id).first()
         user = info.context.user
-        if not user.has_object_perm(fold, ['read', 'edit', 'own']) and not user.is_invited:
+        while fold:
+            if user.has_object_perm(fold, ['read', 'edit', 'own']):
+                break
+            fold = fold.parent_folder
+        if not fold:
             raise PermissionDenied(
-                {'error': 'You don`t have access to this object'})
+                {'error': f'You don`t have access to this object'})
 
     @classmethod
     def has_mutate_object_permission(cls, info, folder_id):
         fold = Folder.objects.filter(pk=folder_id).first()
         user = info.context.user
-        if not user.has_object_perm(fold, ['edit', 'own']):
+        while fold:
+            if user.has_object_perm(fold, ['edit', 'own']):
+                break
+            fold = fold.parent_folder
+        if not fold:
             raise PermissionDenied(
-                {'error': 'You don`t have access to this object'})
+                {'error': f'You don`t have access to this object'})
 
 
 def download_logo(url, project):

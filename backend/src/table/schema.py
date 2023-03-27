@@ -12,7 +12,7 @@ from common.models import UserColumn, UserChoice
 from common.utils import change_disk_space, recount_disk_space, duplicate_object
 from document.models import Document
 from . import serializers
-from graphql_utils.utils_graphql import PermissionClass, check_disk_space, download_logo
+from graphql_utils.utils_graphql import PermissionClassFolder, check_disk_space, download_logo
 from folders.models import Folder
 from table.models import DefaultTableModel, DefaultTableFrame, DefaultTableUsercell, UsercellFile
 from .utils import create_default_table_frame_columns, add_userfields, organize_data_row_sort_arrays
@@ -99,12 +99,12 @@ class Query(ObjectType):
 
     @login_required
     def resolve_all_tables(self, info, host_folder=None, host_document=None):
-        PermissionClass.has_permission(info)
+        PermissionClassFolder.has_permission(info)
         if host_folder:
-             PermissionClass.has_query_object_permission(info, host_folder)
+             PermissionClassFolder.has_query_object_permission(info, host_folder)
         else:
              project_id = Document.objects.filter(pk=host_document).first().folder.id
-             PermissionClass.has_query_object_permission(info, project_id)
+             PermissionClassFolder.has_query_object_permission(info, project_id)
 
         return DefaultTableModel.objects.filter(
             folder=host_folder).all()
@@ -112,42 +112,45 @@ class Query(ObjectType):
     @login_required
     def resolve_table_by_pk(self, info, table_pk=None):
         table = DefaultTableModel.objects.filter(pk=table_pk).first()
-        PermissionClass.has_permission(info)
-        if table.folder:
-            PermissionClass.has_query_object_permission(info, table.folder.id)
-        else:
-            host_project_id = Document.objects.filter(
-                pk=table.host_document.id).first().folder.id
-            PermissionClass.has_query_object_permission(info, host_project_id)
-        instance = DefaultTableModel.objects.filter(pk=table_pk).first()
-        organize_data_row_sort_arrays(instance)
-        return instance
+        PermissionClassFolder.has_permission(info)
+        if table:
+            if table.folder:
+                PermissionClassFolder.has_query_object_permission(info, table.folder.id)
+            else:
+                host_project_id = Document.objects.filter(
+                    pk=table.host_document.id).first().folder.id
+                PermissionClassFolder.has_query_object_permission(info, host_project_id)
+            instance = DefaultTableModel.objects.filter(pk=table_pk).first()
+            organize_data_row_sort_arrays(instance)
+            return instance
 
     @login_required
     def resolve_all_frames(self, info, host_default_table=None):
         table = DefaultTableModel.objects.filter(pk=host_default_table).first()
-        PermissionClass.has_permission(info)
-        if table.folder:
-            PermissionClass.has_query_object_permission(info, table.folder.id)
-        else:
-            host_project_id = Document.filter(
-                pk=table.table.host_document.id).first().folder.id
-            PermissionClass.has_query_object_permission(info, host_project_id)
-        return DefaultTableFrame.objects.filter(host_default_table=host_default_table).all()
+        PermissionClassFolder.has_permission(info)
+        if table:
+            if table.folder:
+                PermissionClassFolder.has_query_object_permission(info, table.folder.id)
+            else:
+                host_project_id = Document.filter(
+                    pk=table.table.host_document.id).first().folder.id
+                PermissionClassFolder.has_query_object_permission(info, host_project_id)
+            return DefaultTableFrame.objects.filter(host_default_table=host_default_table).all()
 
     @login_required
     def resolve_frame_by_pk(self, info, frame_pk=None):
         table = DefaultTableFrame.objects.filter(pk=frame_pk).first().host_default_table
-        PermissionClass.has_permission(info)
-        if table.folder:
-            PermissionClass.has_query_object_permission(info, table.folder.id)
-        else:
-            host_project_id = Document.filter(
-                pk=table.table.host_document.id).first().folder.id
-            PermissionClass.has_query_object_permission(info, host_project_id)
-        instance = DefaultTableFrame.objects.filter(pk=frame_pk).first()
-        organize_data_row_sort_arrays(instance)
-        return instance
+        PermissionClassFolder.has_permission(info)
+        if table:
+            if table.folder:
+                PermissionClassFolder.has_query_object_permission(info, table.folder.id)
+            else:
+                host_project_id = Document.filter(
+                    pk=table.table.host_document.id).first().folder.id
+                PermissionClassFolder.has_query_object_permission(info, host_project_id)
+            instance = DefaultTableFrame.objects.filter(pk=frame_pk).first()
+            organize_data_row_sort_arrays(instance)
+            return instance
 
 
 class CreateDefaultTable(SerializerMutation):
@@ -161,11 +164,12 @@ class CreateDefaultTable(SerializerMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         if "folder" in input:
             folder_id = input["folder"]
+            del input["host_document"]
         else:
             folder_id = Document.objects.filter(pk=input["host_document"]).first().folder.id
 
-        PermissionClass.has_permission(info)
-        PermissionClass.has_mutate_object_permission(info, folder_id)
+        PermissionClassFolder.has_permission(info)
+        PermissionClassFolder.has_mutate_object_permission(info, folder_id)
 
         input.update({'owner': info.context.user.pkid,
                       'last_modified_user': info.context.user.email})
@@ -194,8 +198,8 @@ class UpdateDefaultTable(SerializerMutation):
             folder_id = table_instance.host_document.folder.id
         else:
             folder_id = table_instance.folder.id
-        PermissionClass.has_permission(info)
-        PermissionClass.has_mutate_object_permission(info, folder_id)
+        PermissionClassFolder.has_permission(info)
+        PermissionClassFolder.has_mutate_object_permission(info, folder_id)
         input.update({'last_modified_user': info.context.user.email})
 
         return super().mutate_and_get_payload(root, info, **input)
@@ -211,7 +215,7 @@ class DeleteDefaultTable(graphene.Mutation):
     @login_required
     def mutate(root, info, id, input=None):
         ok = False
-        PermissionClass.has_permission(info)
+        PermissionClassFolder.has_permission(info)
         table_instance = DefaultTableModel.objects.filter(pk=id).first()
         if table_instance:
             ok = True
@@ -219,7 +223,7 @@ class DeleteDefaultTable(graphene.Mutation):
                 folder_id = table_instance.host_document.folder.id
             else:
                 folder_id = table_instance.folder.id
-            PermissionClass.has_mutate_object_permission(info, folder_id)
+            PermissionClassFolder.has_mutate_object_permission(info, folder_id)
             table_instance.deleted_id = uuid.uuid4()
             table_instance.deleted_since = datetime.datetime.now()
             table_instance.last_modified_user = info.context.user.email
@@ -243,8 +247,8 @@ class CreateTableColumn(SerializerMutation):
         else:
             folder_id = table_instance.folder.id
 
-        PermissionClass.has_permission(info)
-        PermissionClass.has_mutate_object_permission(info, folder_id)
+        PermissionClassFolder.has_permission(info)
+        PermissionClassFolder.has_mutate_object_permission(info, folder_id)
 
         host_folder = Folder.objects.filter(pk=folder_id).first()
 
@@ -315,8 +319,8 @@ class UpdateTableColumn(SerializerMutation):
         else:
             folder_id = table_instance.folder.id
 
-        PermissionClass.has_permission(info)
-        PermissionClass.has_mutate_object_permission(info, folder_id)
+        PermissionClassFolder.has_permission(info)
+        PermissionClassFolder.has_mutate_object_permission(info, folder_id)
         input.update({'last_modified_user': info.context.user.email})
 
         host_folder = Folder.objects.filter(pk=folder_id).first()
@@ -351,8 +355,8 @@ class DeleteTableColumn(graphene.Mutation):
     @login_required
     def mutate(root, info, id, host_table, input=None):
         ok = False
-        PermissionClass.has_permission(info)
-        PermissionClass.has_mutate_object_permission(info, host_table)
+        PermissionClassFolder.has_permission(info)
+        PermissionClassFolder.has_mutate_object_permission(info, host_table)
         column_instance = UserColumn.objects.filter(pk=id).first()
         if column_instance:
             ok = True
@@ -384,8 +388,8 @@ class CreateFrame(SerializerMutation):
         else:
             folder_id = table_instance.folder.id
 
-        PermissionClass.has_permission(info)
-        PermissionClass.has_mutate_object_permission(info, folder_id)
+        PermissionClassFolder.has_permission(info)
+        PermissionClassFolder.has_mutate_object_permission(info, folder_id)
         input.update({'owner': info.context.user.pkid,
                       'last_modified_user': info.context.user.email})
         response = super().mutate_and_get_payload(root, info, **input)
@@ -411,8 +415,8 @@ class UpdateFrame(SerializerMutation):
         else:
             folder_id = table_instance.folder.id
 
-        PermissionClass.has_permission(info)
-        PermissionClass.has_mutate_object_permission(info, folder_id)
+        PermissionClassFolder.has_permission(info)
+        PermissionClassFolder.has_mutate_object_permission(info, folder_id)
         input.update({'owner': info.context.user.pkid,
                       'last_modified_user': info.context.user.email})
         return super().mutate_and_get_payload(root, info, **input)
@@ -428,7 +432,7 @@ class DeleteFrame(graphene.Mutation):
     @login_required
     def mutate(root, info, id, input=None):
         ok = False
-        PermissionClass.has_permission(info)
+        PermissionClassFolder.has_permission(info)
         frame_instance = DefaultTableFrame.objects.filter(pk=id).first()
         if frame_instance:
             ok = True
@@ -450,8 +454,8 @@ class CreateUpdateColumnChoice(SerializerMutation):
         else:
             folder_id = table_instance.folder.id
 
-        PermissionClass.has_permission(info)
-        PermissionClass.has_mutate_object_permission(info, folder_id)
+        PermissionClassFolder.has_permission(info)
+        PermissionClassFolder.has_mutate_object_permission(info, folder_id)
         input.update({'owner': info.context.user.pkid,
                       'last_modified_user': info.context.user.email})
         return super().mutate_and_get_payload(root, info, **input)
@@ -467,7 +471,7 @@ class DeleteColumnChoice(graphene.Mutation):
     @login_required
     def mutate(root, info, id, input=None):
         ok = False
-        PermissionClass.has_permission(info)
+        PermissionClassFolder.has_permission(info)
         choice_instance = UserChoice.objects.filter(pk=id).first()
         if choice_instance:
             ok = True
@@ -493,8 +497,8 @@ class UpdateUserCell(SerializerMutation):
         else:
             folder_id = table_instance.folder.id
 
-        PermissionClass.has_permission(info)
-        PermissionClass.has_mutate_object_permission(info, folder_id)
+        PermissionClassFolder.has_permission(info)
+        PermissionClassFolder.has_mutate_object_permission(info, folder_id)
         input.update({'owner': info.context.user.pkid,
                       'last_modified_user': info.context.user.email})
         return super().mutate_and_get_payload(root, info, **input)
@@ -510,7 +514,7 @@ class DeleteUserCell(graphene.Mutation):
     @login_required
     def mutate(root, info, id, input=None):
         ok = False
-        PermissionClass.has_permission(info)
+        PermissionClassFolder.has_permission(info)
         cell_instance = DefaultTableUsercell.objects.filter(cell_id=id).first()
         if cell_instance:
             ok = True
@@ -531,12 +535,12 @@ class CopyTable(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(root, info, id, input=None):
-        PermissionClass.has_permission(info)
+        PermissionClassFolder.has_permission(info)
         ok = False
         table_instance = DefaultTableModel.objects.filter(pk=id).first()
         if table_instance:
             ok = True
-            PermissionClass.has_mutate_object_permission(info, table_instance.folder.id)
+            PermissionClassFolder.has_mutate_object_permission(info, table_instance.folder.id)
             duplicate_object(table_instance, project_id=table_instance.folder.id)
         return CopyTable(ok=ok)
 
@@ -551,7 +555,7 @@ class TableOpenAccess(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(root, info, id, input=None):
-        PermissionClass.has_permission(info)
+        PermissionClassFolder.has_permission(info)
         ok = False
         timing_instance = DefaultTableModel.objects.get(
             Q(pk=id) & Q(owner=info.context.user.pk))
@@ -572,7 +576,7 @@ class TableCloseAccess(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(root, info, id, input=None):
-        PermissionClass.has_permission(info)
+        PermissionClassFolder.has_permission(info)
         ok = False
         timing_instance = DefaultTableModel.objects.get(
             Q(pk=id) & Q(owner=info.context.user.pk))
@@ -597,13 +601,13 @@ class MoveTable(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(root, info, id, folder_id, input=None):
-        PermissionClass.has_permission(info)
+        PermissionClassFolder.has_permission(info)
         ok = False
         table_instance = DefaultTableModel.objects.filter(id=id).first()
         new_host_folder = Folder.objects.filter(id=folder_id).first()
         if table_instance:
             ok = True
-            PermissionClass.has_mutate_object_permission(info, folder_id)
+            PermissionClassFolder.has_mutate_object_permission(info, folder_id)
             table_instance.folder = new_host_folder
             table_instance.save()
         return MoveTable(ok=ok)

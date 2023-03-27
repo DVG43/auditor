@@ -151,6 +151,33 @@ class CrtUpdDateQuestions(SerializerMutation):
         return ret
 
 
+class CrtUpdCheckQuestions(SerializerMutation):
+    """
+    Создание|Обновление вопроса чекбокса (Булевого)
+    """
+
+    class Meta:
+        serializer_class = qstn_serializers.CheckQuestionSerializer
+        model_operations = ['create', 'update']
+        lookup_field = 'question_id'
+        model_class = qstn_models.CheckQuestion
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        PermissionPollClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        PermissionPollClass.has_mutate_object_permission(info, poll)
+
+        input.update({'poll': poll})
+
+        ret = qstn_models.CheckQuestion(**input)
+        ret.save()
+
+        poll.normalize_questions_order_id()
+        return ret
+
+
 class CrtUpdRatingQuestions(SerializerMutation):
 
     class Meta:
@@ -474,8 +501,9 @@ class DeleteItemQuestions(graphene.Mutation):
     """
     Удаляет вариант ответа из вопроса.
     Принимает {item_id: int, item_type: string}, где
-    qstn_type == "ManyFromListQuestion"|"YesNoQuestion"|"MediaQuestion"
-    |"FinalQuestion"|"FreeAnswer"|"PageQuestion"|"SectionQuestion"
+    qstn_type == "PageQuestion"|"ManyFromListQuestion"|"YesNoQuestion"
+    |"SectionQuestion"|"TextQuestion"|"MediaQuestion"
+    |"DateQuestion"|"NumberQuestion"|"FreeAnswer"
     """
 
     class Arguments:
@@ -502,9 +530,9 @@ class DeleteQuestion(graphene.Mutation):
     """
     Удаляет вопрос из чеклиста.
     Принимает {qstn_id: int, qstn_type: string}, где
-    qstn_type == "DivisionQuestion"|"ManyFromListQuestion"|"YesNoQuestion"
-    |"RatingQuestion"|"TextQuestion"|"MediaQuestion"
-    |"FinalQuestion"|"HeadingQuestion"|"FreeAnswer"
+    qstn_type == "PageQuestion"|"ManyFromListQuestion"|"YesNoQuestion"
+    |"SectionQuestion"|"TextQuestion"|"MediaQuestion"
+    |"DateQuestion"|"NumberQuestion"|"FreeAnswer"
     """
 
     class Arguments:
@@ -538,6 +566,7 @@ class QstnMutation(graphene.ObjectType):
     crt_upd_text_question = CrtUpdTextQuestions.Field()
     crt_upd_number_question = CrtUpdNumberQuestions.Field()
     crt_upd_date_question = CrtUpdDateQuestions.Field()
+    crt_upd_check_question = CrtUpdCheckQuestions.Field()
     crt_upd_free_question = CrtUpdFreeQuestions.Field()
     crt_upd_media_question = CrtUpdMediaQuestions.Field()
     crt_upd_many_question = CrtUpdManyQuestions.Field()

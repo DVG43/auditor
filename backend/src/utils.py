@@ -26,12 +26,13 @@ def get_host_id_model(obj):
     if str(obj.__class__.__name__) == "Shot":
         frame = obj.host_frame
         return [frame.host_storyboard.id, "storyboard"]
-    elif str(obj.__class__.__name__) in ['Storyboard',
-                                         'File',
+    elif str(obj.__class__.__name__) in ['File',
                                          'Text',
                                          'Link',
                                          'Timing',
                                          'Document',
+                                         'Poll',
+                                         'Folder',
                                          'DefaultTableModel']:
         return [obj.id, obj.__class__.__name__.lower()]
 

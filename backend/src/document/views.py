@@ -7,10 +7,6 @@ from document.serializers import (
     DocumentLogoSerializer,
     ProjectSerializer,
     DocumentSerializer,
-    TextGenerationSerializer,
-    TextRephraseSerializer,
-    TextShorterSerializer,
-    TextContinueSerializer,
     ImageGenerationSerializer,
     AudioGenerationSerializer,
 )
@@ -22,7 +18,6 @@ from projects.models import Project
 from settings import MEDIA_URL
 from rest_framework import views
 from document import utils
-from . import ai
 
 
 class ChangeDocumentLogoView(generics.UpdateAPIView):
@@ -62,125 +57,6 @@ class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_serializer_class(self):
         return ProjectSerializer
-
-
-class TextGeneration(views.APIView):
-    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
-    serializer_class = TextGenerationSerializer
-
-    def post(self, request, *args, **kwargs):
-        """
-        Генерирует абзац текста согласно теме.
-
-        Пример ответа:
-        ```json
-        {
-            "payload": "... сгенерированный текст ...",
-            "error": null
-        }
-        ```
-
-        - В случае успешной генерации `payload` содержит результат, а `error=null`.
-        - В случае ошибки `payload=null`, а `error` содержит описание ошибки без подробностей, которое можно безопасно показать пользователю.
-        """
-        # 1. Проверка валидности полей
-        if request.data.get('tone') == "null":
-            request.data['tone'] = None
-        serializer = TextGenerationSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        # 2. Извлечение значений переменных из HTTP запроса
-        source = request.data.get('source')
-        language = request.data.get('language')
-        tone = request.data.get('tone')
-        keywords = request.data.get('keywords')
-
-        # 3. Получение ответа от AI
-        result = ai.theme_to_text(theme=source, tone=tone, lang=language,
-            keywords=keywords, include_debug=False)
-
-        return Response(result, status=200)
-
-
-class TextRephrase(views.APIView):
-    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
-    serializer_class = TextRephraseSerializer
-
-    def post(self, request, *args, **kwargs):
-        """
-        Возвращает несколько вариантов такого же по смыслу текста, но другими словами.
-
-        Пример ответа:
-        ```json
-        {
-            "payload": [
-                "Вариант первый",
-                "Вариант второй",
-                ...
-            ],
-            "error": null
-        }
-        ```
-        """
-        # 1. Проверка валидности полей
-        serializer = TextRephraseSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        # 2. Извлечение значений переменных из HTTP запроса
-        source = request.data.get('source')
-
-        # 3. Получение ответа от AI
-        result = ai.rephrase(source, include_debug=False)
-
-        return Response(result, status=200)
-
-
-class TextShorter(views.APIView):
-    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
-    serializer_class = TextShorterSerializer
-
-    def post(self, request, *args, **kwargs):
-        """
-        Делает текст короче, не меняя смысл.
-
-        Пример ответа:
-        ```json
-        {
-            "payload": "... сгенерированный текст ...",
-            "error": null
-        }
-        ```
-        """
-        serializer = TextShorterSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        source = request.data.get('source')
-
-        result = ai.shorter(source, include_debug=False)
-        return Response(result, status=200)
-
-
-class TextContinue(views.APIView):
-    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
-    serializer_class = TextContinueSerializer
-
-    def post(self, request, *args, **kwargs):
-        """
-        Генерирует продолжение для заданного текста.
-
-        Пример ответа:
-        ```json
-        {
-            "payload": "... сгенерированный текст ...",
-            "error": null
-        }
-        ```
-        """
-        serializer = TextContinueSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        source = request.data.get('source')
-
-        result = ai.continue_text(source, include_debug=False)
-        return Response(result, status=200)
 
 
 class ImageGeneration(views.APIView):

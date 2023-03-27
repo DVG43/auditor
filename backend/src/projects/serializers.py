@@ -9,6 +9,7 @@ from poll.models.poll import Poll
 # from storyboards.models import Storyboard
 from document.models import Document
 from document.serializers import RecursiveSerializer
+from table.serializers import DefaultTableSerializer
 from timing.models import Timing
 from folders.models import Folder
 from accounts.models import User
@@ -185,6 +186,8 @@ class RevDocSerializer(serializers.Serializer):
     timings = RevTimingSerializer(
         many=True, read_only=True)
     polls = RevPollSerializer(
+        many=True, read_only=True)
+    tables = DefaultTableSerializer(
         many=True, read_only=True)
     links = LinkSerializer(
         many=True, read_only=True)

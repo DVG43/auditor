@@ -12,6 +12,8 @@ from table.schema import Query as DefaultQueryTable
 from table.schema import Mutation as MutationDefaultTable
 from projects.schema.query import Query as QueryLinkText
 from projects.schema.mutations import Mutation as MutationLinkText
+from integration.schema.queries.query import Query as QueryGoogleSheet
+from integration.schema.mutations.mutations import Mutation as MutationIntegrations
 from .add_logos import Mutation as LogoMutation
 
 
@@ -20,7 +22,8 @@ class Query(
     QueryTiming,
     DefaultQueryTable,
     QueryPoll,
-    QueryLinkText
+    QueryLinkText,
+    QueryGoogleSheet
 ):
     pass
 
@@ -31,6 +34,7 @@ class Mutation(
     MutationDefaultTable,
     MutationPoll,
     MutationLinkText,
+    # MutationIntegrations
     LogoMutation
 ):
     pass

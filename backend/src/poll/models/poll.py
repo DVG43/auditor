@@ -94,24 +94,22 @@ class Poll(PpmDocModel):
 
     def get_questions(self, sort=True):
         questions = []
-        if self.divisionquestion_set:
-            questions.extend(list(self.divisionquestion_set.all()))
         if self.yesnoquestion_set:
             questions.extend(list(self.yesnoquestion_set.all()))
         if self.manyfromlistquestion_set:
             questions.extend(list(self.manyfromlistquestion_set.all()))
         if self.textquestion_set:
             questions.extend(list(self.textquestion_set.all()))
-        if self.ratingquestion_set:
-            questions.extend(list(self.ratingquestion_set.all()))
         if self.mediaquestion_set:
             questions.extend(list(self.mediaquestion_set.all()))
-        if self.headingquestion_set:
-            questions.extend(list(self.headingquestion_set.all()))
+        if self.datequestion_set:
+            questions.extend(list(self.datequestion_set.all()))
+        if self.numberquestion_set:
+            questions.extend(list(self.numberquestion_set.all()))
+        if self.checkquestion_set:
+            questions.extend(list(self.checkquestion_set.all()))
         if self.freeanswer_set:
             questions.extend(list(self.freeanswer_set.all()))
-        if self.finalquestion_set:
-            questions.extend(list(self.finalquestion_set.all()))
         if self.pagequestion_set:
             questions.extend(list(self.pagequestion_set.all()))
         if self.sectionquestion_set:

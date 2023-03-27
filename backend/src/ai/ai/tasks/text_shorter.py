@@ -1,5 +1,5 @@
 
-from ..engines import chat_3_5_turbo_0301 as engine
+from ..engines import gpt_3_5_turbo_0301 as engine
 
 ENGINE_CONFIG = {
     'max_tokens': 1500,
@@ -33,7 +33,8 @@ def get_prompt(text: str) -> str:
 
     <text to shorten>
     """
-    return f'Make this text less verbose:\n\n{text.strip()}'
+    return (f'Make this text less verbose. The output must be in '
+            f'the same language as the original text:\n\n{text.strip()}')
 
 
 def generate(

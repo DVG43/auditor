@@ -1,11 +1,13 @@
 import graphene
 from graphene_file_upload.scalars import Upload
-from django.apps import apps
-from django.contrib.contenttypes.models import ContentType
 
 from common.utils import change_disk_space, get_model
-from graphql_utils.utils_graphql import check_disk_space, download_logo, PermissionClass
-from table.models import DefaultTableModel
+from folders.models import Folder
+from graphql_utils.utils_graphql import (
+    check_disk_space,
+    download_logo,
+    PermissionClassFolder
+)
 
 
 # def get_model(model_name):
@@ -29,11 +31,14 @@ class UploadLogo(graphene.Mutation):
                file=None,
                url=None,
                response=None, **kwargs):
-        PermissionClass.has_permission(info)
+        PermissionClassFolder.has_permission(info)
         instance = get_model(model).objects.filter(pk=document_id).first()
-        host_folder = instance.folder
+        if isinstance(instance, Folder):
+            host_folder = instance
+        else:
+            host_folder = instance.folder
 
-        PermissionClass.has_mutate_object_permission(info, host_folder.id)
+        PermissionClassFolder.has_mutate_object_permission(info, host_folder.id)
 
         if file:
             instance.document_logo = file

@@ -51,6 +51,9 @@ class UserAnswerQuestion(models.Model):
     survey = models.ForeignKey(SurveyPassing, on_delete=models.CASCADE)
     question_id = models.IntegerField(blank=False, null=False)
     text = models.CharField(max_length=500, default=None, blank=True, null=True)
+    date = models.DateTimeField(default=None, blank=True, null=True)
+    number = models.FloatField(default=None, blank=True, null=True)
+    checked = models.BooleanField(default=None, blank=True, null=True)
     poll_id = models.IntegerField(blank=False, null=True, default=None)
     items_question = ArrayField(ArrayField(models.IntegerField()), blank=True, null=True)  # выбор элементов из списка в вопросе
     event = models.CharField(max_length=15, choices=event_choices, default='new')
