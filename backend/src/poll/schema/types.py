@@ -1,5 +1,6 @@
 import graphene
 from graphene_django.types import DjangoObjectType
+from graphql_jwt.decorators import login_required
 from poll.models import analitics as analitics_models
 from poll.models import answer as answer_models
 from poll.models import poll as poll_models
@@ -59,16 +60,6 @@ class PollThemeType(DjangoObjectType):
 
 
 # Questions
-class PageQuestionType(DjangoObjectType):
-    class Meta:
-        model = questions_models.PageQuestion
-
-
-class SectionQuestionType(DjangoObjectType):
-    class Meta:
-        model = questions_models.SectionQuestion
-
-
 class DivisionQuestionType(DjangoObjectType):
     class Meta:
         model = questions_models.DivisionQuestion
@@ -129,6 +120,21 @@ class TextQuestionType(DjangoObjectType):
         model = questions_models.TextQuestion
 
 
+class NumberQuestionType(DjangoObjectType):
+    class Meta:
+        model = questions_models.NumberQuestion
+
+
+class DateQuestionType(DjangoObjectType):
+    class Meta:
+        model = questions_models.DateQuestion
+
+
+class CheckQuestionType(DjangoObjectType):
+    class Meta:
+        model = questions_models.CheckQuestion
+
+
 class FinalQuestionType(DjangoObjectType):
     class Meta:
         model = questions_models.FinalQuestion
@@ -162,6 +168,72 @@ class FreeAnswerType(DjangoObjectType):
 class TagsFreeAnswerType(DjangoObjectType):
     class Meta:
         model = questions_models.TagsFreeAnswer
+
+
+class QuestionType(graphene.Union):
+    class Meta:
+        types = (
+            TextQuestionType,
+            NumberQuestionType,
+            DateQuestionType,
+            CheckQuestionType,
+            YesNoQuestionType,
+            ManyFromListQuestionType,
+        )
+
+
+class SectionQuestionType(DjangoObjectType):
+    sections = graphene.List(lambda: SectionQuestionType)
+    questions = graphene.List(QuestionType)
+
+    class Meta:
+        model = questions_models.SectionQuestion
+
+    @login_required
+    def resolve_sections(self, info):
+        return questions_models.SectionQuestion.objects.filter(
+            parent_id=self.section_id
+        )
+
+    @login_required
+    def resolve_questions(self, info):
+        ret = list()
+
+        ret.extend(questions_models.TextQuestion.objects.filter(parent_id=self.section_id))
+        ret.extend(questions_models.NumberQuestion.objects.filter(parent_id=self.section_id))
+        ret.extend(questions_models.DateQuestion.objects.filter(parent_id=self.section_id))
+        ret.extend(questions_models.CheckQuestion.objects.filter(parent_id=self.section_id))
+        ret.extend(questions_models.YesNoQuestion.objects.filter(parent_id=self.section_id))
+        ret.extend(questions_models.ManyFromListQuestion.objects.filter(parent_id=self.section_id))
+
+        return ret
+
+
+class PageQuestionType(DjangoObjectType):
+    sections = graphene.List(SectionQuestionType)
+    questions = graphene.List(QuestionType)
+
+    class Meta:
+        model = questions_models.PageQuestion
+
+    @login_required
+    def resolve_sections(self, info):
+        return questions_models.SectionQuestion.objects.filter(
+            parent_id=self.page_id
+        )
+
+    @login_required
+    def resolve_questions(self, info):
+        ret = list()
+
+        ret.extend(questions_models.TextQuestion.objects.filter(parent_id=self.page_id))
+        ret.extend(questions_models.NumberQuestion.objects.filter(parent_id=self.page_id))
+        ret.extend(questions_models.DateQuestion.objects.filter(parent_id=self.page_id))
+        ret.extend(questions_models.CheckQuestion.objects.filter(parent_id=self.page_id))
+        ret.extend(questions_models.YesNoQuestion.objects.filter(parent_id=self.page_id))
+        ret.extend(questions_models.ManyFromListQuestion.objects.filter(parent_id=self.page_id))
+
+        return ret
 
 
 # SurveyPassing

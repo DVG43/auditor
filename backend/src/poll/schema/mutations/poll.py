@@ -4,7 +4,6 @@ import graphene
 from django.utils import timezone
 from graphene_django.rest_framework.mutation import SerializerMutation
 from graphql_jwt.decorators import login_required
-from rest_framework.generics import get_object_or_404
 
 from poll.permissions import PermissionPollClass
 from folders.models import Folder
@@ -205,59 +204,7 @@ class CreatePollTag(graphene.Mutation):
         return CreatePollTag(ok=True)
 
 
-class AllPollQuestions(graphene.Mutation):
-    """
-    Resolve all Poll (Check list) questions by poll_id
-    """
-    class Arguments:
-        poll_id = graphene.ID(required=True)
-
-    page_questions = graphene.List(types.PageQuestionType)
-    section_questions = graphene.List(types.SectionQuestionType)
-    division_questions = graphene.List(types.DivisionQuestionType)
-    yesno_questions = graphene.List(types.YesNoQuestionType)
-    manyfromlist_questions = graphene.List(types.ManyFromListQuestionType)
-    text_questions = graphene.List(types.TextQuestionType)
-    media_questions = graphene.List(types.MediaQuestionType)
-    final_questions = graphene.List(types.FinalQuestionType)
-    heading_question = graphene.List(types.HeadingQuestionType)
-    free_answer_question = graphene.List(types.FreeAnswerType)
-
-    @staticmethod
-    @login_required
-    def mutate(cls, info, poll_id):
-
-        PermissionPollClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=poll_id)
-        PermissionPollClass.has_mutate_object_permission(info, poll)
-
-        page = qstn_models.PageQuestion.objects.filter(poll_id=poll_id).all()
-        section = qstn_models.SectionQuestion.objects.filter(poll_id=poll_id).all()
-        division = qstn_models.DivisionQuestion.objects.filter(poll_id=poll_id).all()
-        yes_no = qstn_models.YesNoQuestion.objects.filter(poll_id=poll_id).all()
-        manyfromlist = qstn_models.ManyFromListQuestion.objects.filter(poll_id=poll_id).all()
-        text = qstn_models.TextQuestion.objects.filter(poll_id=poll_id).all()
-        media = qstn_models.MediaQuestion.objects.filter(poll_id=poll_id).all()
-        final = qstn_models.FinalQuestion.objects.filter(poll_id=poll_id).all()
-        heading = qstn_models.HeadingQuestion.objects.filter(poll_id=poll_id).all()
-        free_answer = qstn_models.FreeAnswer.objects.filter(poll_id=poll_id).all()
-
-        return AllPollQuestions(
-            page_questions=page,
-            section_questions=section,
-            division_questions=division,
-            yesno_questions=yes_no,
-            manyfromlist_questions=manyfromlist,
-            text_questions=text,
-            media_questions=media,
-            final_questions=final,
-            heading_question=heading,
-            free_answer_question=free_answer
-        )
-
-
 class PollMutation(graphene.ObjectType):
-    all_poll_questions = AllPollQuestions.Field()
     create_poll = CreatePoll.Field()
     update_poll = UpdatePoll.Field()
     update_poll_setting = UpdatePollSetting.Field()
