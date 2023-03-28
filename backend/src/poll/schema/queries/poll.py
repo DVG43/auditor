@@ -7,6 +7,7 @@ from poll.permissions import PermissionPollClass
 from poll.schema import types
 from poll.models import (
     poll as poll_models,
+    questions as questions_models
 )
 
 
@@ -16,6 +17,7 @@ class QueryPoll(ObjectType):
     poll_by_id = graphene.Field(types.PollType, poll_id=graphene.Int())
     poll_setting_by_id = graphene.Field(types.PollSettingsType, poll_id=graphene.Int())
     poll_tag_by_id = graphene.Field(types.PollTagsType, tag_id=graphene.Int())
+    poll_tree = graphene.List(types.PageQuestionType, poll_id=graphene.Int())
 
     @login_required
     def resolve_all_polls(self, info):
@@ -74,5 +76,17 @@ class QueryPoll(ObjectType):
         polls = ret.poll_set.all()
         for poll in polls:
             PermissionPollClass.has_query_object_permission(info, poll)
+
+        return ret
+
+    @login_required
+    def resolve_poll_tree(self, info, poll_id=None):
+        """
+        Resolve Poll questions Tree
+        """
+        PermissionPollClass.has_permission(info)
+        poll = poll_models.Poll.objects.get(id=poll_id)
+        PermissionPollClass.has_query_object_permission(info, poll)
+        ret = questions_models.PageQuestion.objects.filter(poll=poll)
 
         return ret
