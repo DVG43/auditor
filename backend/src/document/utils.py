@@ -1,12 +1,19 @@
-import os, random, string, urllib3, shutil
+import os
+import random
+import string
+import urllib3
+import shutil
 from hashlib import md5
 import openai
-from speechkit import Session, SpeechSynthesis
-from speechkit.auth import generate_jwt
-from settings import OPENAI_API_KEY, MEDIA_ROOT, YC_SERVICE_ACCOUNT_ID, YC_KEY_ID, YC_PRIVATE_KEY
 
+from settings import OPENAI_API_KEY, MEDIA_ROOT, YC_SERVICE_ACCOUNT_ID, YC_KEY_ID, YC_PRIVATE_KEY, YC_SPEECHKIT_ENABLED
+
+if YC_SPEECHKIT_ENABLED:
+    from speechkit import Session, SpeechSynthesis
+    from speechkit.auth import generate_jwt
 
 openai.api_key = OPENAI_API_KEY
+
 
 def organize_data_row_sort_arrays(instance):
     # чистка и сортировка массивов сортировки
@@ -45,8 +52,10 @@ def organize_data_row_sort_arrays(instance):
 
 
 def gen_unique_filename(ext):
-    s = ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits) for _ in range(10))
+    s = ''.join(random.SystemRandom().choice(
+        string.ascii_lowercase + string.digits) for _ in range(10))
     return md5(s.encode('utf8')).hexdigest() + ext
+
 
 size_dict = {0: '256x256', 1: '512x512', 2: '1024x1024'}
 
@@ -64,7 +73,8 @@ def image_generator(prompt, n=1, size=2):
 
     try:
         os.chdir(f"{MEDIA_ROOT}/images/")
-        response = openai.Image.create(prompt=prompt, n=n, size=size_dict[size])
+        response = openai.Image.create(
+            prompt=prompt, n=n, size=size_dict[size])
 
         http = urllib3.PoolManager()
         for i in range(n):
@@ -109,7 +119,7 @@ def image_edit(baseimage, prompt, pathname, filename, ext='png', mask=None, n=1,
                 shutil.copyfileobj(resp, out_file)
     except Exception as e:
         raise
-        #logging.exception(e)
+        # logging.exception(e)
     finally:
         os.chdir(save_dir)
 
@@ -128,7 +138,8 @@ def variation(baseimage, pathname, filename, ext='png', n=1, size=2):
     save_dir = os.getcwd()
     try:
         os.chdir(pathname)
-        response = openai.Image.create_variation(image=open(baseimage, "rb"), n=n, size=size_dict[size])
+        response = openai.Image.create_variation(
+            image=open(baseimage, "rb"), n=n, size=size_dict[size])
         http = urllib3.PoolManager()
         for i in range(n):
             image_url = response['data'][i]['url']
@@ -136,9 +147,10 @@ def variation(baseimage, pathname, filename, ext='png', n=1, size=2):
                 shutil.copyfileobj(resp, out_file)
     except Exception as e:
         raise
-        #logging.exception(e)
+        # logging.exception(e)
     finally:
         os.chdir(save_dir)
+
 
 def text2speech(text, lang, voice, speed):
     """
@@ -152,21 +164,24 @@ def text2speech(text, lang, voice, speed):
             1.0 (по умолчанию) — средняя скорость речи человека.
             0,1 — самая низкая скорость речи.
     """
-    save_dir = os.getcwd()
-    try:
-        os.chdir(f"{MEDIA_ROOT}/audio/")
+    if YC_SPEECHKIT_ENABLED:
+        save_dir = os.getcwd()
+        try:
+            os.chdir(f"{MEDIA_ROOT}/audio/")
 
-        # авторизуемся в Yandex Cloud и создаем объект синтезирующий речь из текста
-        jwt_token = generate_jwt(YC_SERVICE_ACCOUNT_ID, YC_KEY_ID, YC_PRIVATE_KEY)
-        session = Session.from_jwt(jwt_token)
-        synthesizeAudio = SpeechSynthesis(session)
-        # преобразуем текст из переменной text в аудио файл
-        filename = gen_unique_filename('.mp3')
-        synthesizeAudio.synthesize(filename, text=text, lang=lang, voice=voice, speed=speed, format='mp3')
+            # авторизуемся в Yandex Cloud и создаем объект синтезирующий речь из текста
+            jwt_token = generate_jwt(
+                YC_SERVICE_ACCOUNT_ID, YC_KEY_ID, YC_PRIVATE_KEY)
+            session = Session.from_jwt(jwt_token)
+            synthesizeAudio = SpeechSynthesis(session)
+            # преобразуем текст из переменной text в аудио файл
+            filename = gen_unique_filename('.mp3')
+            synthesizeAudio.synthesize(
+            filename, text=text, lang=lang, voice=voice, speed=speed, format='mp3')
 
-    except Exception as err:
-        raise Exception(err)
-    finally:
-        os.chdir(save_dir)
+        except Exception as err:
+            raise Exception(err)
+        finally:
+            os.chdir(save_dir)
 
-    return filename
+        return filename
