@@ -51,8 +51,12 @@ python-telegram-bot = "*"
 google-api-python-client = "*"
 google-auth-httplib2 = "*"
 graphene-file-upload = "*"
+pyopenssl = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.10"
+
+[pipenv]
+allow_prereleases = true
