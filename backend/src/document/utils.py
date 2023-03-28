@@ -6,9 +6,10 @@ import shutil
 from hashlib import md5
 import openai
 
-from settings import OPENAI_API_KEY, MEDIA_ROOT, YC_SERVICE_ACCOUNT_ID, YC_KEY_ID, YC_PRIVATE_KEY, YC_SPEECHKIT_ENABLED
+from settings import OPENAI_API_KEY, MEDIA_ROOT, YC_SPEECHKIT_ENABLED
 
 if YC_SPEECHKIT_ENABLED:
+    from settings import YC_SERVICE_ACCOUNT_ID, YC_KEY_ID, YC_PRIVATE_KEY
     from speechkit import Session, SpeechSynthesis
     from speechkit.auth import generate_jwt
 
