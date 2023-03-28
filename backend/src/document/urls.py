@@ -1,5 +1,6 @@
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 from graphene_django.views import GraphQLView
 from document.views import (
     ChangeDocumentLogoView,
@@ -17,6 +18,8 @@ urlpatterns = [
 
     ## Image generation
     path('projects/document/image_generator/', ImageGeneration.as_view()),
-    ## Text to speech
-    path('projects/document/text2speech/<int:pk>/', Text2Speech.as_view()),
+
 ]
+## Text to speech
+if settings.YC_SPEECHKIT_ENABLED == True:
+    urlpatterns += [path('projects/document/text2speech/<int:pk>/', Text2Speech.as_view())]

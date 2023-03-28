@@ -16,9 +16,12 @@ CORS_ALLOW_ALL_ORIGINS = True
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-YC_SERVICE_ACCOUNT_ID = os.environ.get("YC_SERVICE_ACCOUNT_ID")
-YC_KEY_ID = os.environ.get("YC_KEY_ID")
-YC_PRIVATE_KEY = os.environ.get("YC_PRIVATE_KEY").encode('ASCII')
+YC_SPEECHKIT_ENABLED = os.environ.get("YC_SPEECHKIT_ENABLED", False) in ('True','true')
+
+if YC_SPEECHKIT_ENABLED:
+    YC_SERVICE_ACCOUNT_ID = os.environ.get("YC_SERVICE_ACCOUNT_ID")
+    YC_KEY_ID = os.environ.get("YC_KEY_ID")
+    YC_PRIVATE_KEY = os.environ.get("YC_PRIVATE_KEY").encode('ASCII')
 
 # os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"
 
