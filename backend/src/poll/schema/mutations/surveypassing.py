@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from graphene_django.rest_framework.mutation import SerializerMutation
 from graphql_jwt.decorators import login_required
 
-from poll.permissions import PermissionPollClass
+from graphql_utils.permissions import PermissionClass
 from poll.models import (
     surveypassing as surveypassing_models,
     poll as poll_models
@@ -32,10 +32,10 @@ class CreateSurvey(SerializerMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
 
         poll = poll_models.Poll.objects.filter(id=int(input["poll"])).first()
-        PermissionPollClass.has_mutate_object_permission(info, poll)
+        PermissionClass.has_mutate_object_permission(info, poll)
 
         user = UserModel.objects.get(pk=int(input["user"]))
         input.update({"user": user, "poll": poll, 'poll_id': poll.id})
@@ -58,10 +58,10 @@ class MultipleDeleteSurvey(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(cls, root, info, ids):
-        PermissionPollClass.has_permission(root)
+        PermissionClass.has_permission(root)
         sp_list = surveypassing_models.SurveyPassing.objects.filter(id__in=ids).all()
         for sp in sp_list:
-            PermissionPollClass.has_mutate_object_permission(root, sp.poll)
+            PermissionClass.has_mutate_object_permission(root, sp.poll)
         sp_list.delete()
         return cls(ok=True)
 

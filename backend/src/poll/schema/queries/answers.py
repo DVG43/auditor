@@ -2,7 +2,7 @@ import graphene
 from graphene_django.types import ObjectType
 from graphql_jwt.decorators import login_required
 
-from poll.permissions import PermissionPollClass
+from graphql_utils.permissions import PermissionClass
 from poll.schema import types
 from poll.models.answer import UserAnswerQuestion
 from poll.models.poll import Poll
@@ -24,7 +24,7 @@ class QueryUserAnswers(ObjectType):
         """
         Resolve all UserAnswers
         """
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
         ret = UserAnswerQuestion.objects\
             .select_related("survey", "survey__poll")\
             .all()
@@ -35,14 +35,14 @@ class QueryUserAnswers(ObjectType):
         """
         Resolve UserAnswers by id
         """
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
 
         ret = UserAnswerQuestion.objects\
             .select_related("survey", "survey__poll")\
             .filter(poll_id=poll_id)\
             .all()
         poll = Poll.objects.get(id=poll_id)
-        PermissionPollClass.has_query_object_permission(info, poll)
+        PermissionClass.has_query_object_permission(info, poll)
 
         return ret
 
@@ -51,13 +51,13 @@ class QueryUserAnswers(ObjectType):
         """
         Resolve UserAnswers by id
         """
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
 
         ret = UserAnswerQuestion.objects\
             .select_related("survey", "survey__poll")\
             .filter(survey_id=survey_id)\
             .all()
         survey = SurveyPassing.objects.select_related('poll').get(id=survey_id)
-        PermissionPollClass.has_query_object_permission(info, survey.poll)
+        PermissionClass.has_query_object_permission(info, survey.poll)
 
         return ret

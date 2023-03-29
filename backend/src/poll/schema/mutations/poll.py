@@ -5,7 +5,7 @@ from django.utils import timezone
 from graphene_django.rest_framework.mutation import SerializerMutation
 from graphql_jwt.decorators import login_required
 
-from poll.permissions import PermissionPollClass
+from graphql_utils.permissions import PermissionClass
 from folders.models import Folder
 from poll.models import (
     poll as poll_models,
@@ -30,11 +30,11 @@ class CreatePoll(SerializerMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
 
         if "folder" in input:
             folder = Folder.objects.filter(pk=input["folder"]).first()
-            PermissionPollClass.has_mutate_object_permission(info, folder)
+            PermissionClass.has_mutate_object_permission(info, folder)
         else:
             folder = None
 
@@ -75,12 +75,12 @@ class UpdatePoll(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(cls, info, poll_id, **input):
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
 
         poll = poll_models.Poll.objects.filter(id=poll_id)
         if poll:
 
-            PermissionPollClass.has_mutate_object_permission(info, poll.first())
+            PermissionClass.has_mutate_object_permission(info, poll.first())
             poll.update(**input['poll_input'])
 
             return UpdatePoll(ok=True, poll=poll.first())
@@ -129,12 +129,12 @@ class UpdatePollSetting(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(cls, info, poll_id, **input):
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
 
         poll_setting = poll_models.PollSettings.objects.filter(poll_id=poll_id)
         if poll_setting:
 
-            PermissionPollClass.has_mutate_object_permission(info, poll_setting.poll)
+            PermissionClass.has_mutate_object_permission(info, poll_setting.poll)
             poll_setting.update(**input['poll_set_input'])
 
             return UpdatePollSetting(ok=True, poll_setting=poll_setting.first())
@@ -157,9 +157,9 @@ class DeletePoll(graphene.Mutation):
     def mutate(cls, info, poll_id):
         poll = poll_models.Poll.objects.filter(id=poll_id).first()
 
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
         if poll:
-            PermissionPollClass.has_mutate_object_permission(info, poll)
+            PermissionClass.has_mutate_object_permission(info, poll)
 
             poll.deleted_id = uuid.uuid4()
             poll.deleted_since = timezone.now()
@@ -188,12 +188,12 @@ class CreatePollTag(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(cls, info, polls, tags):
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
 
         try:
             for poll in polls:
                 get_poll = poll_models.Poll.objects.get(id=poll)
-                PermissionPollClass.has_mutate_object_permission(info, get_poll)
+                PermissionClass.has_mutate_object_permission(info, get_poll)
                 for tag in tags:
                     serialized_tag = poll_serializers.PollTagsSerializer(tag)
 

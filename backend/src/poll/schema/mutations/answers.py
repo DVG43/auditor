@@ -2,7 +2,7 @@ import graphene
 from graphene_django.rest_framework.mutation import SerializerMutation
 from graphql_jwt.decorators import login_required
 
-from poll.permissions import PermissionPollClass
+from graphql_utils.permissions import PermissionClass
 from poll.models import (
     answer as answer_models,
     poll as poll_models
@@ -51,7 +51,7 @@ class CrtUserAnswer(graphene.Mutation):
     @staticmethod
     @login_required
     def mutate(cls, info, **input):
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
         instance = answer_serializers.UserAnswerSerializer.create(
             answer_serializers.UserAnswerSerializer(),
             validated_data=input['new_instance']

@@ -2,7 +2,7 @@ import graphene
 from graphene_django.types import ObjectType
 from graphql_jwt.decorators import login_required
 
-from poll.permissions import PermissionPollClass
+from graphql_utils.permissions import PermissionClass
 from poll.schema import types
 from poll.models import surveypassing
 from rest_framework.generics import get_object_or_404
@@ -20,7 +20,7 @@ class QuerySurveyPassing(ObjectType):
         """
         Resolve all SurveyPassing
         """
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
         ret = surveypassing.SurveyPassing.objects.select_related("user").prefetch_related(
             "useranswerquestion_set",
             "poll__manyfromlistquestion_set__items",
@@ -42,9 +42,9 @@ class QuerySurveyPassing(ObjectType):
         """
         Resolve SurveyPassing by id
         """
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
 
         ret = get_object_or_404(surveypassing.SurveyPassing, id=id)
-        PermissionPollClass.has_query_object_permission(info, ret.poll)
+        PermissionClass.has_query_object_permission(info, ret.poll)
 
         return ret
