@@ -3,7 +3,7 @@ from graphene_django.types import ObjectType
 from graphql_jwt.decorators import login_required
 from rest_framework.generics import get_object_or_404
 
-from poll.permissions import PermissionPollClass
+from graphql_utils.permissions import PermissionClass
 from poll.schema import types
 from poll.models import (
     poll as poll_models,
@@ -24,7 +24,7 @@ class QueryPoll(ObjectType):
         """
         Resolve all poll user
         """
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
         ret = poll_models.Poll.objects.filter(
             owner=info.context.user,
             deleted_id__isnull=True,
@@ -36,9 +36,9 @@ class QueryPoll(ObjectType):
         """
         Resolve all poll tags
         """
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
         poll = get_object_or_404(poll_models.Poll, id=poll_id)
-        PermissionPollClass.has_query_object_permission(info, poll)
+        PermissionClass.has_query_object_permission(info, poll)
         ret = poll_models.PollTags.objects.filter(
             poll=poll_id).all()
         return ret
@@ -48,9 +48,9 @@ class QueryPoll(ObjectType):
         """
         Resolve Poll (check list) by poll_id
         """
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
         ret = get_object_or_404(poll_models.Poll, id=poll_id)
-        PermissionPollClass.has_query_object_permission(info, ret)
+        PermissionClass.has_query_object_permission(info, ret)
 
         return ret
 
@@ -60,9 +60,9 @@ class QueryPoll(ObjectType):
         Resolve Poll (check list) settings by id
         """
 
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
         ret = poll_models.PollSettings.objects.get(id=poll_id)
-        PermissionPollClass.has_query_object_permission(info, ret.poll)
+        PermissionClass.has_query_object_permission(info, ret.poll)
 
         return ret
 
@@ -71,11 +71,11 @@ class QueryPoll(ObjectType):
         """
         Resolve Poll tag settings by id
         """
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
         ret = poll_models.PollTags.objects.get(tag_id=tag_id)
         polls = ret.poll_set.all()
         for poll in polls:
-            PermissionPollClass.has_query_object_permission(info, poll)
+            PermissionClass.has_query_object_permission(info, poll)
 
         return ret
 
@@ -84,9 +84,9 @@ class QueryPoll(ObjectType):
         """
         Resolve Poll questions Tree
         """
-        PermissionPollClass.has_permission(info)
+        PermissionClass.has_permission(info)
         poll = poll_models.Poll.objects.get(id=poll_id)
-        PermissionPollClass.has_query_object_permission(info, poll)
+        PermissionClass.has_query_object_permission(info, poll)
         ret = questions_models.PageQuestion.objects.filter(poll=poll)
 
         return ret

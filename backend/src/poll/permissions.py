@@ -89,34 +89,3 @@ def check_item_permission(item, request):
         if access.role in [AUTHOR, REDACTOR]:
             return True
     raise PermissionDenied()
-
-
-class PermissionPollClass(PermissionClass):
-
-    @classmethod
-    def has_query_object_permission(cls, info, instance):
-
-        user = info.context.user
-        if not user.has_object_perm(instance, ['read', 'edit', 'own']) and not user.is_invited:
-            folder = instance.parent_folder if isinstance(instance, Folder) else instance.folder
-            while folder:
-                if user.has_object_perm(folder, ['read', 'edit', 'own']):
-                    break
-                folder = folder.parent_folder
-            if not folder:
-                raise PermissionDenied(
-                    {'error': f'You don`t have access to this object: {instance}'})
-
-    @classmethod
-    def has_mutate_object_permission(cls, info, instance):
-
-        user = info.context.user
-        if not user.has_object_perm(instance, ['edit', 'own']) and not user.is_invited:
-            folder = instance.parent_folder if isinstance(instance, Folder) else instance.folder
-            while folder:
-                if user.has_object_perm(folder, ['edit', 'own']):
-                    break
-                folder = folder.parent_folder
-            if not folder:
-                raise PermissionDenied(
-                    {'error': f'You don`t have access to this object: {instance}'})
