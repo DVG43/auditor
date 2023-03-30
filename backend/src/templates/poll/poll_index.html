@@ -1,0 +1,138 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="{{dev_path}}css/normalize.css" />
+    <link rel="stylesheet" href="{{dev_path}}css/style.css" />
+    <link rel="stylesheet" href="{{dev_path}}css/media.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <script defer src="{{dev_path}}js/main.js"></script>
+  </head>
+  <body>
+    <div class="modal-checkbox">
+      <header class="header">
+        <div class="container header-container flex">
+          <button class="header__close-btn btn-resert">Закрыть</button>
+
+          <div class="header__content flex">
+            <div class="header__info-block flex select">
+              <h2 class="header__title">Главная страница</h2>
+              <div class="header-accordion flex select__header">
+                <span class="header-accordion__text select__current">
+                  Страница 1 из 2 - Оценка: 0 из 6 (0%)
+                </span>
+                <span class="header-accordion__sign select__icon">
+                  <svg
+                    width="11"
+                    height="6"
+                    viewBox="0 0 11 6"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1.5 1L5.5 5L9.5 1"
+                      stroke="white"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div class="header-select__body select__body">
+                <div class="header-select__item select__item">Страница 1 из 2</div>
+                <div class="header-select__item select__item">Страница 2 из 2</div>
+              </div>
+            </div>
+            <div class="header__count-block flex passive">
+              <span class="header__count-text"> Счет </span>
+              <span class="header__count"> 0 / 5 (0%) </span>
+            </div>
+          </div>
+
+
+
+          <button class="header__burger btn-resert">
+            <svg
+              width="16"
+              height="4"
+              viewBox="0 0 16 4"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <ellipse
+                cx="1.94872"
+                cy="1.99967"
+                rx="1.88119"
+                ry="1.94872"
+                transform="rotate(-90 1.94872 1.99967)"
+                fill="white"
+              />
+              <ellipse
+                cx="8.00047"
+                cy="1.99967"
+                rx="1.88119"
+                ry="1.94872"
+                transform="rotate(-90 8.00047 1.99967)"
+                fill="white"
+              />
+              <ellipse
+                cx="14.0513"
+                cy="1.99967"
+                rx="1.88119"
+                ry="1.94872"
+                transform="rotate(-90 14.0513 1.99967)"
+                fill="white"
+              />
+            </svg>
+          </button>
+        </div>
+      </header>
+      <form action="javascript:;" onsubmit="console.log(this.elements);">
+        {% include 'poll/questions/111.html' with some_key=some_key %}
+        {% include 'poll/questions/222.html' with some_key=some_key %}
+        {% include 'poll/questions/333.html' with some_key=some_key %}
+        {% include 'poll/questions/444.html' with some_key=some_key %}
+        {% include 'poll/questions/555.html' with some_key=some_key %}
+        {% include 'poll/questions/666.html' with some_key=some_key %}
+        {% include 'poll/questions/777.html' with some_key=some_key %}
+      </form>
+
+      <section class="navigate">
+        <div class="container navigate-container flex">
+          <button class="navigate__btn btn-resert flex">
+            <div class="navigate__btn-descr flex">
+              <span class="navigate__btn-text"> Далее </span>
+              <span class="navigate__btn-info"> Страница 2/2 </span>
+            </div>
+            <span class="navigate__btn-sign">
+              <svg
+                width="7"
+                height="12"
+                viewBox="0 0 7 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 11.0039L6 6.00391L1 1.00391"
+                  stroke="white"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+          </button>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
