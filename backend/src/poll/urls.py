@@ -23,6 +23,8 @@ from poll.views_v2.sub_question_view import ItemViewSet, ItemCreateViewSet, Atta
 from poll.views_v2.poll import PollViewSet
 from poll.views_v2.questions import QuestionViewSet, QuestionCreateView
 
+from poll.views.poll_templates import my_view
+
 
 router = DefaultRouter()
 router.register('poll-theme', PollThemeViewSet)
@@ -85,6 +87,9 @@ poll_endpoints = [
 
     path('user/<int:pk>/list/', PollMinimumFieldList.as_view()),
     path('user/<int:pk>/poll_create/', PollCreate.as_view()),
+
+    # templates
+    path('poll_templates/', my_view, name='templates'),
 
 ]
 
