@@ -1,4 +1,4 @@
-{% load static %}
+{% load static %}{% load poll_tags %}
         <div class="flex accordion">
           <div class="container">
             <div class="flex accordion__header">
@@ -25,7 +25,6 @@
             </div>
           </div>
           <div class="accordion__body">
-            {% include 'poll/questions/yes_no_question.html' with some_key=some_key %}
-            {% include 'poll/questions/check_question.html' with some_key=some_key %}
+            {% get_questions instance.section_id%}
           </div>
         </div>
