@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% load static %}{% load poll_tags %}<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -97,14 +97,10 @@
         </div>
       </header>
       <form action="javascript:;" onsubmit="console.log(this.elements);">
-        {% include 'poll/questions/date_question.html' with some_key=some_key %}
-        {% include 'poll/questions/many_from_list_question.html' with some_key=some_key %}
-        {% include 'poll/questions/text_question.html' with some_key=some_key %}
-        {% include 'poll/questions/number_question.html' with some_key=some_key %}
-        {% include 'poll/questions/yes_no_question.html' with some_key=some_key %}
-        {% include 'poll/questions/check_question.html' with some_key=some_key %}
+        {% for instance in instances %}
+          {% get_questions instance.page_id%}
+        {% endfor %}
 
-        {% include 'poll/questions/sections.html' with some_key=some_key %}
 
         <section class="submit">
           <div class="container submit-container flex">

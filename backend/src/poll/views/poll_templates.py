@@ -27,13 +27,13 @@ def my_view(request, pk):
     context = {'some_key': 'some_value'}
     #
     as_file =True
-    instance = questions('856331c7-62d9-45e7-a0cf-ce09753d2e28')
-    context.update({'instance':instance})
+    #instances = questions('856331c7-62d9-45e7-a0cf-ce09753d2e28')
+    instances = questions_models.PageQuestion.objects.filter(poll_id=pk)
+    context.update({'instances':instances})
     aaa = os.path.join(settings.MEDIA_ROOT, 'your-template-static.html')
     if as_file:
         content = render_to_string('poll/poll_index.html', context)
         with open(aaa, mode='w', encoding="utf-8") as static_file: #'xxxx/your-template-static.html'
             static_file.write(content)
-            print(instance)
     context.update({'dev_path':'/statics/'})
     return render(request, 'poll/poll_index.html', context)
