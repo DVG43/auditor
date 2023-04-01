@@ -1,4 +1,4 @@
-{% load static %}<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -97,19 +97,50 @@
         </div>
       </header>
       <form action="javascript:;" onsubmit="console.log(this.elements);">
-        {% include 'poll/questions/111.html' with some_key=some_key %}
-        {% include 'poll/questions/222.html' with some_key=some_key %}
-        {% include 'poll/questions/333.html' with some_key=some_key %}
-        {% include 'poll/questions/444.html' with some_key=some_key %}
-        {% include 'poll/questions/555.html' with some_key=some_key %}
-        {% include 'poll/questions/666.html' with some_key=some_key %}
-        {% include 'poll/questions/777.html' with some_key=some_key %}
+        {% include 'poll/questions/date_question.html' with some_key=some_key %}
+        {% include 'poll/questions/many_from_list_question.html' with some_key=some_key %}
+        {% include 'poll/questions/text_question.html' with some_key=some_key %}
+        {% include 'poll/questions/number_question.html' with some_key=some_key %}
+        {% include 'poll/questions/yes_no_question.html' with some_key=some_key %}
+        {% include 'poll/questions/check_question.html' with some_key=some_key %}
+
+        {% include 'poll/questions/sections.html' with some_key=some_key %}
+
+        <section class="submit">
+          <div class="container submit-container flex">
+            <button class="submit__btn btn-resert">Завершить проверку</button>
+          </div>
+        </section>
       </form>
 
       <section class="navigate">
         <div class="container navigate-container flex">
-          <button class="navigate__btn btn-resert flex">
+          <button class="navigate__btn navigate__btn-back btn-resert flex passive">
+            <span class="navigate__btn-sign navigate__btn-back-sign">
+              <svg
+                width="7"
+                height="12"
+                viewBox="0 0 7 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 11.0039L6 6.00391L1 1.00391"
+                  stroke="white"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
             <div class="navigate__btn-descr flex">
+              <span class="navigate__btn-text"> Назад </span>
+              <span class="navigate__btn-info"> Страница 1/2 </span>
+            </div>
+            
+          </button>
+          <button class="navigate__btn navigate__btn-next btn-resert flex">
+            <div class="navigate__btn-descr navigate__btn-next-descr flex">
               <span class="navigate__btn-text"> Далее </span>
               <span class="navigate__btn-info"> Страница 2/2 </span>
             </div>
