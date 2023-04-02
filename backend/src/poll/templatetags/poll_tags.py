@@ -22,3 +22,10 @@ def questions(page_id):
 def get_questions(page_id=None):
     instances = questions(page_id)
     return {"instances": instances}
+
+@register.inclusion_tag(
+    'poll/questions/items_many_list.html')  # тэг который возр-ет шаблон items_many_list.html с передачей в нее параметров "question_id"
+def get_items_many_list(question_id=None):
+    ManyFromListQuestion_instance = questions_models.ManyFromListQuestion.objects.get(question_id=question_id)
+    instances = list(ManyFromListQuestion_instance.items.all().values())
+    return {"instances": instances}
