@@ -1,4 +1,4 @@
-{% load static %}
+{% load static %}{% load poll_tags %}
         <section class="question">
           <div class="container">
             <div class="question-container">
@@ -28,11 +28,7 @@
                 </div>
 
                 <div class="select__body">
-                  <div class="question-select__item select__item">Value 1</div>
-                  <div class="question-select__item select__item">Value 2</div>
-                  <div class="question-select__item select__item">Value 3</div>
-                  <div class="question-select__item select__item">Value 4</div>
-                  <div class="question-select__item select__item">Value 5</div>
+                  {% get_items_many_list instance.question_id%}
                 </div>
               </div>
               <ul class="question-action-list list-resert flex">
