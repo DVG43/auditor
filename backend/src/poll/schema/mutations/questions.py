@@ -34,12 +34,30 @@ class CrtUpdPageQuestions(SerializerMutation):
         PermissionClass.has_mutate_object_permission(info, poll)
 
         input.update({'poll': poll})
-
-        ret = qstn_models.PageQuestion(**input)
+        if 'question_id' in input.keys():
+            question_id = input.pop('question_id')
+            qstn_models.PageQuestion.objects.filter(question_id=question_id).update(**input)
+            ret = qstn_models.PageQuestion.objects.get(pk=question_id)
+        else:
+            ret = qstn_models.PageQuestion(**input)
         ret.save()
 
         poll.normalize_questions_order_id()
         return ret
+
+    @classmethod
+    def get_serializer_kwargs(cls, root, info, **input):
+        if 'question_id' in input:
+            instance = qstn_models.PageQuestion.objects.filter(
+                question_id=input['question_id'], owner=info.context.user
+            ).first()
+            if instance:
+                return {'instance': instance, 'data': input, 'partial': True}
+
+            else:
+                raise http.Http404
+
+        return {'data': input, 'partial': True}
 
 
 class CrtUpdSectionQuestions(SerializerMutation):
