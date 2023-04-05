@@ -532,26 +532,6 @@ class DeleteItemQuestions(graphene.Mutation):
         return DeleteItemQuestions(ok=False)
 
 
-class QuestionEnum(Enum):
-    PageQuestionType = 'PageQuestionType'
-    SectionQuestionType = 'SectionQuestionType'
-    DivisionQuestionType = 'DivisionQuestionType'
-    NumberQuestionType = 'NumberQuestionType'
-    DateQuestionType = 'DateQuestionType'
-    CheckQuestionType = 'CheckQuestionType'
-    ManyFromListQuestionType = 'ManyFromListQuestionType'
-    YesNoQuestionType = 'YesNoQuestionType'
-    RatingQuestionType = 'RatingQuestionType'
-    TextQuestionType = 'TextQuestionType'
-    MediaQuestionType = 'MediaQuestionType'
-    FinalQuestionType = 'FinalQuestion'
-    HeadingQuestionType = 'HeadingQuestionType'
-    FreeAnswerType = 'FreeAnswerType'
-
-
-ChoiceQuestionType = graphene.Enum.from_enum(QuestionEnum)
-
-
 class DeleteQuestion(graphene.Mutation):
     """
     Удаляет вопрос из чеклиста.
@@ -562,19 +542,19 @@ class DeleteQuestion(graphene.Mutation):
     """
 
     class Arguments:
-        question_id = graphene.ID()
-        qstn_type = ChoiceQuestionType(required=True)
+        qstn_id = graphene.ID()
+        qstn_type = graphene.String()
     ok = graphene.Boolean()
 
     @staticmethod
     @login_required
-    def mutate(cls, info, question_id, qstn_type):
+    def mutate(cls, info, qstn_id, qstn_type):
         PermissionClass.has_permission(info)
         index = qstn_type.rfind('type')
         question_type = qstn_type[:index]
         if question_type in QUESTION_MODELS.keys():
             question = QUESTION_MODELS[question_type].objects.filter(
-                question_id=question_id
+                question_id=qstn_id
             ).first()
             if question:
                 PermissionClass.has_mutate_object_permission(
