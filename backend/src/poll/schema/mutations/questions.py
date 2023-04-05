@@ -541,7 +541,7 @@ class DeleteQuestion(graphene.Mutation):
 
     class Arguments:
         qstn_id = graphene.ID()
-        qstn_type = String()
+        qstn_type = graphene.String()
     ok = graphene.Boolean()
 
     @staticmethod
