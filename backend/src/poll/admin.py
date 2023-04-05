@@ -2,27 +2,50 @@ from django.contrib import admin
 
 from poll.models.analitics import PollAnalitics
 from poll.models.surveypassing import SurveyPassing
+from poll.models.poll import Poll, PollTags
+from poll.models.questions import ItemQuestion
+from poll.models.answer import UserAnswerQuestion
 
 
 class PollAnaliticsModelAdmin(admin.ModelAdmin):
-	list_display = ['id', 'poll_id', 'avarage_age', 'men_total',
+	list_display = ('id', 'poll_id', 'avarage_age', 'men_total',
 	                'women_total', 'women_before_18', 'men_before_18',
 	                'women_in_18_24', 'men_in_18_24', 'women_in_25_35',
 	                'men_in_25_35', 'women_in_36_45', 'men_in_36_45', 
 	                'women_older_46', 'men_older_46', 'from_desktop',
-	                'from_mobile', 'from_other']
-	list_display_links = ['id']
+	                'from_mobile', 'from_other')
+	list_display_links = ('id', )
 	class Meta:
 		model = PollAnalitics
 
 
 class SurveyPassingModelAdmin(admin.ModelAdmin):
-	list_display = ['id', 'poll', 'user', 'sex', 'platform', 'age']
-	list_display_links = ['id']
+	list_display = ('id', 'poll', 'user', 'sex', 'platform', 'age')
+	list_display_links = ('id', )
 	class Meta:
 		model = SurveyPassing
 
 
+class PollAdmin(admin.ModelAdmin):
+    list_display = ('owner', 'id', 'name', 'count_answers')
+
+
+class PollTagsAdmin(admin.ModelAdmin):
+    list_display = ('tag_id', 'name')
+
+
+class ItemQuestionAdmin(admin.ModelAdmin):
+    list_display = ('item_question_id', )
+
+
+class UserAnswerQuestionAdmin(admin.ModelAdmin):
+    list_display = ('survey', 'poll_id', 'question_id')
+
+
+admin.site.register(UserAnswerQuestion, UserAnswerQuestionAdmin)
+admin.site.register(ItemQuestion, ItemQuestionAdmin)
+admin.site.register(PollTags, PollTagsAdmin)
+admin.site.register(Poll, PollAdmin)
 admin.site.register(PollAnalitics, PollAnaliticsModelAdmin)
 admin.site.register(SurveyPassing, SurveyPassingModelAdmin)
 

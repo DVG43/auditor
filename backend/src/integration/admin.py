@@ -15,15 +15,6 @@ class GoogleSheetIntegrationModelAdmin(admin.ModelAdmin):
         model = GoogleSheetIntegration
 
 
-class PollModelAdmin(admin.ModelAdmin):
-    list_display = [
-        'id', 'owner', 'name', 'image', 'test_mode_global',
-        'count_answers', 'last_open']
-
-    class Meta:
-        model = Poll
-
-
 class GoogleSheetCredentialsModelAdmin(admin.ModelAdmin):
     list_display = [
         'id', 'user', 'google_sheet_credentials']
@@ -36,5 +27,4 @@ class GoogleSheetCredentialsModelAdmin(admin.ModelAdmin):
 
 
 admin.site.register(GoogleSheetIntegration, GoogleSheetIntegrationModelAdmin)
-admin.site.register(Poll, PollModelAdmin)
 admin.site.register(GoogleSheetCredentials, GoogleSheetCredentialsModelAdmin)
