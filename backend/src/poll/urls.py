@@ -89,7 +89,7 @@ poll_endpoints = [
     path('user/<int:pk>/poll_create/', PollCreate.as_view()),
 
     # templates
-    path('poll_templates/<int:pk>/', my_view, name='templates'),
+    path('poll_templates/<uuid:templ_uuid>/', my_view, name='templates'),
 
 ]
 

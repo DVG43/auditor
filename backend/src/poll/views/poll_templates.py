@@ -7,22 +7,24 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 import settings
 from poll.models import questions as questions_models
+from poll.models import poll as poll_models
+from django.core.files import File
+from django.core.files.base import ContentFile
 
 
-
-def my_view(request, pk):
-    #as_file = request.GET.get('pk')
+def my_view(request, templ_uuid):
+    # as_file = request.GET.get('pk')
     context = {'some_key': 'some_value'}
-    #
-    as_file =True
-    #instances = questions('856331c7-62d9-45e7-a0cf-ce09753d2e28')
-    instances = questions_models.PageQuestion.objects.filter(poll_id=pk)
-    context.update({'instances':instances})
-    result_template_path = os.path.join(settings.MEDIA_ROOT, 'your-template-static.html')
-    if as_file:
-        content = render_to_string('poll/poll_index.html', context)
-        with open(result_template_path, mode='w', encoding="utf-8") as static_file: #'xxxx/your-template-static.html'
-            static_file.write(content)
 
-    context.update({'dev_path':'/statics/'})
+    page_instances = questions_models.PageQuestion.objects.filter(poll__template_uuid=templ_uuid)
+    context.update({'instances': page_instances})
+
+    context.update({'dev_path': '/statics/'})
+
+    # # если надо сохранить шаблон в html файл, но небходимо добавить поле "poll_template" у модели Poll
+    # content = render_to_string('poll/poll_index.html', context)
+    # poll_instance = poll_models.Poll.objects.get(pk=pk)
+    # name = "template_poll_"
+    # poll_instance.poll_template.save(f'{name}{poll_instance.order_id}.html', ContentFile(content), save=True)
+
     return render(request, 'poll/poll_index.html', context)

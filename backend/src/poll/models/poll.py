@@ -46,6 +46,8 @@ class Poll(PpmDocModel):
     document_logo = ImageField(upload_to=get_doc_upload_path,
                                null=True, blank=True,
                                verbose_name=_('Document logo'))
+    # для шаблона ответа
+    template_uuid = models.UUIDField(editable=False, unique=True, null=True, blank=True)
 
     class Meta:
         db_table = 'poll'
