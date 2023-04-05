@@ -1,4 +1,5 @@
 import graphene
+from enum import Enum
 from rest_framework.generics import get_object_or_404
 from graphql_jwt.decorators import login_required
 from graphene_django.rest_framework.mutation import SerializerMutation
@@ -12,6 +13,7 @@ from poll.models import (
 from poll.serializers import (
     questions as qstn_serializers,
 )
+from poll.schema.types import QuestionType
 
 
 class CrtUpdPageQuestions(SerializerMutation):
@@ -44,20 +46,6 @@ class CrtUpdPageQuestions(SerializerMutation):
 
         poll.normalize_questions_order_id()
         return ret
-
-    @classmethod
-    def get_serializer_kwargs(cls, root, info, **input):
-        if 'question_id' in input:
-            instance = qstn_models.PageQuestion.objects.filter(
-                question_id=input['question_id'], owner=info.context.user
-            ).first()
-            if instance:
-                return {'instance': instance, 'data': input, 'partial': True}
-
-            else:
-                raise http.Http404
-
-        return {'data': input, 'partial': True}
 
 
 class CrtUpdSectionQuestions(SerializerMutation):
@@ -544,28 +532,49 @@ class DeleteItemQuestions(graphene.Mutation):
         return DeleteItemQuestions(ok=False)
 
 
+class QuestionEnum(Enum):
+    PageQuestionType = 'PageQuestionType'
+    SectionQuestionType = 'SectionQuestionType'
+    DivisionQuestionType = 'DivisionQuestionType'
+    NumberQuestionType = 'NumberQuestionType'
+    DateQuestionType = 'DateQuestionType'
+    CheckQuestionType = 'CheckQuestionType'
+    ManyFromListQuestionType = 'ManyFromListQuestionType'
+    YesNoQuestionType = 'YesNoQuestionType'
+    RatingQuestionType = 'RatingQuestionType'
+    TextQuestionType = 'TextQuestionType'
+    MediaQuestionType = 'MediaQuestionType'
+    FinalQuestionType = 'FinalQuestion'
+    HeadingQuestionType = 'HeadingQuestionType'
+    FreeAnswerType = 'FreeAnswerType'
+
+
+ChoiceQuestionType = graphene.Enum.from_enum(QuestionEnum)
+
+
 class DeleteQuestion(graphene.Mutation):
     """
     Удаляет вопрос из чеклиста.
-    Принимает {qstn_id: int, qstn_type: string}, где
-    qstn_type == "PageQuestion"|"ManyFromListQuestion"|"YesNoQuestion"
-    |"SectionQuestion"|"TextQuestion"|"MediaQuestion"
-    |"DateQuestion"|"NumberQuestion"|"FreeAnswer"
+    Принимает {question_id: int, qstn_type: string}, где
+    qstn_type == "PageQuestionType"|"ManyFromListQuestionType"|"YesNoQuestionType"
+    |"SectionQuestionType"|"TextQuestionType"|"MediaQuestionType"
+    |"DateQuestionType"|"NumberQuestionType"|"FreeAnswerType"
     """
 
     class Arguments:
-        qstn_id = graphene.ID()
-        qstn_type = graphene.String()
-
+        question_id = graphene.ID()
+        qstn_type = ChoiceQuestionType(required=True)
     ok = graphene.Boolean()
 
     @staticmethod
     @login_required
-    def mutate(cls, info, qstn_id, qstn_type):
+    def mutate(cls, info, question_id, qstn_type):
         PermissionClass.has_permission(info)
-        if qstn_type in QUESTION_MODELS.keys():
-            question = QUESTION_MODELS[qstn_type].objects.filter(
-                question_id=qstn_id
+        index = qstn_type.rfind('type')
+        question_type = qstn_type[:index]
+        if question_type in QUESTION_MODELS.keys():
+            question = QUESTION_MODELS[question_type].objects.filter(
+                question_id=question_id
             ).first()
             if question:
                 PermissionClass.has_mutate_object_permission(
