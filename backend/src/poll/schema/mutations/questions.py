@@ -1,5 +1,4 @@
 import graphene
-from enum import Enum
 from rest_framework.generics import get_object_or_404
 from graphql_jwt.decorators import login_required
 from graphene_django.rest_framework.mutation import SerializerMutation
@@ -13,7 +12,6 @@ from poll.models import (
 from poll.serializers import (
     questions as qstn_serializers,
 )
-from poll.schema.types import QuestionType
 
 
 class CrtUpdPageQuestions(SerializerMutation):
