@@ -204,9 +204,65 @@ class CreatePollTag(graphene.Mutation):
         return CreatePollTag(ok=True)
 
 
+class OpenAccessPollTemplate(graphene.Mutation):
+    """
+    open access Poll template by poll_id
+    """
+    class Arguments:
+        poll_id = graphene.ID(required=True)
+
+    ok = graphene.Boolean()
+    url = graphene.String()
+
+    @staticmethod
+    @login_required
+    def mutate(cls, info, poll_id):
+        poll = poll_models.Poll.objects.filter(id=poll_id).first()
+
+        PermissionClass.has_permission(info)
+        if poll:
+            PermissionClass.has_mutate_object_permission(info, poll)
+
+            poll.template_uuid = uuid.uuid4()
+            poll.save()
+            print(info.context.META['HTTP_HOST'])
+
+            return OpenAccessPollTemplate(ok=True, url=info.context.META['HTTP_HOST']+"/api/v1/poll/poll_templates/"+str(poll.template_uuid))
+        else:
+            return OpenAccessPollTemplate(ok=False, url=None)
+
+class CloseAccessPollTemplate(graphene.Mutation):
+    """
+    close access Poll template by poll_id
+    """
+    class Arguments:
+        poll_id = graphene.ID(required=True)
+
+    ok = graphene.Boolean()
+
+    @staticmethod
+    @login_required
+    def mutate(cls, info, poll_id):
+        poll = poll_models.Poll.objects.filter(id=poll_id).first()
+
+        PermissionClass.has_permission(info)
+        if poll:
+            PermissionClass.has_mutate_object_permission(info, poll)
+
+            poll.template_uuid = None
+            poll.save()
+
+            return CloseAccessPollTemplate(ok=True)
+        else:
+            return CloseAccessPollTemplate(ok=False)
+
 class PollMutation(graphene.ObjectType):
     create_poll = CreatePoll.Field()
     update_poll = UpdatePoll.Field()
     update_poll_setting = UpdatePollSetting.Field()
     delete_poll = DeletePoll.Field()
     create_poll_tag = CreatePollTag.Field()
+    open_access_poll_template = OpenAccessPollTemplate.Field()
+    close_access_poll_template = CloseAccessPollTemplate.Field()
+
+
