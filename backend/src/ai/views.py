@@ -155,3 +155,30 @@ class QueryAi(views.APIView):
 
         result = ai.query_ai(source, context, include_debug=DEBUG)
         return Response(result, status=200)
+
+
+
+class StandardGeneration(views.APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
+    serializer_class = serializers.StandardGenerationSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Генерирует текст согласно одной из стандартного набора команд.
+
+        Пример ответа:
+        ```json
+        {
+            "payload": "... ответ ИИ ...",
+            "error": null
+        }
+        ```
+        """
+        serializer = serializers.StandardGenerationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        context = request.data.get('context')
+        command = request.data.get('command')
+
+        result = ai.standard_generation(command, context,
+            include_debug=DEBUG)
+        return Response(result, status=200)

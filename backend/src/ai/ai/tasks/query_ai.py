@@ -6,7 +6,7 @@ ENGINE_CONFIG = {
     'max_tokens': 1500,
 
     # Set to `0` during development for determined answers from GPT
-    'temperature': 0,
+    'temperature': 0.7,
 }
 
 

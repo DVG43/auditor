@@ -2,7 +2,7 @@
 from ..engines import gpt_3_5_turbo_0301 as engine
 
 # Целевое число слов для генерируемого текста
-LEN_WORDS = 30
+LEN_WORDS = 90
 
 ENGINE_CONFIG = {
     'max_tokens': 1500,
@@ -10,6 +10,7 @@ ENGINE_CONFIG = {
     # Set to `0` during development for determined answers from GPT
     'temperature': 0,
 }
+
 
 def get_prompt(text: str, len_words: int) -> str:
     """
@@ -45,7 +46,12 @@ def get_prompt(text: str, len_words: int) -> str:
     if len_words < 1:
         raise ValueError(f'len_words expected to be >= 1, got: {len_words}')
 
-    prompt = f'Continue the text. Use no more then {len_words} words:\n\n{text.strip()}'
+    # prompt = f'Continue the text. Use no more then {len_words} words:\n\n{text.strip()}'
+
+    prompt = (
+        f'Используй не более {len_words} слов. '
+        f'Продолжи текст:\n\n{text.strip()}'
+    )
     return prompt
 
 
