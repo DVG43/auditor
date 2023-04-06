@@ -46,3 +46,29 @@ class QueryAiSerializer(serializers.Serializer):
     source = serializers.CharField()
     context = serializers.CharField(required=False)
 
+
+
+class StandardGenerationSerializer(serializers.Serializer):
+    """ Ввод стандартной команды для AI генерации текста """
+    context = serializers.CharField()
+    command = serializers.ChoiceField(choices={
+            "Сократить текст",
+            "Расширить текст",
+            "Продолжить писать",
+            "Изменить тон на обычный",
+            "Изменить тон на формальный",
+            "Подвести итог",
+            "Объяснить это",
+        },
+        required=True,
+        allow_null=False)
+
+
+
+
+
+
+
+
+
+

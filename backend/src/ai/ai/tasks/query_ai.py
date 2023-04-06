@@ -3,10 +3,10 @@ from ..engines import gpt_3_5_turbo_0301 as engine
 
 
 ENGINE_CONFIG = {
-    'max_tokens': 1500,
+    'max_tokens': 500,
 
     # Set to `0` during development for determined answers from GPT
-    'temperature': 0,
+    'temperature': 0.7,
 }
 
 
