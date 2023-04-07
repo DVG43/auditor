@@ -6,12 +6,18 @@ from rest_framework.viewsets import ModelViewSet
 from .serializers import CategoryForTemplateSerializer, TemplateSerializer #, CreateTemplateSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
+from rest_framework.pagination import PageNumberPagination
 
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
 
 class CategoryForTemplateViewSet(ModelViewSet):
     queryset = CategoryForTemplate.objects.prefetch_related(
         'templates')
     http_method_names = ['get']
+    pagination_class = StandardResultsSetPagination
     serializer_class = CategoryForTemplateSerializer
     permission_classes = [IsAuthenticated]
     #serializer_class = CreateTemplateSerializer
@@ -20,8 +26,10 @@ class CategoryForTemplateViewSet(ModelViewSet):
         instance = CategoryForTemplate.objects.filter(templates__pk=self.kwargs.get('catalog_template_pk'))
         return instance
 
+
 class TemplateViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
     queryset = Template.objects.prefetch_related(
         'categories')
     http_method_names = ['get', 'post', 'patch', 'delete']
