@@ -36,11 +36,15 @@ class CrtUpdPageQuestions(SerializerMutation):
         PermissionClass.has_mutate_object_permission(info, poll)
 
         input.update({'poll': poll})
-        ret = qstn_models.PageQuestion(**input)
-        ret.save()
 
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
+
+        obj, created = qstn_models.PageQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+                                                                         defaults={**input})
         poll.normalize_questions_order_id()
-        return ret
+        return obj
 
 
 class CrtUpdSectionQuestions(SerializerMutation):
@@ -65,11 +69,14 @@ class CrtUpdSectionQuestions(SerializerMutation):
 
         input.update({'poll': poll})
 
-        ret = qstn_models.SectionQuestion(**input)
-        ret.save()
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
 
+        obj, created = qstn_models.SectionQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+                                                                            defaults={**input})
         poll.normalize_questions_order_id()
-        return ret
+        return obj
 
 
 class CrtUpdHeadQuestions(SerializerMutation):
@@ -92,11 +99,14 @@ class CrtUpdHeadQuestions(SerializerMutation):
 
         input.update({'poll': poll})
 
-        ret = qstn_models.HeadingQuestion(**input)
-        ret.save()
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
 
+        obj, created = qstn_models.HeadingQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+                                                                            defaults={**input})
         poll.normalize_questions_order_id()
-        return ret
+        return obj
 
 
 class CrtUpdNumberQuestions(SerializerMutation):
@@ -119,11 +129,14 @@ class CrtUpdNumberQuestions(SerializerMutation):
 
         input.update({'poll': poll})
 
-        ret = qstn_models.NumberQuestion(**input)
-        ret.save()
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
 
+        obj, created = qstn_models.NumberQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+                                                                           defaults={**input})
         poll.normalize_questions_order_id()
-        return ret
+        return obj
 
 
 class CrtUpdDateQuestions(SerializerMutation):
@@ -146,11 +159,14 @@ class CrtUpdDateQuestions(SerializerMutation):
 
         input.update({'poll': poll})
 
-        ret = qstn_models.DateQuestion(**input)
-        ret.save()
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
 
+        obj, created = qstn_models.DateQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+                                                                         defaults={**input})
         poll.normalize_questions_order_id()
-        return ret
+        return obj
 
 
 class CrtUpdCheckQuestions(SerializerMutation):
@@ -173,11 +189,14 @@ class CrtUpdCheckQuestions(SerializerMutation):
 
         input.update({'poll': poll})
 
-        ret = qstn_models.CheckQuestion(**input)
-        ret.save()
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
 
+        obj, created = qstn_models.CheckQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+                                                                          defaults={**input})
         poll.normalize_questions_order_id()
-        return ret
+        return obj
 
 
 class CrtUpdRatingQuestions(SerializerMutation):
@@ -196,11 +215,14 @@ class CrtUpdRatingQuestions(SerializerMutation):
 
         input.update({'poll': poll})
 
-        ret = qstn_models.RatingQuestion(**input)
-        ret.save()
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
 
+        obj, created = qstn_models.RatingQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+                                                                           defaults={**input})
         poll.normalize_questions_order_id()
-        return ret
+        return obj
 
 
 class CrtUpdTextQuestions(SerializerMutation):
@@ -223,11 +245,14 @@ class CrtUpdTextQuestions(SerializerMutation):
 
         input.update({'poll': poll})
 
-        ret = qstn_models.TextQuestion(**input)
-        ret.save()
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
 
+        obj, created = qstn_models.TextQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+                                                                         defaults={**input})
         poll.normalize_questions_order_id()
-        return ret
+        return obj
 
 
 class CrtUpdFreeQuestions(SerializerMutation):
@@ -258,23 +283,27 @@ class CrtUpdFreeQuestions(SerializerMutation):
             attached_types = input['attached_type']
             del input['attached_type']
 
-        ret = qstn_models.FreeAnswer(**input)
-        ret.save()
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
+
+        obj, created = qstn_models.FreeAnswer.objects.update_or_create(poll=poll, question_id=input["question_id"],
+                                                                       defaults={**input})
 
         if items:
             for item in items:
                 crt_item = qstn_models.ItemsFreeAnswer(**item)
                 crt_item.save()
-                ret.items.add(crt_item)
+                obj.items.add(crt_item)
 
         if attached_types:
             for attached_type in attached_types:
                 crt_attype = qstn_models.FreeAnswerAttachedType(**attached_type)
                 crt_attype.save()
-                ret.attached_type.add(crt_attype)
+                obj.attached_type.add(crt_attype)
 
         poll.normalize_questions_order_id()
-        return ret
+        return obj
 
 
 class CrtUpdMediaQuestions(SerializerMutation):
@@ -305,23 +334,27 @@ class CrtUpdMediaQuestions(SerializerMutation):
             attached_types = input['attached_type']
             del input['attached_type']
 
-        ret = qstn_models.MediaQuestion(**input)
-        ret.save()
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
+
+        obj, created = qstn_models.MediaQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+                                                                          defaults={**input})
 
         if items:
             for item in items:
                 crt_item = qstn_models.MediaItemQuestion(**item)
                 crt_item.save()
-                ret.items.add(crt_item)
+                obj.items.add(crt_item)
 
         if attached_types:
             for attached_type in attached_types:
                 crt_attype = qstn_models.MediaAttachedType(**attached_type)
                 crt_attype.save()
-                ret.attached_type.add(crt_attype)
+                obj.attached_type.add(crt_attype)
 
         poll.normalize_questions_order_id()
-        return ret
+        return obj
 
 
 class CrtUpdManyQuestions(SerializerMutation):
@@ -352,23 +385,28 @@ class CrtUpdManyQuestions(SerializerMutation):
             attached_types = input['attached_type']
             del input['attached_type']
 
-        ret = qstn_models.ManyFromListQuestion(**input)
-        ret.save()
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
+
+        obj, created = qstn_models.ManyFromListQuestion.objects.update_or_create(poll=poll,
+                                                                                 question_id=input["question_id"],
+                                                                                 defaults={**input})
 
         if items:
             for item in items:
                 crt_item = qstn_models.ItemQuestion(**item)
                 crt_item.save()
-                ret.items.add(crt_item)
+                obj.items.add(crt_item)
 
         if attached_types:
             for attached_type in attached_types:
                 crt_attype = qstn_models.ManyFromListAttachedType(**attached_type)
                 crt_attype.save()
-                ret.attached_type.add(crt_attype)
+                obj.attached_type.add(crt_attype)
 
         poll.normalize_questions_order_id()
-        return ret
+        return obj
 
 
 class CrtUpdYesNoQuestions(SerializerMutation):
@@ -402,29 +440,33 @@ class CrtUpdYesNoQuestions(SerializerMutation):
             yes_no_answers = input['yes_no_answers']
             del input['yes_no_answers']
 
-        ret = qstn_models.YesNoQuestion(**input)
-        ret.save()
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
+
+        obj, created = qstn_models.YesNoQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+                                                                          defaults={**input})
 
         if items:
             for item in items:
                 crt_item = qstn_models.ItemQuestion(**item)
                 crt_item.save()
-                ret.items.add(crt_item)
+                obj.items.add(crt_item)
 
         if attached_types:
             for attached_type in attached_types:
                 crt_attype = qstn_models.YesNoAttachedType(**attached_type)
                 crt_attype.save()
-                ret.attached_type.add(crt_attype)
+                obj.attached_type.add(crt_attype)
 
         if yes_no_answers:
             for yes_no_answer in yes_no_answers:
                 crt_yesnoanswer = qstn_models.YesNoAnswers(**yes_no_answer)
                 crt_yesnoanswer.save()
-                ret.yes_no_answers.add(crt_yesnoanswer)
+                obj.yes_no_answers.add(crt_yesnoanswer)
 
         poll.normalize_questions_order_id()
-        return ret
+        return obj
 
 
 class CrtUpdFinalQuestions(SerializerMutation):
@@ -451,17 +493,21 @@ class CrtUpdFinalQuestions(SerializerMutation):
             items = input['items']
             del input['items']
 
-        ret = qstn_models.FinalQuestion(**input)
-        ret.save()
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
+
+        obj, created = qstn_models.FinalQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+                                                                          defaults={**input})
 
         if 'items' in input:
             for item in items:
                 crt_item = qstn_models.ItemQuestion(**item)
                 crt_item.save()
-                ret.items.add(crt_item)
+                obj.items.add(crt_item)
 
         poll.normalize_questions_order_id()
-        return ret
+        return obj
 
 
 class CrtUpdDivisionQuestions(SerializerMutation):
@@ -479,10 +525,17 @@ class CrtUpdDivisionQuestions(SerializerMutation):
         PermissionClass.has_mutate_object_permission(info, poll)
 
         input.update({'poll': poll})
-        ret = qstn_models.DivisionQuestion(**input)
-        ret.save()
+
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
+
+        obj, created = qstn_models.DivisionQuestion.objects.update_or_create(poll=poll,
+                                                                             question_id=input["question_id"],
+                                                                             defaults={**input})
+
         poll.normalize_questions_order_id()
-        return ret
+        return obj
 
 
 class CrtUpdItemQuestions(SerializerMutation):
@@ -497,23 +550,35 @@ class CrtUpdItemQuestions(SerializerMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
 
-        ret = qstn_models.ItemQuestion(**input)
-        ret.save()
-        return ret
+        if "parent_id" in input.keys():
+            if not input["parent_id"]:
+                del input["parent_id"]
+
+        obj, created = qstn_models.TextQuestion.objects.update_or_create(item_question_id=input["item_question_id"],
+                                                                         defaults={**input})
+        return obj
+
+
+class ItemEnum(Enum):
+    ManyFromListItemType = 'ManyFromListQuestion'
+    YesNoItemType = 'YesNoQuestion'
+    MediaItemType = 'MediaQuestion'
+    FinalQuestionItemType = 'FinalQuestion'
+    FreeAnswerItemType = 'FreeAnswer'
+
+
+ChoiceItemType = graphene.Enum.from_enum(ItemEnum)
 
 
 class DeleteItemQuestions(graphene.Mutation):
     """
     Удаляет вариант ответа из вопроса.
-    Принимает {item_id: int, item_type: string}, где
-    qstn_type == "PageQuestion"|"ManyFromListQuestion"|"YesNoQuestion"
-    |"SectionQuestion"|"TextQuestion"|"MediaQuestion"
-    |"DateQuestion"|"NumberQuestion"|"FreeAnswer"
+    Принимает аргументы (itemId: ID, itemType: ItemType)
     """
 
     class Arguments:
         item_id = graphene.ID()
-        item_type = graphene.String()
+        item_type = ChoiceItemType(required=True)
 
     ok = graphene.Boolean()
 
@@ -521,9 +586,9 @@ class DeleteItemQuestions(graphene.Mutation):
     @login_required
     def mutate(cls, root, item_id, item_type):
         PermissionClass.has_permission(root)
-        if item_type in ITEM_MODELS:
-            item = ITEM_MODELS(item_type).objects.filter(
-                id=item_id
+        if item_type in ITEM_MODELS.keys():
+            item = ITEM_MODELS[item_type].objects.filter(
+                pk=item_id
             ).first()
             if item:
                 item.delete()
@@ -554,10 +619,7 @@ ChoiceQuestionType = graphene.Enum.from_enum(QuestionEnum)
 class DeleteQuestion(graphene.Mutation):
     """
     Удаляет вопрос из чеклиста.
-    Принимает аргументы (questionId: ID, questionType: QuestionType), где
-    questionType == "PageQuestionType"|"ManyFromListQuestionType"|"YesNoQuestionType"
-    |"SectionQuestionType"|"TextQuestionType"|"MediaQuestionType"
-    |"DateQuestionType"|"NumberQuestionType"|"FreeAnswerType"
+    Принимает аргументы (questionId: ID, questionType: QuestionType)
     """
 
     class Arguments:
