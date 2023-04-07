@@ -15,12 +15,14 @@ from poll.schema import types
 from poll.serializers import (
     poll as poll_serializers,
 )
+from poll.utils import QUESTION_MODELS
 
 
 class CreatePoll(SerializerMutation):
     """
     Create Poll (Check list)
     """
+
     class Meta:
         serializer_class = poll_serializers.PollSerializer
         model_operations = ['create']
@@ -47,7 +49,37 @@ class CreatePoll(SerializerMutation):
             validated_data=input
         )
 
+        cls.generate_base_structure(poll)
+
         return poll
+
+    @staticmethod
+    def generate_base_structure(poll):
+        """
+        Creates base page and section with possible questions
+        """
+
+        base_page = qstn_models.PageQuestion.objects.create(poll=poll, caption="Введите название страницы")
+        base_section = qstn_models.SectionQuestion.objects.create(poll=poll, parent_id=base_page.page_id,
+                                                                  caption="Введите название раздела")
+
+        data = {
+            "poll": poll,
+            "parent_id": base_section.section_id
+        }
+
+        simple_questions = ('TextQuestion', 'RatingQuestion', 'CheckQuestion',
+                            'DateQuestion', 'NumberQuestion', 'DivisionQuestion', 'HeadingQuestion')
+        questions_with_items = ('ManyFromListQuestion', 'YesNoQuestion', 'MediaQuestion', 'FreeAnswer', 'FinalQuestion')
+
+        order = 1
+
+        for k, v in QUESTION_MODELS.items():
+            if k in simple_questions:
+                v.objects.create(caption=k, order_id=order, **data)
+                order += 1
+            if k in ('PageQuestion', 'SectionQuestion'):
+                continue
 
 
 class UpdatePollInput(graphene.InputObjectType):
@@ -64,6 +96,7 @@ class UpdatePoll(graphene.Mutation):
     """
     Update Poll (Check list) by poll_id
     """
+
     class Arguments:
         # The input arguments for this mutation
         poll_id = graphene.ID(required=True)
@@ -118,6 +151,7 @@ class UpdatePollSetting(graphene.Mutation):
     """
     Update Poll (Check list) settings by poll_id
     """
+
     class Arguments:
         # The input arguments for this mutation
         poll_id = graphene.ID(required=True)
@@ -146,6 +180,7 @@ class DeletePoll(graphene.Mutation):
     """
     Delete Poll (Check list) settings by poll_id
     """
+
     class Arguments:
         # The input arguments for this mutation
         poll_id = graphene.ID()
@@ -178,6 +213,7 @@ class CreatePollTag(graphene.Mutation):
     """
     MultiCreate Poll (Check list) Tag settings by poll_id
     """
+
     class Arguments:
         # The input arguments for this mutation
         polls = graphene.List(graphene.Int)
@@ -208,6 +244,7 @@ class OpenAccessPollTemplate(graphene.Mutation):
     """
     open access Poll template by poll_id
     """
+
     class Arguments:
         poll_id = graphene.ID(required=True)
 
@@ -227,14 +264,18 @@ class OpenAccessPollTemplate(graphene.Mutation):
             poll.save()
             print(info.context.META['HTTP_HOST'])
 
-            return OpenAccessPollTemplate(ok=True, url=info.context.META['HTTP_HOST']+"/api/v1/poll/poll_templates/"+str(poll.template_uuid))
+            return OpenAccessPollTemplate(ok=True,
+                                          url=info.context.META['HTTP_HOST'] + "/api/v1/poll/poll_templates/" + str(
+                                              poll.template_uuid))
         else:
             return OpenAccessPollTemplate(ok=False, url=None)
+
 
 class CloseAccessPollTemplate(graphene.Mutation):
     """
     close access Poll template by poll_id
     """
+
     class Arguments:
         poll_id = graphene.ID(required=True)
 
@@ -256,6 +297,7 @@ class CloseAccessPollTemplate(graphene.Mutation):
         else:
             return CloseAccessPollTemplate(ok=False)
 
+
 class PollMutation(graphene.ObjectType):
     create_poll = CreatePoll.Field()
     update_poll = UpdatePoll.Field()
@@ -264,5 +306,3 @@ class PollMutation(graphene.ObjectType):
     create_poll_tag = CreatePollTag.Field()
     open_access_poll_template = OpenAccessPollTemplate.Field()
     close_access_poll_template = CloseAccessPollTemplate.Field()
-
-
