@@ -394,7 +394,7 @@ class NumberQuestion(Question):
     """
     Just Number
     """
-    number = models.FloatField(default='')
+    number = models.FloatField(default=0.0)
 
     def __init__(self, *args, **kwargs):
         super(NumberQuestion, self).__init__(*args, **kwargs)
@@ -412,7 +412,7 @@ class DateQuestion(Question):
     """
     Just Date
     """
-    date = models.DateTimeField(default='')
+    date = models.DateTimeField(default=timezone.now)
 
     def __init__(self, *args, **kwargs):
         super(DateQuestion, self).__init__(*args, **kwargs)

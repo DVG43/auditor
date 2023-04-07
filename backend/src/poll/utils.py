@@ -21,6 +21,7 @@ USER_ACCESS_TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 QUESTION_MODELS = {
     'PageQuestion': PageQuestion,
     'SectionQuestion': SectionQuestion,
+    'HeadingQuestion': HeadingQuestion,
     'DivisionQuestion': DivisionQuestion,
     'NumberQuestion': NumberQuestion,
     'DateQuestion': DateQuestion,
@@ -30,9 +31,8 @@ QUESTION_MODELS = {
     'RatingQuestion': RatingQuestion,
     'TextQuestion': TextQuestion,
     'MediaQuestion': MediaQuestion,
-    'FinalQuestion': FinalQuestion,
-    'HeadingQuestion': HeadingQuestion,
-    'FreeAnswer': FreeAnswer
+    'FreeAnswer': FreeAnswer,
+    'FinalQuestion': FinalQuestion
 }
 
 QUESTION_SERIALIZERS_V1 = {
