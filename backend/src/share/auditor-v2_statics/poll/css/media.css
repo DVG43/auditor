@@ -85,7 +85,7 @@
 
   /*question*/
 
-  .question:not(:last-child) {
+  .question {
     margin-bottom: 16px;
   }
 
@@ -109,4 +109,28 @@
   .question-answers-list__item{
     flex-grow: 1;
   }
+
+  /*submit-modal*/
+
+  .submit-modal{
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .submit-modal-container{
+    width: 550px;
+    padding: 32px 20px;
+    padding-top: 396px;
+    border-radius: 8px;
+    border: 1px solid #666666;
+    background-color: #2F3136;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.3);
+    background-size: 332px 331px;
+    background-position: top 32px center;
+  }
+
+  .submit-modal__spinner {
+    margin-bottom: 36px
+  }
 }
+
+

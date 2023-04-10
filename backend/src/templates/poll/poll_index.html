@@ -48,8 +48,6 @@
                 </span>
               </div>
               <div class="header-select__body select__body">
-                <div class="header-select__item select__item">Страница 1 из 2</div>
-                <div class="header-select__item select__item">Страница 2 из 2</div>
               </div>
             </div>
             <div class="header__count-block flex passive">
@@ -96,21 +94,23 @@
           </button>
         </div>
       </header>
-      <form action="javascript:;" onsubmit="console.log(this.elements);">
+      <form action="javascript:;" id="form">
         {% for instance in instances %}
+          <section class="page page-{{ forloop.counter }} {% if forloop.counter != 1 %}passive{% endif %}">
           {% get_questions instance.page_id%}
+          </section>
         {% endfor %}
 
 
         <section class="submit">
           <div class="container submit-container flex">
-            <button class="submit__btn btn-resert">Завершить проверку</button>
+            <button type="submit" id="submit-btn" class="submit__btn btn-resert">Завершить проверку</button>
           </div>
         </section>
       </form>
 
       <section class="navigate">
-        <div class="container navigate-container flex">
+        <div class="container navigate-container navigate-container-next  flex">
           <button class="navigate__btn navigate__btn-back btn-resert flex passive">
             <span class="navigate__btn-sign navigate__btn-back-sign">
               <svg
