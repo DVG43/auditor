@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SSE API Test (server)</title>
+</head>
+<body>
+  <h1>SSE API Test (server)</h1>
+  <input id="urlInp" value="stream_test/"></input>
+  <button id="startBtn">Start</button>
+  <button id="stopBtn">Stop</button>
+  <button id="clearBtn">Clear</button>
+  <div id="output"></div>
+
+  <script>
+    const output = document.getElementById('output');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const urlInp = document.getElementById('urlInp');
+    let eventSource;
+
+    closeConnection = function() {
+        eventSource.close();
+        eventSource = null;
+    }
+
+    startBtn.addEventListener('click', () => {
+      console.log('start clicked');
+      eventSource = new EventSource(urlInp.value);
+      eventSource.onmessage = function(e) {
+        console.log('eventSource onmessage');
+        output.innerHTML += e.data + '<br>';
+      };
+      eventSource.onopen = function(e) {
+        console.log('eventSource onopen', e.data);
+      };
+      eventSource.onerror = function(e) {
+        console.log('eventSource onerror', e);
+        closeConnection();
+      };
+    });
+
+    stopBtn.addEventListener('click', () => {
+      if (eventSource) {
+          closeConnection();
+      }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      output.innerHTML = '';
+    });
+  </script>
+</body>
+</html>
