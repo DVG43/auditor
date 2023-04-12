@@ -56,7 +56,7 @@ class TemplateViewSet(ModelViewSet):
             pass
 
         # добавляем в избранные
-        if self.request.data.get("favourite") == 'true':
+        if self.request.data.get("favourite") == True or self.request.data.get("favourite") == 'true':
             favourite = [self.request.user]
             save_kw.update({"favourite": favourite})
         else:
@@ -74,10 +74,10 @@ class TemplateViewSet(ModelViewSet):
             pass
 
         # проевряем есть ли в избранных и добавляем в словарь
-        if self.request.data.get("favourite") == 'true':
+        if self.request.data.get("favourite") == True or self.request.data.get("favourite") == 'true':
             favourite = [self.request.user]
             save_kw.update({"favourite": favourite})
-        elif self.request.data.get("favourite") == 'false':
+        elif self.request.data.get("favourite") == False or self.request.data.get("favourite") == 'false':
             save_kw.update({"favourite": []})
         else:
             pass
