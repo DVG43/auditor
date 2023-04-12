@@ -72,7 +72,7 @@ class TemplateSerializer(serializers.ModelSerializer):
         return ret
 
     def to_internal_value(self, data):
-        data['categories_input'] = data['categories_input'].split(',') if data['categories_input'] else []
+        data['categories_input'] = data['categories_input'].split(',') if data.get('categories_input') else []
         return self.super_to_internal_value(data)
 
 
