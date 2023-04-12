@@ -22,7 +22,7 @@ class Question(models.Model):
     parent_id = models.UUIDField(null=True, blank=True)
     order_id = models.IntegerField(default=0)
     description = models.CharField(max_length=512)
-    poll = models.ForeignKey('Poll', on_delete=models.CASCADE, default='1')
+    poll = models.ForeignKey('Poll', on_delete=models.CASCADE)
     caption = models.CharField(max_length=255)
 
     # Необязательные поля
@@ -206,12 +206,18 @@ class ManyFromListAttachedType(models.Model):
     type = models.CharField(max_length=16, default=None, blank=True, null=True)
     active = models.BooleanField(default=False, blank=False, null=False)
 
+
 class ManyFromListQuestion(Question):
     """
     ManyFromList
     """
+
+    answer_mode_choices = (('ONE', 1),
+                           ('SOME', 2),)
+
     items = models.ManyToManyField(ItemQuestion)
     attached_type = models.ManyToManyField(ManyFromListAttachedType)
+    answer_mode = models.IntegerField(choices=answer_mode_choices, default=1)
 
     # Необязательные поля
     description_mode = models.BooleanField(default=False)
