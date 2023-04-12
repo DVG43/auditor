@@ -33,7 +33,8 @@ def get_host_id_model(obj):
                                          'Document',
                                          'Poll',
                                          'Folder',
-                                         'DefaultTableModel']:
+                                         'DefaultTableModel',
+                                         'TestForm']:
         return [obj.id, obj.__class__.__name__.lower()]
 
 
