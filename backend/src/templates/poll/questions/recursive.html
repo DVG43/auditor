@@ -1,0 +1,31 @@
+{% load static %}
+        {% for instance in instances %}
+            {% if instance.question_type in "DateQuestion,ManyFromListQuestion,TextQuestion,NumberQuestion,YesNoQuestion,CheckQuestion" %}
+                <section class="question">
+                      <div class="container">
+                          <div class="question-container {% if instance.require %}question-container-obligatory{% endif %}">
+                              {% if instance.require %}<span class="question__star-obligatory">*</span>{% endif %}
+
+                              {% if instance.question_type == "DateQuestion" %}
+                                {% include 'poll/questions/date_question.html' with instance=instance %}
+                              {% elif instance.question_type == "ManyFromListQuestion" %}
+                                {% include 'poll/questions/many_from_list_question.html' with instance=instance %}
+                              {% elif instance.question_type == "TextQuestion" %}
+                                {% include 'poll/questions/text_question.html' with instance=instance %}
+                              {% elif instance.question_type == "NumberQuestion" %}
+                                {% include 'poll/questions/number_question.html' with instance=instance %}
+                              {% elif instance.question_type == "YesNoQuestion" %}
+                                {% include 'poll/questions/yes_no_question.html' with instance=instance %}
+                              {% elif instance.question_type == "CheckQuestion" %}
+                                {% include 'poll/questions/check_question.html' with instance=instance %}
+                              {% endif %}
+
+                                {% include 'poll/questions/attachments.html' %}
+                          </div>
+                    </div>
+                </section>
+            {% endif %}
+            {% if instance.question_type == "SectionQuestion" %}
+                {% include 'poll/questions/sections.html' with instance=instance %}
+            {% endif %}
+        {% endfor %}

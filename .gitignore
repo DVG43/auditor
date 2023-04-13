@@ -1,3 +1,5 @@
+# для правильной отработки CI/CD
+share
 # Logs
 logs
 *.log
@@ -131,4 +133,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# backend/src/share
+backend/src/share/*
+! backend/src/share/.geetkeep

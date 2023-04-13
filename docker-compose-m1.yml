@@ -1,0 +1,80 @@
+---
+version: '2.4'
+services:
+
+  auditor-v2-api:
+    platform: linux/arm64/v8
+    user: app:app
+    container_name: auditor-v2-api
+    hostname: auditor-v2-api
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
+      args:
+        APP_API_LOG: /app/backend/src/logs/apilog.log
+    entrypoint: /app/docker/backend/wsgi-entrypoint.sh
+    env_file:
+      - .env.local
+    volumes:
+      - .:/app/
+    depends_on:
+      - auditor-v2-postgres
+    ports:
+      - 8000:8000
+    healthcheck:
+      test: curl -s -I --fail http://0.0.0.0:8000/ht/
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  auditor-v2-postgres:
+    platform: linux/arm64/v8
+    container_name: auditor-v2-postgres
+    hostname: auditor-v2-postgres
+    image: postgres:14
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/app/pgdata/
+    volumes:
+      - pgdata:/var/lib/postgresql/data/app/
+    healthcheck:
+       test: pg_isready -U postgres -d postgres
+       interval: 10s
+       timeout: 5s
+       retries: 5
+       start_period: 10s
+    ports:
+      - 5432:5432
+
+  auditor-v2-redis:
+    platform: linux/arm64/v8
+    image: redis:6.2.6
+    container_name: auditor-v2-redis
+    hostname: auditor-v2-redis
+
+  auditor-v2-celery:
+    platform: linux/arm64/v8
+    user: app:app
+    image: auditor-v2-celery
+    container_name: auditor-v2-celery
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
+      args:
+        APP_API_LOG: /app/backend/src/logs/apilog.log
+    entrypoint: /app/docker/backend/celery-entrypoint.sh
+    env_file:
+      - .env.local
+    volumes:
+      - .:/app/
+    depends_on:
+      - auditor-v2-redis
+
+volumes:
+  pgdata: {}
+  shared_web_root:
+    external: true

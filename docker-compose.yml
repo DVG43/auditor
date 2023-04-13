@@ -1,7 +1,18 @@
 ---
 version: '2.4'
 services:
-
+  auditor-v2-nginx:
+    # image: ${CI_REGISTRY_IMAGE}:latest
+    build: nginx
+    container_name: main_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+        - shared_web_root:/var/www/html
+    networks:
+      - home
   auditor-v2-api:
     user: app:app
     container_name: auditor-v2-api
@@ -18,6 +29,8 @@ services:
       - .:/app/
     depends_on:
       - auditor-v2-postgres
+    networks:
+      - home
     ports:
       - 8000:8000
     healthcheck:
@@ -45,13 +58,16 @@ services:
        timeout: 5s
        retries: 5
        start_period: 10s
-    ports:
-      - 5432:5432
-
+    # ports:
+      # - 5432:5432
+    networks:
+      - home
   auditor-v2-redis:
     image: redis:6.2.6
     container_name: auditor-v2-redis
     hostname: auditor-v2-redis
+    networks:
+      - home
 
   auditor-v2-celery:
     user: app:app
@@ -69,8 +85,11 @@ services:
       - .:/app/
     depends_on:
       - auditor-v2-redis
+    networks:
+      - home
 
 volumes:
   pgdata: {}
-  shared_web_root:
-    external: true
+  shared_web_root: {}
+networks:
+  home: {}

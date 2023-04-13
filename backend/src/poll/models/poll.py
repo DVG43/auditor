@@ -46,6 +46,8 @@ class Poll(PpmDocModel):
     document_logo = ImageField(upload_to=get_doc_upload_path,
                                null=True, blank=True,
                                verbose_name=_('Document logo'))
+    # для шаблона ответа
+    template_uuid = models.UUIDField(editable=False, unique=True, null=True, blank=True)
 
     class Meta:
         db_table = 'poll'
@@ -92,56 +94,54 @@ class Poll(PpmDocModel):
             poll_url = 'https' + poll_url[4:]
         return poll_url
 
-    def get_questions(self, sort=True):
+    def get_questions(self, parent_id):
         questions = []
         if self.yesnoquestion_set:
-            questions.extend(list(self.yesnoquestion_set.all()))
+            questions.extend(list(self.yesnoquestion_set.filter(parent_id=parent_id)))
         if self.manyfromlistquestion_set:
-            questions.extend(list(self.manyfromlistquestion_set.all()))
+            questions.extend(list(self.manyfromlistquestion_set.filter(parent_id=parent_id)))
         if self.textquestion_set:
-            questions.extend(list(self.textquestion_set.all()))
+            questions.extend(list(self.textquestion_set.filter(parent_id=parent_id)))
         if self.mediaquestion_set:
-            questions.extend(list(self.mediaquestion_set.all()))
+            questions.extend(list(self.mediaquestion_set.filter(parent_id=parent_id)))
         if self.datequestion_set:
-            questions.extend(list(self.datequestion_set.all()))
+            questions.extend(list(self.datequestion_set.filter(parent_id=parent_id)))
         if self.numberquestion_set:
-            questions.extend(list(self.numberquestion_set.all()))
+            questions.extend(list(self.numberquestion_set.filter(parent_id=parent_id)))
         if self.checkquestion_set:
-            questions.extend(list(self.checkquestion_set.all()))
+            questions.extend(list(self.checkquestion_set.filter(parent_id=parent_id)))
         if self.freeanswer_set:
-            questions.extend(list(self.freeanswer_set.all()))
+            questions.extend(list(self.freeanswer_set.filter(parent_id=parent_id)))
         if self.pagequestion_set:
-            questions.extend(list(self.pagequestion_set.all()))
+            questions.extend(list(self.pagequestion_set.filter(parent_id=parent_id)))
         if self.sectionquestion_set:
-            questions.extend(list(self.sectionquestion_set.all()))
-
-        if sort:
-            questions = sorted(questions, key=attrgetter('order_id'))
-        return questions
-
-    def normalize_questions_order_id(self):
-        questions = self.get_questions(sort=False)
-        questions = sorted(questions, key=lambda x: (x.order_id, -x.updated_at.timestamp()))
-
-        _questions = questions.copy()
-        index = 0
-        questions_for_update = {}
-        for i, v in enumerate(_questions, start=1):
-            key = v.__class__.__name__
-            prev_data = questions_for_update.get(key, [])
-            if v.question_type == 'FinalQuestion':
-                questions.remove(v)
-                v.order_id = len(_questions) + 1
-                index -= 1
-            else:
-                v.order_id = i + index
-            questions_for_update[key] = [*prev_data, v]
-
-        for key in questions_for_update.keys():
-            question_model = questions_for_update[key][0].__class__
-            question_model.objects.bulk_update(questions_for_update[key], ["order_id"])
+            questions.extend(list(self.sectionquestion_set.filter(parent_id=parent_id)))
 
         return questions
+
+    # def normalize_questions_order_id(self):
+    #     questions = self.get_questions(sort=False)
+    #     questions = sorted(questions, key=lambda x: (x.order_id, -x.updated_at.timestamp()))
+    #
+    #     _questions = questions.copy()
+    #     index = 0
+    #     questions_for_update = {}
+    #     for i, v in enumerate(_questions, start=1):
+    #         key = v.__class__.__name__
+    #         prev_data = questions_for_update.get(key, [])
+    #         if v.question_type == 'FinalQuestion':
+    #             questions.remove(v)
+    #             v.order_id = len(_questions) + 1
+    #             index -= 1
+    #         else:
+    #             v.order_id = i + index
+    #         questions_for_update[key] = [*prev_data, v]
+    #
+    #     for key in questions_for_update.keys():
+    #         question_model = questions_for_update[key][0].__class__
+    #         question_model.objects.bulk_update(questions_for_update[key], ["order_id"])
+    #
+    #     return questions
 
 
 class PollSettings(models.Model):

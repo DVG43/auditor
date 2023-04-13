@@ -1,7 +1,12 @@
 from django.urls import path, include
 from rest_framework_nested import routers
 from common.views import UserColumnViewSet
-from contacts.views import PositionViewSet, DepartmentViewSet, ContactsDeleteListView
+from contacts.views import (
+    PositionViewSet,
+    DepartmentViewSet,
+    ContactsDeleteListView,
+    ContactViewSet
+)
 from urls import router
 
 # # /contacts/usercolumns/

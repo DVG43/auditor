@@ -6,6 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import views
 
+from django.http import StreamingHttpResponse
+
 from settings import DEBUG
 
 from . import serializers
@@ -155,3 +157,83 @@ class QueryAi(views.APIView):
 
         result = ai.query_ai(source, context, include_debug=DEBUG)
         return Response(result, status=200)
+
+
+
+class StandardGeneration(views.APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
+    serializer_class = serializers.StandardGenerationSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Генерирует текст согласно одной из стандартного набора команд.
+
+        Пример ответа:
+        ```json
+        {
+            "payload": "... ответ ИИ ...",
+            "error": null
+        }
+        ```
+        """
+        serializer = serializers.StandardGenerationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        context = request.data.get('context')
+        command = request.data.get('command')
+
+        result = ai.standard_generation(command, context,
+            include_debug=DEBUG)
+        return Response(result, status=200)
+
+
+class StreamTest(views.APIView):
+    serializer_class = serializers.QueryAiSerializer
+
+    def get(self, request, *args, **kwargs):
+        """
+        Эндпоинт для тестирования потоковой передачи данных (stream).
+        """
+        def generate_stream():
+            import time
+            time_0 = time.time()
+            yield f'data: {{"payload": "{time.time() - time_0:.3f}s"}}\n\n'
+            for i in range(111):
+                time.sleep(0.5)
+                yield f'data: {{"payload": "{time.time() - time_0:.3f}s"}}\n\n'
+        return StreamingHttpResponse(generate_stream(), content_type='text/event-stream')
+
+
+    def post(self, request, *args, **kwargs):
+        """
+        Эндпоинт для тестирования потоковой передачи данных (stream).
+        """
+        serializer = serializers.QueryAiSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        source = request.data.get('source')
+        context = request.data.get('context')
+        stream = request.data.get('stream')
+
+        def generate_stream():
+            import json
+            import time
+
+            time_0 = time.time()
+            data = json.dumps({
+                'payload': f'{time.time() - time_0:.3f}s',
+                'source': source,
+                'context': context,
+                'stream': stream,})
+            yield f"data: {data}"
+
+            for i in range(7):
+                time.sleep(0.5)
+                data = json.dumps({
+                    'payload': f'+{time.time() - time_0:.3f}s',
+                    'source': source,
+                    'context': context,
+                    'stream': stream,
+                })
+                yield f"data: {data}"
+
+        return StreamingHttpResponse(
+            generate_stream(), content_type='text/event-stream')

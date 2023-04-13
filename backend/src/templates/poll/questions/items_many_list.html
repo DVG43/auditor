@@ -1,0 +1,4 @@
+{% load static %}{% load poll_tags %}
+        {% for instance in instances %}
+          <div class="question-select__item select__item">{{instance.text}}</div>
+        {% endfor %}

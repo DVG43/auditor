@@ -20,6 +20,8 @@ class PpmDocModel(models.Model):
 
     owner = models.ForeignKey(
         'accounts.User', verbose_name=_('Owner'), on_delete=models.CASCADE)
+    # portal = models.ForeignKey(
+    #     'portal.Portal', verbose_name=_('Portal'), on_delete=models.CASCADE)
     name = models.CharField(_('Title'), max_length=255)
     description = models.TextField(_('Description'), blank=True, max_length=1000)
     created_at = models.DateTimeField(_('Created at'), auto_now_add=True)
@@ -167,6 +169,7 @@ class StandardIcon(models.Model, ResizeImageMixin):
         """Forms and returns a printable representation of the object.
         """
         return f'Icon {self.id}'
+
 
 register(UserColumn, permissions)
 register(UserCell, permissions)

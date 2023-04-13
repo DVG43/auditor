@@ -14,16 +14,16 @@ do
         sleep 1
     fi
 done
-if [ "$ENVIRONMENT" != "local" ];
-then
-    mkdir -p ./backend/src/share
-    mkdir -p ./backend/src/share/auditor-v2_media
-    mkdir -p ./backend/src/share/auditor-v2_media/images
-    mkdir -p ./backend/src/share/auditor-v2_media/video
-    mkdir -p ./backend/src/share/auditor-v2_media/audio
-    mkdir -p ./backend/src/share/auditor-v2_statics
+# if [ "$ENVIRONMENT" != "local" ];
+# then
+    mkdir -p share
+    mkdir -p share/auditor-v2_media
+    mkdir -p share/auditor-v2_media/images
+    mkdir -p share/auditor-v2_media/video
+    mkdir -p share/auditor-v2_media/audio
+    mkdir -p share/auditor-v2_statics
     touch "${APP_API_LOG}"
-fi
+# fi
 counter=0
 until python3 ./manage.py showmigrations && python3 ./manage.py migrate
 do
@@ -37,10 +37,10 @@ do
         sleep 1
     fi
 done
-if [ "$ENVIRONMENT" = "local" ]
-then
-  DEBUG=True python3 ./manage.py runserver 0.0.0.0:8000
-else
+# if [ "$ENVIRONMENT" = "local" ]
+# then
+#   DEBUG=True python3 ./manage.py runserver 0.0.0.0:8000
+# else
   python3 ./manage.py collectstatic --noinput
 
   gunicorn asgi:application \
@@ -49,7 +49,7 @@ else
   --workers "${GUNICORN_WORKERS_NUMBER:-1}" \
   --threads "${GUNICORN_THREADS_NUMBER:-1}" \
   --log-level "${GUNICORN_LOG_LEVEL:-debug}"
-fi
+# fi
 #####################################################################################
 # Options to DEBUG Django server
 # Optional commands to replace abouve gunicorn command
