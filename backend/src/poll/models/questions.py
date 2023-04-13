@@ -21,9 +21,9 @@ class Question(models.Model):
     question_type = models.CharField(max_length=100, default='Question')
     parent_id = models.UUIDField(null=True, blank=True)
     order_id = models.IntegerField(default=0)
-    description = models.CharField(max_length=512)
+    description = models.CharField(max_length=512, null=True, blank=True, default='')
     poll = models.ForeignKey('Poll', on_delete=models.CASCADE)
-    caption = models.CharField(max_length=255)
+    caption = models.CharField(max_length=255, null=True, blank=True, default='')
 
     # Необязательные поля
     require = models.BooleanField(default=False)
@@ -114,7 +114,7 @@ class DivisionQuestion(Question):
     """
     Division
     """
-    comment = models.CharField(max_length=512)
+    comment = models.CharField(max_length=512, blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
         super(DivisionQuestion, self).__init__(*args, **kwargs)
@@ -128,13 +128,31 @@ class DivisionQuestion(Question):
         ]
 
 
+class ItemSet(models.Model):
+    item_set_id = models.AutoField(primary_key=True)
+    poll = models.ForeignKey('Poll', on_delete=models.CASCADE)
+
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = 'poll_item_set'
+        verbose_name_plural = 'poll_item_sets'
+        ordering = ['-updated_at']
+        indexes = [
+            models.Index(fields=['poll'])
+        ]
+
+
 class ItemQuestion(models.Model, ItemBase):
     item_question_id = models.AutoField(primary_key=True)
+    item_set = models.ForeignKey(ItemSet, on_delete=models.CASCADE, null=True)
     order_id = models.IntegerField(default=0)
     text = models.TextField(default='', blank=True, null=True)
-    checked = models.BooleanField(default=False)
+    checked = models.BooleanField(blank=True, null=True, default=False)
     photo_path = models.CharField(max_length=500, default='', blank=True, null=True)
     points = models.IntegerField(blank=True, null=True)
+    hex_color = models.CharField(max_length=7, default="#ffffff")
     selected = models.BooleanField(default=False)
     userAnswer = models.BooleanField(default=False)
     userAnswerText = models.TextField(default='')
@@ -146,6 +164,9 @@ class ItemQuestion(models.Model, ItemBase):
         db_table = 'poll_question_item'
         verbose_name_plural = 'poll_item_questions'
         ordering = ['order_id', '-updated_at']
+        indexes = [
+            models.Index(fields=['item_set'])
+        ]
 
     def delete(self, using=None, keep_parents=False):
         yesnoquestion = self.yesnoquestion_set.first()
@@ -243,7 +264,7 @@ class ManyFromListQuestion(Question):
 class YesNoAnswers(models.Model):
     textAnswer = models.TextField(default='', blank=True)
     checked = models.BooleanField(default=False)
-    points = models.IntegerField(default=0, blank=True, null=True)
+    points = models.IntegerField(blank=True, null=True)
 
     class Meta:
         db_table = 'one_from_answer'
@@ -382,7 +403,7 @@ class TextQuestion(Question):
     """
     Just Text
     """
-    text = models.TextField(default='')
+    text = models.TextField(blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
         super(TextQuestion, self).__init__(*args, **kwargs)
@@ -400,7 +421,7 @@ class NumberQuestion(Question):
     """
     Just Number
     """
-    number = models.FloatField(default=0.0)
+    number = models.FloatField(blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
         super(NumberQuestion, self).__init__(*args, **kwargs)
@@ -418,7 +439,7 @@ class DateQuestion(Question):
     """
     Just Date
     """
-    date = models.DateTimeField(default=timezone.now)
+    date = models.DateTimeField(blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
         super(DateQuestion, self).__init__(*args, **kwargs)
@@ -436,7 +457,8 @@ class CheckQuestion(Question):
     """
     Just bool Checkbox question
     """
-    checked = models.BooleanField(default=False)
+    checked = models.BooleanField(blank=True, null=True, default=False)
+    points = models.IntegerField(blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
         super(CheckQuestion, self).__init__(*args, **kwargs)
@@ -513,7 +535,7 @@ class ItemsFreeAnswer(models.Model):
     photo_path = models.CharField(max_length=500, default='', blank=True, null=True)
     count_of_input = models.IntegerField(default=0, blank=True, null=True)
     selected = models.BooleanField(default=False)
-    points = models.IntegerField(default=0, blank=True, null=True)
+    points = models.IntegerField(blank=True, null=True)
     type_answer_row = models.CharField(max_length=255, blank=True, null=True)
     tags = models.ManyToManyField(ItemTagsFreeAnswer)
 
