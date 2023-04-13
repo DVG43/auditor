@@ -59,27 +59,17 @@ class CreatePoll(SerializerMutation):
         Creates base page and section with possible questions
         """
 
-        base_page = qstn_models.PageQuestion.objects.create(poll=poll, caption="Введите название страницы")
-        base_section = qstn_models.SectionQuestion.objects.create(poll=poll, parent_id=base_page.page_id,
-                                                                  caption="Введите название раздела")
+        base_page = qstn_models.PageQuestion.objects.create(poll=poll, caption="Заглавная страница")
 
         data = {
             "poll": poll,
-            "parent_id": base_section.section_id
+            "parent_id": base_page.page_id
         }
 
-        simple_questions = ('TextQuestion', 'RatingQuestion', 'CheckQuestion',
-                            'DateQuestion', 'NumberQuestion', 'DivisionQuestion', 'HeadingQuestion')
-        questions_with_items = ('ManyFromListQuestion', 'YesNoQuestion', 'MediaQuestion', 'FreeAnswer', 'FinalQuestion')
-
-        order = 1
-
-        for k, v in QUESTION_MODELS.items():
-            if k in simple_questions:
-                v.objects.create(caption=k, order_id=order, **data)
-                order += 1
-            if k in ('PageQuestion', 'SectionQuestion'):
-                continue
+        qstn_models.DateQuestion.objects.create(caption="Дата и время", order_id=1, **data)
+        qstn_models.TextQuestion.objects.create(caption="Введите вопрос", order_id=2, **data)
+        qstn_models.NumberQuestion.objects.create(caption="Число", order_id=3, **data)
+        qstn_models.CheckQuestion.objects.create(caption="Чек бокс", order_id=4, **data)
 
 
 class UpdatePollInput(graphene.InputObjectType):

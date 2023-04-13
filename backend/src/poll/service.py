@@ -66,3 +66,22 @@ def update_order_free_answer_items(item_question_id: int, old_order_id: int, ord
             answer.text_answer = swap(swap_list=items, a=old_order_id - 1, b=order_id - 1)
 
     UserAnswerQuestion.objects.bulk_update(answers, ['text_answer'])
+
+
+def update_questions_order(question, created=True):
+    poll = question.poll
+    questions = poll.get_questions(parent_id=question.parent_id)
+    if created:
+        question.order_id = max(questions, key=lambda x: x.order_id).order_id + 1
+        question.save()
+    else:
+        questions.remove(question)
+        questions = sorted(questions, key=lambda x: x.order_id)
+        orders = [x.order_id for x in questions]
+        try:
+            position = orders.index(question.order_id)
+            for q in questions[position:]:
+                q.order_id += 1
+                q.save()
+        except ValueError:
+            return

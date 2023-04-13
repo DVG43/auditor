@@ -13,6 +13,7 @@ from poll.models import (
 from poll.serializers import (
     questions as qstn_serializers,
 )
+from poll.service import update_questions_order
 
 
 class CrtUpdPageQuestions(SerializerMutation):
@@ -32,18 +33,14 @@ class CrtUpdPageQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
 
-        input.update({'poll': poll})
+        question_id = input.get('question_id', None)
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
-
-        obj, created = qstn_models.PageQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+        obj, created = qstn_models.PageQuestion.objects.update_or_create(poll=poll, question_id=question_id,
                                                                          defaults={**input})
-        poll.normalize_questions_order_id()
+        update_questions_order(obj, created)
         return obj
 
 
@@ -64,18 +61,14 @@ class CrtUpdSectionQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
 
-        input.update({'poll': poll})
+        question_id = input.get('question_id', None)
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
-
-        obj, created = qstn_models.SectionQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+        obj, created = qstn_models.SectionQuestion.objects.update_or_create(poll=poll, question_id=question_id,
                                                                             defaults={**input})
-        poll.normalize_questions_order_id()
+        update_questions_order(obj, created)
         return obj
 
 
@@ -94,18 +87,14 @@ class CrtUpdHeadQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
 
-        input.update({'poll': poll})
+        question_id = input.get('question_id', None)
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
-
-        obj, created = qstn_models.HeadingQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+        obj, created = qstn_models.HeadingQuestion.objects.update_or_create(poll=poll, question_id=question_id,
                                                                             defaults={**input})
-        poll.normalize_questions_order_id()
+        update_questions_order(obj, created)
         return obj
 
 
@@ -124,18 +113,14 @@ class CrtUpdNumberQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
 
-        input.update({'poll': poll})
+        question_id = input.get('question_id', None)
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
-
-        obj, created = qstn_models.NumberQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+        obj, created = qstn_models.NumberQuestion.objects.update_or_create(poll=poll, question_id=question_id,
                                                                            defaults={**input})
-        poll.normalize_questions_order_id()
+        update_questions_order(obj, created)
         return obj
 
 
@@ -154,18 +139,14 @@ class CrtUpdDateQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
 
-        input.update({'poll': poll})
+        question_id = input.get('question_id', None)
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
-
-        obj, created = qstn_models.DateQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+        obj, created = qstn_models.DateQuestion.objects.update_or_create(poll=poll, question_id=question_id,
                                                                          defaults={**input})
-        poll.normalize_questions_order_id()
+        update_questions_order(obj, created)
         return obj
 
 
@@ -184,18 +165,14 @@ class CrtUpdCheckQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
 
-        input.update({'poll': poll})
+        question_id = input.get('question_id', None)
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
-
-        obj, created = qstn_models.CheckQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+        obj, created = qstn_models.CheckQuestion.objects.update_or_create(poll=poll, question_id=question_id,
                                                                           defaults={**input})
-        poll.normalize_questions_order_id()
+        update_questions_order(obj, created)
         return obj
 
 
@@ -210,18 +187,14 @@ class CrtUpdRatingQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
 
-        input.update({'poll': poll})
+        question_id = input.get('question_id', None)
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
-
-        obj, created = qstn_models.RatingQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+        obj, created = qstn_models.RatingQuestion.objects.update_or_create(poll=poll, question_id=question_id,
                                                                            defaults={**input})
-        poll.normalize_questions_order_id()
+        update_questions_order(obj, created)
         return obj
 
 
@@ -240,18 +213,14 @@ class CrtUpdTextQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
 
-        input.update({'poll': poll})
+        question_id = input.get('question_id', None)
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
-
-        obj, created = qstn_models.TextQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+        obj, created = qstn_models.TextQuestion.objects.update_or_create(poll=poll, question_id=question_id,
                                                                          defaults={**input})
-        poll.normalize_questions_order_id()
+        update_questions_order(obj, created)
         return obj
 
 
@@ -270,10 +239,8 @@ class CrtUpdFreeQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
-
-        input.update({'poll': poll})
 
         items, attached_types = [], []
         if 'items' in input:
@@ -283,13 +250,10 @@ class CrtUpdFreeQuestions(SerializerMutation):
             attached_types = input['attached_type']
             del input['attached_type']
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
+        question_id = input.get('question_id', None)
 
-        obj, created = qstn_models.FreeAnswer.objects.update_or_create(poll=poll, question_id=input["question_id"],
+        obj, created = qstn_models.FreeAnswer.objects.update_or_create(poll=poll, question_id=question_id,
                                                                        defaults={**input})
-
         if items:
             for item in items:
                 crt_item = qstn_models.ItemsFreeAnswer(**item)
@@ -302,7 +266,7 @@ class CrtUpdFreeQuestions(SerializerMutation):
                 crt_attype.save()
                 obj.attached_type.add(crt_attype)
 
-        poll.normalize_questions_order_id()
+        update_questions_order(obj, created)
         return obj
 
 
@@ -321,10 +285,8 @@ class CrtUpdMediaQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
-
-        input.update({'poll': poll})
 
         items, attached_types = [], []
         if 'items' in input:
@@ -334,11 +296,9 @@ class CrtUpdMediaQuestions(SerializerMutation):
             attached_types = input['attached_type']
             del input['attached_type']
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
+        question_id = input.get('question_id', None)
 
-        obj, created = qstn_models.MediaQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+        obj, created = qstn_models.MediaQuestion.objects.update_or_create(poll=poll, question_id=question_id,
                                                                           defaults={**input})
 
         if items:
@@ -353,7 +313,7 @@ class CrtUpdMediaQuestions(SerializerMutation):
                 crt_attype.save()
                 obj.attached_type.add(crt_attype)
 
-        poll.normalize_questions_order_id()
+        update_questions_order(obj, created)
         return obj
 
 
@@ -372,10 +332,8 @@ class CrtUpdManyQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
-
-        input.update({'poll': poll})
 
         items, attached_types = [], []
         if 'items' in input:
@@ -385,28 +343,25 @@ class CrtUpdManyQuestions(SerializerMutation):
             attached_types = input['attached_type']
             del input['attached_type']
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
+        question_id = input.get('question_id', None)
 
-        obj, created = qstn_models.ManyFromListQuestion.objects.update_or_create(poll=poll,
-                                                                                 question_id=input["question_id"],
-                                                                                 defaults={**input})
-
+        question_obj, created = qstn_models.ManyFromListQuestion.objects.update_or_create(poll=poll,
+                                                                                          question_id=question_id,
+                                                                                          defaults={**input})
         if items:
             for item in items:
                 crt_item = qstn_models.ItemQuestion(**item)
                 crt_item.save()
-                obj.items.add(crt_item)
+                question_obj.items.add(crt_item)
 
         if attached_types:
             for attached_type in attached_types:
                 crt_attype = qstn_models.ManyFromListAttachedType(**attached_type)
                 crt_attype.save()
-                obj.attached_type.add(crt_attype)
+                question_obj.attached_type.add(crt_attype)
 
-        poll.normalize_questions_order_id()
-        return obj
+        update_questions_order(question_id, created)
+        return question_obj
 
 
 class CrtUpdYesNoQuestions(SerializerMutation):
@@ -424,10 +379,8 @@ class CrtUpdYesNoQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
-
-        input.update({'poll': poll})
 
         items, attached_types, yes_no_answers = [], [], []
         if 'items' in input:
@@ -440,33 +393,30 @@ class CrtUpdYesNoQuestions(SerializerMutation):
             yes_no_answers = input['yes_no_answers']
             del input['yes_no_answers']
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
+        question_id = input.get('question_id', None)
 
-        obj, created = qstn_models.YesNoQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
-                                                                          defaults={**input})
-
+        question_obj, created = qstn_models.YesNoQuestion.objects.update_or_create(poll=poll, question_id=question_id,
+                                                                                   defaults={**input})
         if items:
             for item in items:
                 crt_item = qstn_models.ItemQuestion(**item)
                 crt_item.save()
-                obj.items.add(crt_item)
+                question_obj.items.add(crt_item)
 
         if attached_types:
             for attached_type in attached_types:
                 crt_attype = qstn_models.YesNoAttachedType(**attached_type)
                 crt_attype.save()
-                obj.attached_type.add(crt_attype)
+                question_obj.attached_type.add(crt_attype)
 
         if yes_no_answers:
             for yes_no_answer in yes_no_answers:
                 crt_yesnoanswer = qstn_models.YesNoAnswers(**yes_no_answer)
                 crt_yesnoanswer.save()
-                obj.yes_no_answers.add(crt_yesnoanswer)
+                question_obj.yes_no_answers.add(crt_yesnoanswer)
 
-        poll.normalize_questions_order_id()
-        return obj
+        update_questions_order(question_obj, created)
+        return question_obj
 
 
 class CrtUpdFinalQuestions(SerializerMutation):
@@ -484,29 +434,25 @@ class CrtUpdFinalQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
 
-        input.update({'poll': poll})
         items = []
         if 'items' in input:
             items = input['items']
             del input['items']
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
+        question_id = input.get('question_id', None)
 
-        obj, created = qstn_models.FinalQuestion.objects.update_or_create(poll=poll, question_id=input["question_id"],
+        obj, created = qstn_models.FinalQuestion.objects.update_or_create(poll=poll, question_id=question_id,
                                                                           defaults={**input})
-
         if 'items' in input:
             for item in items:
                 crt_item = qstn_models.ItemQuestion(**item)
                 crt_item.save()
                 obj.items.add(crt_item)
 
-        poll.normalize_questions_order_id()
+        update_questions_order(obj, created)
         return obj
 
 
@@ -521,20 +467,14 @@ class CrtUpdDivisionQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input['poll'])
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
 
-        input.update({'poll': poll})
+        question_id = input.get('question_id', None)
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
-
-        obj, created = qstn_models.DivisionQuestion.objects.update_or_create(poll=poll,
-                                                                             question_id=input["question_id"],
+        obj, created = qstn_models.DivisionQuestion.objects.update_or_create(poll=poll, question_id=question_id,
                                                                              defaults={**input})
-
-        poll.normalize_questions_order_id()
+        update_questions_order(obj, created)
         return obj
 
 
@@ -550,11 +490,9 @@ class CrtUpdItemQuestions(SerializerMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
 
-        if "parent_id" in input.keys():
-            if not input["parent_id"]:
-                del input["parent_id"]
+        item_id = input.get('item_question_id', None)
 
-        obj, created = qstn_models.TextQuestion.objects.update_or_create(item_question_id=input["item_question_id"],
+        obj, created = qstn_models.TextQuestion.objects.update_or_create(item_question_id=item_id,
                                                                          defaults={**input})
         return obj
 
@@ -642,7 +580,6 @@ class DeleteQuestion(graphene.Mutation):
                     question.poll
                 )
                 question.delete()
-                question.poll.normalize_questions_order_id()
                 return DeleteQuestion(ok=True)
         return DeleteQuestion(ok=False)
 
