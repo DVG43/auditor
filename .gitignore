@@ -1,6 +1,5 @@
 # для правильной отработки CI/CD
-backend/src/share/*
-!backend/src/share/.geetkeep
+backend/src/share/
 # Logs
 logs
 *.log

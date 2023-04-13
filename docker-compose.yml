@@ -29,6 +29,7 @@ services:
       - .:/app/
     depends_on:
       - auditor-v2-postgres
+      - auditor-v2-source
     networks:
       - home
     ports:
@@ -52,6 +53,8 @@ services:
       PGDATA: /var/lib/postgresql/data/app/pgdata/
     volumes:
       - pgdata:/var/lib/postgresql/data/app/
+    depends_on:
+      - auditor-v2-source
     healthcheck:
        test: pg_isready -U postgres -d postgres
        interval: 10s
@@ -85,8 +88,14 @@ services:
       - .:/app/
     depends_on:
       - auditor-v2-redis
+      - auditor-v2-source
     networks:
       - home
+  auditor-v2-source:
+    image: ubuntu
+    entrypoint: /app/docker/backend/source-entrypoint.sh
+    volumes:
+      - .:/app
 
 volumes:
   pgdata: {}
