@@ -1,10 +1,11 @@
 # для правильной отработки CI/CD
-share
+backend/src/share/*
+!backend/src/share/.geetkeep
 # Logs
 logs
 *.log
 .idea
-# */src/share/**
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
