@@ -1,36 +1,65 @@
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from common.models import PpmDocModel, permissions
+from objectpermissions.registration import register
+
+from testform.utils import QTYPE
+from utils import get_doc_upload_path
 
 
 class TestForm(PpmDocModel):
+    """
+    Основная форма шаблона теста
+    """
     id = models.AutoField(primary_key=True)
-    seconds_time = models.PositiveIntegerField(default=120, verbose_name=_("время для прохождения"))
+    time_to_answer = models.PositiveIntegerField(default=120, verbose_name=_("время для прохождения"))
     folder = models.ForeignKey(
         'folders.Folder',
         on_delete=models.CASCADE,
-        related_name='polls',
+        related_name='testforms',
         verbose_name=_('Folder'),
         blank=True, null=True
     )
-    test_logo = ImageField(upload_to=get_doc_upload_path,
-                           null=True, blank=True,
-                           verbose_name=_('TestForm logo'))
+    last_open = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    document_logo = models.ImageField(upload_to=get_doc_upload_path,
+                                      null=True, blank=True,
+                                      verbose_name=_('Document logo'))
+
+    class Meta:
+        db_table = 'testform'
+        verbose_name_plural = _('testforms')
+        ordering = ['-id']
+        indexes = [
+            models.Index(fields=['owner'])
+        ]
 
 
-class TFQuestion(models.Model):
+class TestFormQuestion(models.Model):
+    """
+    Модель шаблона вопроса.
+    """
     question_id = models.AutoField(primary_key=True)
     question_type = models.CharField(max_length=100,
-                                     default='MainQuestion',
+                                     choices=QTYPE,
+                                     default="BaseTFQuestion",
                                      verbose_name=_("тип вопроса"))
-    order_id = models.PositiveIntegerField(default=1)
-    caption = models.CharField(max_lenth=200, verbose_name=_("текст вопроса"))
+    caption = models.CharField(max_length=200,
+                               verbose_name=_("текст вопроса"),
+                               default="",
+                               null=True, blank=True)
     description = models.CharField(max_length=512,
                                    verbose_name=_("описание вопроса"),
                                    null=True, blank=True)
     testform = models.ForeignKey(TestForm, on_delete=models.CASCADE)
     require = models.BooleanField(default=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = 'testform_question'
+        verbose_name_plural = _('testform_questions')
+        indexes = [
+            models.Index(fields=['testform'])
+        ]
 
     # mix_answers = models.BooleanField(default=False)
     # time_for_answer = models.BooleanField(default=False)
@@ -40,90 +69,46 @@ class TFQuestion(models.Model):
     # test_mode = models.BooleanField(default=False)
 
 
-    class Meta:
-        abstract = True
-        ordering = ['-updated_at']
-
-    def _update_or_related_objects(self, objects_list, related_name, primary_key_name, model):
-        for obj in objects_list:
-            obj_id = obj.pop(primary_key_name, None)
-            obj_id = int(obj_id) if obj_id else None
-            obj, created = model.objects.update_or_create(
-                pk=obj_id,
-                defaults={**obj},
-            )
-            getattr(self, related_name).add(obj)
-        self.save()
-        return getattr(self, related_name)
+class TFQuestionType(models.Model):
+    """
+    Модель типа вопроса
+    """
+    testform_question = models.ForeignKey(TestFormQuestion, on_delete=models.CASCADE)
+    order_id = models.PositiveIntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(default=timezone.now)
 
     def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None, sort=True):
-        # if self.poll.telegram_integration_is_active():
-        #     self.poll.telegramintegration.update_variable_in_message()
+             update_fields=None):
+        if self.order_id == 0:
+            last = self.__class__.objects.only('order_id').order_by('order_id').last() or 0
+            self.order_id = last.order_id + 1 if last != 0 else 1
+        return super().save(force_insert, force_update, using, update_fields)
 
-        result = super(Question, self).save(
-            force_insert=force_insert,
-            force_update=force_update,
-            using=using,
-            update_fields=update_fields
-        )
-        return result
-
-    @staticmethod
-    def normalize_order_id(query_set):
-        for i, v in enumerate(query_set.all(), start=1):
-            v.order_id = i
-            v.save()
-        return query_set
+    class Meta:
+        db_table = 'tf_question_type'
+        verbose_name_plural = _('tf_question_types')
+        indexes = [
+            models.Index(fields=['testform_question'])
+        ]
 
 
-class MainQuestion(TFQuestion):
+class BaseTFQuestion(TFQuestionType):
+    """
+    Модель конкретного типа вопроса, наследована от TFQuestionType
+    """
     ANSWER_TYPE = (
         ('text', 'text'),
         ('video', 'video'),
     )
-    type_answer = models.ArrayField(models.CharField(max_lenth=10, choices=ANSWER_TYPE))
-#
-# class TFQuestion(models.Model):
-#     ANSWER_TYPE = (
-#         ('text', 'text'),
-#         ('video', 'video'),
-#     )
-#     number = models.PositiveIntegerField(default=1)
-#     testform = models.ForeignKey(TestForm, ondelete=models.CASCADE)
-#     required = models.BooleanField(default=False)
-#     description = models.CharField(max_lenth=250, blank=True, null=True)
-#     answer_type = models.CharField(max_lenth=100, chioces=ANSWER_TYPE)
-#     poster = models.FileField(upload_to=None, max_length=254, blank=True, null=True)
-#
-#     class Meta:
-#         unique_together = ('storyboard', 'number')
-#         verbose_name_plural = _('storyboard_questions')
-#         ordering = ['number', ]
-#
+
+    type_answer = models.CharField(max_length=10, choices=ANSWER_TYPE, default='text', blank=True, null=True)
+    max_time = models.PositiveIntegerField(default=120, null=True, blank=True)
 
 
-class FinalTFQuestion(TFQuestion):
-    description_mode = models.BooleanField(default=False)
-    max_video_duration = models.IntegerField(default=0, blank=False, null=False)
-    is_video = models.BooleanField(default=False)
-    items = models.ManyToManyField(ItemQuestion)
+class FinalTFQuestion(TFQuestionType):
+    answer = models.CharField(max_length=250, null=True, blank=True)
 
-    show_my_answers = models.BooleanField(default=False)
-    correct_answers = models.BooleanField(default=False)
-    point_for_answers = models.BooleanField(default=False)
-    button_mode = models.BooleanField(default=False)
-    button_text = models.CharField(max_length=512, default='', blank=True, null=True)
-    button_url = models.CharField(max_length=512, default='', blank=True, null=True)
-    reopen = models.BooleanField(default=False)
 
-    def __init__(self, *args, **kwargs):
-        super(FinalTFQuestion, self).__init__(*args, **kwargs)
-        self.question_type = __class__.__name__
-
-    class Meta:
-        db_table = 'testform_final_question'
-        verbose_name_plural = 'testform_final_questions'
-        indexes = [
-            models.Index(fields=['testform'])
-        ]
+register(TestForm, permissions)
+register(TestFormQuestion, permissions)
