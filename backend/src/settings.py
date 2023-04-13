@@ -174,9 +174,9 @@ FIRST_DAY_OF_WEEK = 1
 
 STATIC_URL = "/statics/"
 STATIC_ROOT = os.path.join(BASE_DIR, "share", "auditor-v2_statics")
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "share/auditor-v2_statics/poll"),
-]
+# STATICFILES_DIRS = [
+#     "static",
+# ]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "share", "auditor-v2_media")

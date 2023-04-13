@@ -197,11 +197,10 @@ class StreamTest(views.APIView):
             import time
             time_0 = time.time()
             yield f'data: {{"payload": "{time.time() - time_0:.3f}s"}}\n\n'
-            for i in range(7):
+            for i in range(111):
                 time.sleep(0.5)
                 yield f'data: {{"payload": "{time.time() - time_0:.3f}s"}}\n\n'
-        return StreamingHttpResponse(
-            generate_stream(), content_type='text/event-stream')
+        return StreamingHttpResponse(generate_stream(), content_type='text/event-stream')
 
 
     def post(self, request, *args, **kwargs):

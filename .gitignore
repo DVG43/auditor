@@ -1,3 +1,5 @@
+# для правильной отработки CI/CD
+share
 # Logs
 logs
 *.log
