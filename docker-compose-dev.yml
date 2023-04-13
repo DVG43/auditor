@@ -59,7 +59,7 @@ services:
     image: ubuntu
     entrypoint: /app/docker/backend/source-entrypoint.sh
     volumes:
-      - ./backend/src:/app/backend/src/
+      - .:/app/
 networks:
   devserver_default:
     external: true

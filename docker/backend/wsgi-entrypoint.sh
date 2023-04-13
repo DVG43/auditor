@@ -15,7 +15,7 @@ do
     fi
 done
     python3 ./manage.py showmigrations && python3 ./manage.py migrate
-    
+
 until cd /app/backend/src/share
 do
     echo "Waiting for volume to be ready..."
@@ -29,6 +29,7 @@ do
         sleep 1
     fi
 done
+  mkdir -p auditor-v2_media auditor-v2_media/images auditor-v2_media/video auditor-v2_media/audio auditor-v2_statics
   cd ..
   python3 ./manage.py collectstatic --noinput
 

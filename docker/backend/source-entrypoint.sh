@@ -15,6 +15,5 @@ do
     fi
 done
 mkdir -p share
-mkdir -p share/auditor-v2_media share/auditor-v2_media/images share/auditor-v2_media/video share/auditor-v2_media/audio share/auditor-v2_statics
 chmod -R 777 share
 touch "${APP_API_LOG}"
