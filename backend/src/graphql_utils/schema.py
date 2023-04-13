@@ -5,6 +5,8 @@ from document.schema import Mutation as MutationDocument
 from document.schema import Subscription as SubscriptionDocument
 from poll.schema.queries.query import Query as QueryPoll
 from poll.schema.mutations.mutations import Mutation as MutationPoll
+from testform.schema.queries import QueryTestForm
+from testform.schema.mutations import MutationTestForm
 from timing.schema import Query as QueryTiming
 from timing.schema import Mutation as MutationTiming
 from timing.schema import Subscription as SubscriptionTiming
@@ -23,7 +25,8 @@ class Query(
     DefaultQueryTable,
     QueryPoll,
     QueryLinkText,
-    QueryGoogleSheet
+    QueryGoogleSheet,
+    QueryTestForm,
 ):
     pass
 
@@ -35,7 +38,8 @@ class Mutation(
     MutationPoll,
     MutationLinkText,
     # MutationIntegrations
-    LogoMutation
+    LogoMutation,
+    MutationTestForm,
 ):
     pass
 
