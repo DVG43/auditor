@@ -214,6 +214,7 @@ class SectionQuestionType(DjangoObjectType):
 
 
 class PageQuestionType(DjangoObjectType):
+    item_sets = graphene.List(ItemSetQuestionType)
     sections = graphene.List(SectionQuestionType)
     questions = graphene.List(QuestionType)
 
@@ -238,6 +239,12 @@ class PageQuestionType(DjangoObjectType):
         ret.extend(questions_models.ManyFromListQuestion.objects.filter(parent_id=self.page_id))
 
         return ret
+
+    @login_required
+    def resolve_item_sets(self, info):
+        return questions_models.ItemSet.objects.filter(
+            poll=self.poll
+        )
 
 
 # SurveyPassing

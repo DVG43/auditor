@@ -233,12 +233,12 @@ class ManyFromListQuestion(Question):
     ManyFromList
     """
 
-    answer_mode_choices = (('ONE', 1),
-                           ('SOME', 2),)
+    ANSWER_MODE_CHOICES = ((1, 'ONE'),
+                           (2, 'SOME'),)
 
     item_set = models.ForeignKey(ItemSet, on_delete=models.CASCADE, null=True)
     attached_type = models.ManyToManyField(ManyFromListAttachedType)
-    answer_mode = models.IntegerField(choices=answer_mode_choices, default=1)
+    answer_mode = models.IntegerField(choices=ANSWER_MODE_CHOICES, default=1)
 
     # Необязательные поля
     description_mode = models.BooleanField(default=False)

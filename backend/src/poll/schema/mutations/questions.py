@@ -479,6 +479,7 @@ class CrtUpdManyQuestions(SerializerMutation):
         model_operations = ['create', 'update']
         lookup_field = 'question_id'
         model_class = qstn_models.ManyFromListQuestion
+        convert_choices_to_enum = False
 
     @classmethod
     @login_required
