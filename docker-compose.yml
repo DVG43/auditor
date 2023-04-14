@@ -27,6 +27,7 @@ services:
       - .env.local
     volumes:
       - .:/app/
+      - shared_web_root:/app/backend/src/share/
     depends_on:
       - auditor-v2-postgres
       - auditor-v2-source
@@ -86,6 +87,7 @@ services:
       - .env.local
     volumes:
       - .:/app/
+      - shared_web_root:/app/backend/src/share/
     depends_on:
       - auditor-v2-redis
       - auditor-v2-source
