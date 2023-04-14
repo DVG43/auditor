@@ -317,53 +317,6 @@ class CrtUpdMediaQuestions(SerializerMutation):
         return obj
 
 
-class CrtUpdManyQuestions(SerializerMutation):
-    """
-    Создание|Обновление вопроса с множественным выбором
-    """
-
-    class Meta:
-        serializer_class = qstn_serializers.ManyFromListQuestionSerializer
-        model_operations = ['create', 'update']
-        lookup_field = 'question_id'
-        model_class = qstn_models.ManyFromListQuestion
-
-    @classmethod
-    @login_required
-    def mutate_and_get_payload(cls, root, info, **input):
-        PermissionClass.has_permission(info)
-        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
-        PermissionClass.has_mutate_object_permission(info, poll)
-
-        items, attached_types = [], []
-        if 'items' in input:
-            items = input['items']
-            del input['items']
-        if 'attached_type' in input:
-            attached_types = input['attached_type']
-            del input['attached_type']
-
-        question_id = input.get('question_id', None)
-
-        question_obj, created = qstn_models.ManyFromListQuestion.objects.update_or_create(poll=poll,
-                                                                                          question_id=question_id,
-                                                                                          defaults={**input})
-        if items:
-            for item in items:
-                crt_item = qstn_models.ItemQuestion(**item)
-                crt_item.save()
-                question_obj.items.add(crt_item)
-
-        if attached_types:
-            for attached_type in attached_types:
-                crt_attype = qstn_models.ManyFromListAttachedType(**attached_type)
-                crt_attype.save()
-                question_obj.attached_type.add(crt_attype)
-
-        update_questions_order(question_id, created)
-        return question_obj
-
-
 class CrtUpdYesNoQuestions(SerializerMutation):
     """
     Создание|Обновление вопроса с одиночным выбором
@@ -478,6 +431,25 @@ class CrtUpdDivisionQuestions(SerializerMutation):
         return obj
 
 
+class CrtUpdItemSet(SerializerMutation):
+    class Meta:
+        serializer_class = qstn_serializers.ItemSetSerializer
+        model_operations = ['create', 'update']
+        lookup_field = 'item_set_id'
+        model_class = qstn_models.ItemSet
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        PermissionClass.has_permission(info)
+
+        item_id = input.get('item_set_id', None)
+
+        obj, created = qstn_models.ItemSet.objects.update_or_create(item_set_id=item_id,
+                                                                    defaults={**input})
+        return obj
+
+
 class CrtUpdItemQuestions(SerializerMutation):
     class Meta:
         serializer_class = qstn_serializers.ItemQuestionSerializer
@@ -495,6 +467,53 @@ class CrtUpdItemQuestions(SerializerMutation):
         obj, created = qstn_models.TextQuestion.objects.update_or_create(item_question_id=item_id,
                                                                          defaults={**input})
         return obj
+
+
+class CrtUpdManyQuestions(SerializerMutation):
+    """
+    Создание|Обновление вопроса с множественным выбором
+    """
+
+    class Meta:
+        serializer_class = qstn_serializers.ManyFromListQuestionSerializer
+        model_operations = ['create', 'update']
+        lookup_field = 'question_id'
+        model_class = qstn_models.ManyFromListQuestion
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(cls, root, info, **input):
+        PermissionClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
+        PermissionClass.has_mutate_object_permission(info, poll)
+
+        items, attached_types = [], []
+        if 'items' in input:
+            items = input['items']
+            del input['items']
+        if 'attached_type' in input:
+            attached_types = input['attached_type']
+            del input['attached_type']
+
+        question_id = input.get('question_id', None)
+
+        question_obj, created = qstn_models.ManyFromListQuestion.objects.update_or_create(poll=poll,
+                                                                                          question_id=question_id,
+                                                                                          defaults={**input})
+        if items:
+            for item in items:
+                crt_item = qstn_models.ItemQuestion(**item)
+                crt_item.save()
+                question_obj.items.add(crt_item)
+
+        if attached_types:
+            for attached_type in attached_types:
+                crt_attype = qstn_models.ManyFromListAttachedType(**attached_type)
+                crt_attype.save()
+                question_obj.attached_type.add(crt_attype)
+
+        update_questions_order(question_id, created)
+        return question_obj
 
 
 class ItemEnum(Enum):
@@ -595,6 +614,7 @@ class QstnMutation(graphene.ObjectType):
     crt_upd_media_question = CrtUpdMediaQuestions.Field()
     crt_upd_many_question = CrtUpdManyQuestions.Field()
     crt_upd_yes_no_question = CrtUpdYesNoQuestions.Field()
+    crt_upd_item_set = CrtUpdItemSet.Field()
     crt_upd_item_question = CrtUpdItemQuestions.Field()
     delete_item_question = DeleteItemQuestions.Field()
     delete_question = DeleteQuestion.Field()

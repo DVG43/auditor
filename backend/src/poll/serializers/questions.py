@@ -3,7 +3,7 @@ from rest_framework import serializers
 from poll.models.questions import DivisionQuestion, ItemQuestion, ManyFromListQuestion, YesNoQuestion, \
     RatingQuestion, MediaFile, MediaQuestion, TextQuestion, MediaItemQuestion, MediaAttachedType, FinalQuestion, \
     YesNoAnswers, YesNoAttachedType, HeadingQuestion, FreeAnswer, ItemsFreeAnswer, FreeAnswerAttachedType, \
-    TagsFreeAnswer, ItemTagsFreeAnswer, ManyFromListAttachedType, PageQuestion, SectionQuestion
+    TagsFreeAnswer, ItemTagsFreeAnswer, ManyFromListAttachedType, PageQuestion, SectionQuestion, ItemSet
 
 
 def max_min_validator(value):
@@ -52,12 +52,22 @@ class DivisionQuestionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ItemSetSerializer(serializers.ModelSerializer):
+    item_set_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = ItemSet
+        fields = ['item_set_id', 'poll']
+
+
 class ItemQuestionSerializer(serializers.ModelSerializer):
+    item_set = serializers.IntegerField()
+
     class Meta:
         model = ItemQuestion
         fields = [
-            'item_question_id', 'order_id', 'text',
-            'checked', 'photo_path', 'points', 'selected',
+            'item_question_id', 'item_set', 'order_id', 'text',
+            'checked', 'photo_path', 'points', 'hex_color', 'selected',
             'userAnswer', 'userAnswerText'
         ]
 
@@ -156,6 +166,7 @@ class ManyFromListQuestionAttachedTypeSerializer(serializers.ModelSerializer):
 
 
 class ManyFromListQuestionSerializer(BaseQuestionSerializer):
+    # item_set = ItemSetSerializer()
     comment = serializers.CharField(max_length=512, required=False)
     poll = serializers.IntegerField()
     answer_time = serializers.IntegerField(default=0, required=False)
@@ -165,7 +176,6 @@ class ManyFromListQuestionSerializer(BaseQuestionSerializer):
     answer_from = serializers.IntegerField(required=False)
     answer_to = serializers.IntegerField(required=False)
     attached_type = ManyFromListQuestionAttachedTypeSerializer(many=True, required=False)
-    items = ItemQuestionSerializer(many=True, required=False)
 
     class Meta:
         model = ManyFromListQuestion

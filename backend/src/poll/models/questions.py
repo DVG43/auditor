@@ -236,7 +236,7 @@ class ManyFromListQuestion(Question):
     answer_mode_choices = (('ONE', 1),
                            ('SOME', 2),)
 
-    items = models.ManyToManyField(ItemQuestion)
+    item_set = models.ForeignKey(ItemSet, on_delete=models.CASCADE, null=True)
     attached_type = models.ManyToManyField(ManyFromListAttachedType)
     answer_mode = models.IntegerField(choices=answer_mode_choices, default=1)
 
