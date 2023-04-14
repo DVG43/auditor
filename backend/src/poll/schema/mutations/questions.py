@@ -431,9 +431,9 @@ class CrtUpdDivisionQuestions(SerializerMutation):
         return obj
 
 
-class CrtUpdItemSet(SerializerMutation):
+class CrtUpdItemSetQuestion(SerializerMutation):
     class Meta:
-        serializer_class = qstn_serializers.ItemSetSerializer
+        serializer_class = qstn_serializers.ItemSetQuestionSerializer
         model_operations = ['create', 'update']
         lookup_field = 'item_set_id'
         model_class = qstn_models.ItemSet
@@ -614,7 +614,7 @@ class QstnMutation(graphene.ObjectType):
     crt_upd_media_question = CrtUpdMediaQuestions.Field()
     crt_upd_many_question = CrtUpdManyQuestions.Field()
     crt_upd_yes_no_question = CrtUpdYesNoQuestions.Field()
-    crt_upd_item_set = CrtUpdItemSet.Field()
+    crt_upd_item_set = CrtUpdItemSetQuestion.Field()
     crt_upd_item_question = CrtUpdItemQuestions.Field()
     delete_item_question = DeleteItemQuestions.Field()
     delete_question = DeleteQuestion.Field()

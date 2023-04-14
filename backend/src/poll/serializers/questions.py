@@ -52,7 +52,7 @@ class DivisionQuestionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ItemSetSerializer(serializers.ModelSerializer):
+class ItemSetQuestionSerializer(serializers.ModelSerializer):
     item_set_id = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -166,7 +166,7 @@ class ManyFromListQuestionAttachedTypeSerializer(serializers.ModelSerializer):
 
 
 class ManyFromListQuestionSerializer(BaseQuestionSerializer):
-    # item_set = ItemSetSerializer()
+    item_set = ItemSetQuestionSerializer(many=True, required=False)
     comment = serializers.CharField(max_length=512, required=False)
     poll = serializers.IntegerField()
     answer_time = serializers.IntegerField(default=0, required=False)
@@ -299,6 +299,7 @@ class TextQuestionSerializer(BaseQuestionSerializer):
 class CheckQuestionSerializer(BaseQuestionSerializer):
     checked = serializers.BooleanField()
     poll = serializers.IntegerField()
+    points = serializers.IntegerField()
 
     def create(self, validated_data):
         return TextQuestion.objects.create(**validated_data)

@@ -35,7 +35,6 @@ class PollTagsType(DjangoObjectType):
 
 
 class FolderType(DjangoObjectType):
-
     class Meta:
         model = Folder
 
@@ -63,6 +62,11 @@ class PollThemeType(DjangoObjectType):
 class DivisionQuestionType(DjangoObjectType):
     class Meta:
         model = questions_models.DivisionQuestion
+
+
+class ItemSetQuestionType(DjangoObjectType):
+    class Meta:
+        model = questions_models.ItemSet
 
 
 class ItemQuestionType(DjangoObjectType):
