@@ -52,14 +52,6 @@ class DivisionQuestionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ItemSetQuestionSerializer(serializers.ModelSerializer):
-    item_set_id = serializers.IntegerField(read_only=True)
-
-    class Meta:
-        model = ItemSet
-        fields = ['item_set_id', 'poll']
-
-
 class ItemQuestionSerializer(serializers.ModelSerializer):
     item_set = serializers.IntegerField()
 
@@ -74,6 +66,16 @@ class ItemQuestionSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         instance = super(ItemQuestionSerializer, self).create(validated_data)
         return instance
+
+
+class ItemSetQuestionSerializer(serializers.ModelSerializer):
+    item_set_id = serializers.IntegerField(read_only=True)
+    poll = serializers.IntegerField(required=False)
+    items = ItemQuestionSerializer(many=True, required=False)
+
+    class Meta:
+        model = ItemSet
+        fields = ['item_set_id', 'poll', 'items']
 
 
 class MediaAttachedTypeSerializer(serializers.ModelSerializer):

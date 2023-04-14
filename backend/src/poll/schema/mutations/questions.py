@@ -442,12 +442,25 @@ class CrtUpdItemSetQuestion(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
+        poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
 
-        item_id = input.get('item_set_id', None)
+        items = []
+        if 'items' in input:
+            items = input['items']
+            del input['items']
 
-        obj, created = qstn_models.ItemSet.objects.update_or_create(item_set_id=item_id,
-                                                                    defaults={**input})
-        return obj
+        item_set_id = input.get('item_set_id', None)
+
+        item_set_obj, created = qstn_models.ItemSet.objects.update_or_create(item_set_id=item_set_id,
+                                                                             poll=poll,
+                                                                             defaults={**input})
+        if items:
+            for item in items:
+                crt_item = qstn_models.ItemQuestion(**item)
+                crt_item.save()
+                item_set_obj.items.add(crt_item)
+
+        return item_set_obj
 
 
 class CrtUpdItemQuestions(SerializerMutation):
@@ -461,10 +474,12 @@ class CrtUpdItemQuestions(SerializerMutation):
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
+        item_set = get_object_or_404(qstn_models.ItemSet, item_set_id=input.pop('item_set'))
 
         item_id = input.get('item_question_id', None)
 
-        obj, created = qstn_models.TextQuestion.objects.update_or_create(item_question_id=item_id,
+        obj, created = qstn_models.ItemQuestion.objects.update_or_create(item_question_id=item_id,
+                                                                         item_set=item_set,
                                                                          defaults={**input})
         return obj
 
@@ -488,30 +503,11 @@ class CrtUpdManyQuestions(SerializerMutation):
         poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
         PermissionClass.has_mutate_object_permission(info, poll)
 
-        items, attached_types = [], []
-        if 'items' in input:
-            items = input['items']
-            del input['items']
-        if 'attached_type' in input:
-            attached_types = input['attached_type']
-            del input['attached_type']
-
         question_id = input.get('question_id', None)
 
         question_obj, created = qstn_models.ManyFromListQuestion.objects.update_or_create(poll=poll,
                                                                                           question_id=question_id,
                                                                                           defaults={**input})
-        if items:
-            for item in items:
-                crt_item = qstn_models.ItemQuestion(**item)
-                crt_item.save()
-                question_obj.items.add(crt_item)
-
-        if attached_types:
-            for attached_type in attached_types:
-                crt_attype = qstn_models.ManyFromListAttachedType(**attached_type)
-                crt_attype.save()
-                question_obj.attached_type.add(crt_attype)
 
         update_questions_order(question_id, created)
         return question_obj
