@@ -297,9 +297,9 @@ class TextQuestionSerializer(BaseQuestionSerializer):
 
 
 class CheckQuestionSerializer(BaseQuestionSerializer):
-    checked = serializers.BooleanField()
     poll = serializers.IntegerField()
-    points = serializers.IntegerField()
+    checked = serializers.BooleanField(required=False)
+    points = serializers.IntegerField(required=False)
 
     def create(self, validated_data):
         return TextQuestion.objects.create(**validated_data)
