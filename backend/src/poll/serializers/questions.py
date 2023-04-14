@@ -53,7 +53,7 @@ class DivisionQuestionSerializer(serializers.ModelSerializer):
 
 
 class ItemQuestionSerializer(serializers.ModelSerializer):
-    item_set = serializers.IntegerField()
+    item_set = serializers.IntegerField(required=False)
 
     class Meta:
         model = ItemQuestion

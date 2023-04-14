@@ -168,58 +168,58 @@ class ItemQuestion(models.Model, ItemBase):
             models.Index(fields=['item_set'])
         ]
 
-    def delete(self, using=None, keep_parents=False):
-        yesnoquestion = self.yesnoquestion_set.first()
-        finalquestion = self.finalquestion_set.first()
-        manyfromlistquestion = self.manyfromlistquestion_set.first()
+    # def delete(self, using=None, keep_parents=False):
+    #     yesnoquestion = self.yesnoquestion_set.first()
+    #     finalquestion = self.finalquestion_set.first()
+    #     manyfromlistquestion = self.manyfromlistquestion_set.first()
+    #
+    #     result = super(ItemQuestion, self).delete(using=None, keep_parents=False)
+    #
+    #     if yesnoquestion:
+    #         self.normalize_order_id(yesnoquestion.items)
+    #
+    #     elif finalquestion:
+    #         self.normalize_order_id(finalquestion.items)
+    #
+    #     elif manyfromlistquestion:
+    #         self.normalize_order_id(manyfromlistquestion.items)
+    #
+    #     return result
 
-        result = super(ItemQuestion, self).delete(using=None, keep_parents=False)
+    # def normalize_order_id_other(self, old_order_id, new_order_id):
+        # yesnoquestion = self.yesnoquestion_set.first()
+        # finalquestion = self.finalquestion_set.first()
+        # manyfromlistquestion = self.manyfromlistquestion_set.first()
+        #
+        # items = None
+        # if yesnoquestion:
+        #     items = yesnoquestion.items
+        #
+        # elif finalquestion:
+        #     items = finalquestion.items
+        #
+        # elif manyfromlistquestion:
+        #     items = manyfromlistquestion.items
+        #
+        # if items:
+        #     if new_order_id > old_order_id:
+        #         items = items.order_by('order_id', 'updated_at')
+        #     self.normalize_order_id(items)
 
-        if yesnoquestion:
-            self.normalize_order_id(yesnoquestion.items)
-
-        elif finalquestion:
-            self.normalize_order_id(finalquestion.items)
-
-        elif manyfromlistquestion:
-            self.normalize_order_id(manyfromlistquestion.items)
-
-        return result
-
-    def normalize_order_id_other(self, old_order_id, new_order_id):
-        yesnoquestion = self.yesnoquestion_set.first()
-        finalquestion = self.finalquestion_set.first()
-        manyfromlistquestion = self.manyfromlistquestion_set.first()
-
-        items = None
-        if yesnoquestion:
-            items = yesnoquestion.items
-
-        elif finalquestion:
-            items = finalquestion.items
-
-        elif manyfromlistquestion:
-            items = manyfromlistquestion.items
-
-        if items:
-            if new_order_id > old_order_id:
-                items = items.order_by('order_id', 'updated_at')
-            self.normalize_order_id(items)
-
-    def get_question(self):
-        yesnoquestion = self.yesnoquestion_set.first()
-        if yesnoquestion:
-            return yesnoquestion
-
-        finalquestion = self.finalquestion_set.first()
-        if finalquestion:
-            return finalquestion
-
-        manyfromlistquestion = self.manyfromlistquestion_set.first()
-        if manyfromlistquestion:
-            return manyfromlistquestion
-
-        return None
+    # def get_question(self):
+    #     yesnoquestion = self.yesnoquestion_set.first()
+    #     if yesnoquestion:
+    #         return yesnoquestion
+    #
+    #     finalquestion = self.finalquestion_set.first()
+    #     if finalquestion:
+    #         return finalquestion
+    #
+    #     manyfromlistquestion = self.manyfromlistquestion_set.first()
+    #     if manyfromlistquestion:
+    #         return manyfromlistquestion
+    #
+    #     return None
 
 
 class ManyFromListAttachedType(models.Model):

@@ -88,3 +88,25 @@ def update_questions_order(question, created=True):
                     q.save()
             except ValueError:
                 return
+
+
+def update_items_order(item, created=True):
+    if created and item.order_id:
+        return
+    else:
+        item_qset = list(item.item_set.itemquestion_set.all())
+        if created:
+            item.order_id = max(item_qset, key=lambda x: x.order_id).order_id + 1
+            item.save()
+        else:
+            # TODO: bulk update
+            item_qset.remove(item)
+            items = sorted(item_qset, key=lambda x: x.order_id)
+            orders = [x.order_id for x in items]
+            try:
+                position = orders.index(item.order_id)
+                for i in items[position:]:
+                    i.order_id += 1
+                    i.save()
+            except ValueError:
+                return

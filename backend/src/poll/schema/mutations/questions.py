@@ -13,7 +13,7 @@ from poll.models import (
 from poll.serializers import (
     questions as qstn_serializers,
 )
-from poll.service import update_questions_order
+from poll.service import update_questions_order, update_items_order
 
 
 class CrtUpdPageQuestions(SerializerMutation):
@@ -475,12 +475,13 @@ class CrtUpdItemQuestions(SerializerMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         PermissionClass.has_permission(info)
         item_set = get_object_or_404(qstn_models.ItemSet, item_set_id=input.pop('item_set'))
-
         item_id = input.get('item_question_id', None)
 
-        obj, created = qstn_models.ItemQuestion.objects.update_or_create(item_question_id=item_id,
-                                                                         item_set=item_set,
+        obj, created = qstn_models.ItemQuestion.objects.update_or_create(item_set=item_set,
+                                                                         item_question_id=item_id,
                                                                          defaults={**input})
+
+        update_items_order(obj, created)
         return obj
 
 
