@@ -5,7 +5,7 @@ from pathlib import Path
 
 # from firebase_admin import initialize_app, credentials
 
-DEBUG = os.environ.get("DEBUG", True)
+DEBUG = os.environ.get("DEBUG", False) in ('True', 'true')
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "local")
 BASE_DIR = Path(__file__).parent
