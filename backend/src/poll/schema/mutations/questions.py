@@ -444,26 +444,16 @@ class CrtUpdItemSetQuestion(SerializerMutation):
         PermissionClass.has_permission(info)
         poll = get_object_or_404(poll_models.Poll, id=input.pop('poll'))
 
-        items = []
-        if 'items' in input:
-            items = input['items']
-            del input['items']
-
         item_set_id = input.get('item_set_id', None)
 
         item_set_obj, created = qstn_models.ItemSet.objects.update_or_create(item_set_id=item_set_id,
                                                                              poll=poll,
                                                                              defaults={**input})
-        if items:
-            for item in items:
-                crt_item = qstn_models.ItemQuestion(**item)
-                crt_item.save()
-                item_set_obj.items.add(crt_item)
 
         return item_set_obj
 
 
-class CrtUpdItemQuestions(SerializerMutation):
+class CrtUpdItemQuestion(SerializerMutation):
     class Meta:
         serializer_class = qstn_serializers.ItemQuestionSerializer
         model_operations = ['create', 'update']
@@ -485,7 +475,7 @@ class CrtUpdItemQuestions(SerializerMutation):
         return obj
 
 
-class CrtUpdManyQuestions(SerializerMutation):
+class CrtUpdManyFromListQuestion(SerializerMutation):
     """
     Создание|Обновление вопроса с множественным выбором
     """
@@ -495,7 +485,6 @@ class CrtUpdManyQuestions(SerializerMutation):
         model_operations = ['create', 'update']
         lookup_field = 'question_id'
         model_class = qstn_models.ManyFromListQuestion
-        convert_choices_to_enum = False
 
     @classmethod
     @login_required
@@ -505,12 +494,17 @@ class CrtUpdManyQuestions(SerializerMutation):
         PermissionClass.has_mutate_object_permission(info, poll)
 
         question_id = input.get('question_id', None)
+        item_set_id = input.get('item_set_id', None)
+
+        item_set = qstn_models.ItemSet.objects.get(item_set_id=item_set_id) if item_set_id else None
+
+        input.update({"item_set": item_set})
 
         question_obj, created = qstn_models.ManyFromListQuestion.objects.update_or_create(poll=poll,
                                                                                           question_id=question_id,
                                                                                           defaults={**input})
 
-        update_questions_order(question_id, created)
+        update_questions_order(question_obj, created)
         return question_obj
 
 
@@ -548,6 +542,30 @@ class DeleteItemQuestions(graphene.Mutation):
             if item:
                 item.delete()
                 return DeleteItemQuestions(ok=True)
+        return DeleteItemQuestions(ok=False)
+
+
+class DeleteItemSet(graphene.Mutation):
+    """
+    Удаляет набор ответов из poll.
+    Принимает аргументы (itemId: ID, itemType: ItemType)
+    """
+
+    class Arguments:
+        item_set_id = graphene.ID()
+
+    ok = graphene.Boolean()
+
+    @staticmethod
+    @login_required
+    def mutate(cls, root, item_set_id):
+        PermissionClass.has_permission(root)
+        item_set = qstn_models.ItemSet.objects.filter(
+                pk=item_set_id
+            ).first()
+        if item_set:
+            item_set.delete()
+            return DeleteItemQuestions(ok=True)
         return DeleteItemQuestions(ok=False)
 
 
@@ -610,9 +628,10 @@ class QstnMutation(graphene.ObjectType):
     crt_upd_check_question = CrtUpdCheckQuestions.Field()
     crt_upd_free_question = CrtUpdFreeQuestions.Field()
     crt_upd_media_question = CrtUpdMediaQuestions.Field()
-    crt_upd_many_question = CrtUpdManyQuestions.Field()
+    crt_upd_many_question = CrtUpdManyFromListQuestion.Field()
     crt_upd_yes_no_question = CrtUpdYesNoQuestions.Field()
     crt_upd_item_set = CrtUpdItemSetQuestion.Field()
-    crt_upd_item_question = CrtUpdItemQuestions.Field()
+    crt_upd_item_question = CrtUpdItemQuestion.Field()
     delete_item_question = DeleteItemQuestions.Field()
+    delete_item_set = DeleteItemSet.Field()
     delete_question = DeleteQuestion.Field()

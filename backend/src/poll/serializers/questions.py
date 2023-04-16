@@ -53,7 +53,7 @@ class DivisionQuestionSerializer(serializers.ModelSerializer):
 
 
 class ItemQuestionSerializer(serializers.ModelSerializer):
-    item_set = serializers.IntegerField(required=False)
+    item_set = serializers.IntegerField(required=True)
 
     class Meta:
         model = ItemQuestion
@@ -69,13 +69,12 @@ class ItemQuestionSerializer(serializers.ModelSerializer):
 
 
 class ItemSetQuestionSerializer(serializers.ModelSerializer):
-    item_set_id = serializers.IntegerField(read_only=True)
-    poll = serializers.IntegerField(required=False)
-    items = ItemQuestionSerializer(many=True, required=False)
+    item_set_id = serializers.IntegerField(required=False)
+    poll = serializers.IntegerField(required=True)
 
     class Meta:
         model = ItemSet
-        fields = ['item_set_id', 'poll', 'items']
+        fields = ['item_set_id', 'poll']
 
 
 class MediaAttachedTypeSerializer(serializers.ModelSerializer):
@@ -168,8 +167,8 @@ class ManyFromListQuestionAttachedTypeSerializer(serializers.ModelSerializer):
 
 
 class ManyFromListQuestionSerializer(BaseQuestionSerializer):
-    item_set = ItemSetQuestionSerializer(many=True, required=False)
-    answer_mode = serializers.ChoiceField(choices=ManyFromListQuestion.ANSWER_MODE_CHOICES, required=False)
+    item_set_id = serializers.IntegerField(required=False)
+    multiple_choices = serializers.BooleanField(required=False)
     comment = serializers.CharField(max_length=512, required=False)
     poll = serializers.IntegerField()
     answer_time = serializers.IntegerField(default=0, required=False)
