@@ -23,16 +23,12 @@ enum_fields = [
 class EnumQuestion(Enum):
     BaseQuestion = 'BaseTFQuestion'
 
-    class Meta:
-        name = 'EnumQuestion'
-
 
 class EnumTypeAnswer(Enum):
     Text = 'text'
     Video = 'video'
 
-    class Meta:
-        name = 'EnumTypeAnswer'
+
 
 
 def _normalize_enum_value(value: str | Enum) -> str:
