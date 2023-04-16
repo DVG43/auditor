@@ -308,6 +308,12 @@ class DeleteDocument(graphene.Mutation):
 
     @staticmethod
     def mutate(root, info, id, input=None):
+        def remove_doc_uuid_and_save(instance):
+            instance.doc_uuid = None
+            document_instance.save()
+            if children := instance.children:
+                map(remove_doc_uuid_and_save, children)
+
         ok = False
         PermissionClass.has_permission(info)
         PermissionClass.has_mutate_object_permission(info, id)
@@ -317,7 +323,7 @@ class DeleteDocument(graphene.Mutation):
             ok = True
             document_instance.deleted_id = uuid.uuid4()
             document_instance.deleted_since = timezone.now()
-            document_instance.save()
+            remove_doc_uuid_and_save(document_instance)
             return DeleteDocument(ok=ok, id=id)
 
 
