@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from common.models import PpmDocModel, permissions
 from objectpermissions.registration import register
 
-from testform.utils import QTYPE
+from testform.schema.utils import QTYPE, ANSWER_TYPE
 from utils import get_doc_upload_path
 
 
@@ -12,8 +12,7 @@ class TestForm(PpmDocModel):
     """
     Основная форма шаблона теста
     """
-    id = models.AutoField(primary_key=True)
-    time_to_answer = models.PositiveIntegerField(default=120, verbose_name=_("время для прохождения"))
+    time_to_answer = models.PositiveIntegerField(default=120, verbose_name=_("duration by test"))
     folder = models.ForeignKey(
         'folders.Folder',
         on_delete=models.CASCADE,
@@ -31,25 +30,28 @@ class TestForm(PpmDocModel):
         verbose_name_plural = _('testforms')
         ordering = ['-id']
         indexes = [
-            models.Index(fields=['owner'])
+            models.Index(fields=['owner', 'id'])
         ]
+
+    def __str__(self):
+        return f"Test №{self.id}"
 
 
 class TestFormQuestion(models.Model):
     """
-    Модель шаблона вопроса.
+    Основная модель вопроса.
     """
     question_id = models.AutoField(primary_key=True)
     question_type = models.CharField(max_length=100,
                                      choices=QTYPE,
                                      default="BaseTFQuestion",
-                                     verbose_name=_("тип вопроса"))
+                                     verbose_name=_("question type"))
     caption = models.CharField(max_length=200,
-                               verbose_name=_("текст вопроса"),
+                               verbose_name=_("question text"),
                                default="",
                                null=True, blank=True)
     description = models.CharField(max_length=512,
-                                   verbose_name=_("описание вопроса"),
+                                   verbose_name=_("question description"),
                                    null=True, blank=True)
     testform = models.ForeignKey(TestForm, on_delete=models.CASCADE)
     require = models.BooleanField(default=True)
@@ -61,12 +63,8 @@ class TestFormQuestion(models.Model):
             models.Index(fields=['testform'])
         ]
 
-    # mix_answers = models.BooleanField(default=False)
-    # time_for_answer = models.BooleanField(default=False)
-    # type_for_show = models.IntegerField(default=0)
-    # title_image = models.CharField(max_length=512, default='')
-    # resize_image = models.BooleanField(default=False)
-    # test_mode = models.BooleanField(default=False)
+    def __str__(self):
+        return f"Question for {self.testform}"
 
 
 class TFQuestionType(models.Model):
@@ -95,18 +93,19 @@ class TFQuestionType(models.Model):
 
 class BaseTFQuestion(TFQuestionType):
     """
-    Модель конкретного типа вопроса, наследована от TFQuestionType
+    Модель основного вопроса, наследована от TFQuestionType
     """
-    ANSWER_TYPE = (
-        ('text', 'text'),
-        ('video', 'video'),
-    )
-
-    type_answer = models.CharField(max_length=10, choices=ANSWER_TYPE, default='text', blank=True, null=True)
+    type_answer = models.CharField(max_length=10,
+                                   choices=ANSWER_TYPE,
+                                   default='text',
+                                   blank=True, null=True)
     max_time = models.PositiveIntegerField(default=120, null=True, blank=True)
 
 
 class FinalTFQuestion(TFQuestionType):
+    """
+    Модель завершающего вопроса, наследована от TFQuestionType
+    """
     answer = models.CharField(max_length=250, null=True, blank=True)
 
 

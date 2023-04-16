@@ -9,16 +9,15 @@ from graphql_utils.permissions import PermissionClass
 
 from testform.schema import types
 from testform.models import TestFormQuestion, TFQuestionType, TestForm
-from testform.utils import EnumQuestion, EnumTypeAnswer
+from testform.schema.utils import EnumQuestion, EnumTypeAnswer, update_attrs, normalize_order
 from testform.serializers import TestFormSerializer
 
 UserModel = get_user_model()
-
 ChoiceTypeQuestion = graphene.Enum.from_enum(EnumQuestion)
 ChoiceTypeAnswer = graphene.Enum.from_enum(EnumTypeAnswer)
 
 
-class crtUpdTestForm(SerializerMutation):
+class CrtUpdTestForm(SerializerMutation):
     """
     Создание шаблона теста
     """
@@ -49,14 +48,29 @@ class crtUpdTestForm(SerializerMutation):
         return instance
 
 
-class BaseQuestionData(graphene.InputObjectType):
+class DeleteTestForm(graphene.Mutation):
+    """
+    Удаление шаблона теста
+    """
+    class Arguments:
+        testform_id = graphene.ID()
+
+    ok = graphene.Boolean()
+
+    def mutate(self, info, testform_id):
+        PermissionClass.has_permission(info)
+        instance = TestForm.objects.filter(id=testform_id).first()
+        if instance:
+            instance.deleted_id = uuid.uuid4()
+            instance.deleted_since = timezone.now()
+            instance.save()
+        return DeleteTestForm(ok=False)
+
+
+class QuestionData(graphene.InputObjectType):
     order_id = graphene.Int(required=False)
     type_answer = ChoiceTypeAnswer(required=False)
     max_time = graphene.Int(required=False)
-
-
-class FinalQuestionData(graphene.InputObjectType):
-    order_id = graphene.Int(required=False)
     answer = graphene.String(required=False)
 
 
@@ -70,26 +84,26 @@ class CrtTFQuestion(graphene.Mutation):
     - description - описание вопроса, по умолчанию пустая строка
     - require - статус вопроса(обязательный или нет), по умолчанию False
 
-    При создании новго вопроса автоматически создается указанный тип вопроса.
-    На данный момент общий(BaseTFQuiestion) | завершающий(FinalTFQuestion)
+    При создании нового вопроса автоматически создается указанный тип вопроса.
+    На данный момент есть только общий(BaseTFQuiestion), который является значением по умолчанию,
+    поэтому параметр questionType можно не использовать.
     """
 
     class Arguments:
+        testform_id = graphene.ID(required=True)
         caption = graphene.String(required=False)
         question_type = ChoiceTypeQuestion(required=False)
         description = graphene.String(required=False)
-        testform_id = graphene.ID(required=True)
         require = graphene.Boolean(required=False)
 
-    question = graphene.Field(types.TestFormQuestionType)
+    Output = types.TestFormQuestionType
 
     @staticmethod
-    @login_required
     def mutate(cls, info, **input):
         PermissionClass.has_permission(info)
         question = TestFormQuestion(**input)
         question.save()
-        return CrtTFQuestion(question=question)
+        return question
 
 
 class UpdTFQuestion(graphene.Mutation):
@@ -98,63 +112,90 @@ class UpdTFQuestion(graphene.Mutation):
     - questionId - id вопроса (обязательное поле)
 
     - caption - текст вопроса
-    - questionType - тип вопроса по выбору из вариантов
+    - questionType - тип вопроса по выбору из вариантов.
     - description - описание вопроса
     - require - статус вопроса(обязательный или нет)
-    - mainQData | finalQData - в зависимости от типа вопроса, данные для обновления
+    - questionData - в зависимости от типа вопроса, данные для обновления полей вопроса
 
+    На данный момент есть только общий(BaseTFQuiestion), который является значением по умолчанию,
+    поэтому параметр questionType можно не использовать.
     """
     class Arguments:
+        question_id = graphene.ID(required=True)
+
         caption = graphene.String(required=False)
         question_type = ChoiceTypeQuestion(required=False)
         description = graphene.String(required=False)
-        question_id = graphene.ID(required=True)
         require = graphene.Boolean(required=False)
-        main_qdata = BaseQuestionData(required=False)
-        final_qdata = FinalQuestionData(required=False)
+        question_data = QuestionData(required=False)
 
-    question = graphene.Field(types.TestFormQuestionType)
+    Output = types.TestFormQuestionType
 
     @staticmethod
-    @login_required
     def mutate(cls, info, **input):
         PermissionClass.has_permission(info)
-        extra_data = input.pop('main_qdata') if 'main_qdata' in input else None
-        if not extra_data:
-            extra_data = input.pop('final_qdata') if 'final_qdata' in input else None
-
         obj_id = input.pop('question_id')
         question = TestFormQuestion.objects.get(pk=obj_id)
-        for k, v in input.items():
-            if k == 'question_type':
-                if isinstance(v, EnumQuestion):
-                    v = v._value_
-                elif v.count('.'):
-                    v = v.split('.')[-1]
-            setattr(question, k, v)
-        question.save()
+        question_type_data = input.pop('question_data') if 'question_data' in input else None
+        # Запрет на изменение порядка и типа вопроса для финального вопроса
+        if question.question_type == 'FinalTFQuestion':
+            if input.get('question_type'):
+                raise ValueError("You cant change type by Final Question")
+            elif question_type_data.get('order_id'):
+                raise ValueError("You cant change order for Final Question")
 
-        if extra_data:
-            model = apps.get_model('testform', question.question_type.split('.')[-1])
-            extra_model = model.objects.filter(testform_question=question).first()
-            for k, v in extra_data.items():
-                if k == 'type_answer':
-                    if isinstance(v, EnumTypeAnswer):
-                        v = v._value_
-                    elif v.count('.'):
-                        v = v.split('.')[-1]
-                setattr(extra_model, k, v)
-            extra_model.save()
-            for i, v in enumerate(TFQuestionType.objects
-                                                .filter(testform_question__testform=question.testform)
-                                                .order_by('-updated_at', '-created_at'), start=1):
-                v.order_id = i
-                v.save()
+        if input:
+            update_attrs(question, input)
 
-        return UpdTFQuestion(question=question)
+        if question_type_data:
+            model = apps.get_model('testform', question.question_type)
+
+            # Валидация введенных данных для соответствующего типа вопроса
+            fields = [field.name for field in model._meta.get_fields()]
+            if non_fields := set.difference(set(question_type_data.keys()), set(fields)):
+                raise KeyError(f"{question.question_type} have not fields: {', '.join(list(non_fields))}")
+
+            # Обновление полей вопроса
+            question_type_instance = model.objects.filter(testform_question=question).first()
+            update_order = '-updated_at'
+            if question_type_data.get('order_id', 0) > question_type_instance.order_id:
+                update_order = 'updated_at'
+            update_attrs(question_type_instance, question_type_data)
+
+            # Нормализация порядка вопросов теста в случае изменения order_id
+            if 'order_id' in question_type_data:
+                queryset = TFQuestionType.objects.only('order_id', 'updated_at')\
+                    .filter(testform_question__testform=question.testform,
+                            order_id__lt=10000)\
+                    .order_by('order_id', update_order)
+                normalize_order(queryset)
+
+        return question
+
+
+class DeleteTestFormQuestion(graphene.Mutation):
+    """
+    Удаление вопроса к тесту
+    """
+
+    class Arguments:
+        testform_id = graphene.ID()
+        question_id = graphene.ID()
+
+    ok = graphene.Boolean()
+
+    def mutate(cls, info, question_id, testform_id):
+        PermissionClass.has_permission(info)
+        instance = TestFormQuestion.objects.filter(question_id=question_id, testform_id=testform_id).first()
+        if instance:
+            instance.delete()
+            return DeleteTestFormQuestion(ok=True)
+        return DeleteTestFormQuestion(ok=False)
 
 
 class MutationTestForm(graphene.ObjectType):
-    crt_upd_testform = crtUpdTestForm.Field()
-    crt_tf_question = CrtTFQuestion.Field()
-    upd_tf_question = UpdTFQuestion.Field()
+    crt_upd_testform = CrtUpdTestForm.Field()
+    delete_testform = DeleteTestForm.Field()
+    crt_testform_question = CrtTFQuestion.Field()
+    upd_testform_question = UpdTFQuestion.Field()
+    delete_testform_question = DeleteTestFormQuestion.Field()

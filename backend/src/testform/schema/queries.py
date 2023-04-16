@@ -7,11 +7,11 @@ from testform.models import TestFormQuestion, TFQuestionType
 
 
 class QueryTestForm(graphene.ObjectType):
-    all_testforms = graphene.List(types.TestFormQuestionType, testform_id=graphene.Int())
-    tf_question_by_id = graphene.Field(types.TestFormQuestionType, question_id=graphene.Int())
+    all_testform_questions = graphene.List(types.TestFormQuestionType, testform_id=graphene.Int())
+    testform_question_by_id = graphene.Field(types.TestFormQuestionType, question_id=graphene.Int())
 
     @login_required
-    def resolve_all_testforms(self, info, testform_id=None):
+    def resolve_all_testform_questions(self, info, testform_id=None):
         """
         Получение всех вопросов по тесту
         """
@@ -20,7 +20,7 @@ class QueryTestForm(graphene.ObjectType):
         return ret
 
     @login_required
-    def resolve_tf_question_by_id(self, info, question_id=None):
+    def resolve_testform_question_by_id(self, info, question_id=None):
         """
         Получение конкретного вопроса по questionId.
         """
