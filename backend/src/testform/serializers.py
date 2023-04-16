@@ -5,7 +5,7 @@ from testform.models import TestForm
 
 class TestFormSerializer(serializers.ModelSerializer):
     """
-    Poll model serializer implementation.
+    TestForm model serializer implementation.
     """
 
     class Meta:
