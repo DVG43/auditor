@@ -3,8 +3,9 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from common.models import PpmDocModel, permissions
 from objectpermissions.registration import register
+from django.contrib.postgres.fields import ArrayField
 
-from testform.schema.utils import QTYPE, ANSWER_TYPE
+from testform.schema.utils import QTYPE, ANSWER_TYPE, LOGO_CHOICE, get_question_logo_default
 from utils import get_doc_upload_path
 
 
@@ -55,6 +56,13 @@ class TestFormQuestion(models.Model):
                                    null=True, blank=True)
     testform = models.ForeignKey(TestForm, on_delete=models.CASCADE)
     require = models.BooleanField(default=True)
+    logo_question = models.CharField(max_length=50,
+                                     choices=LOGO_CHOICE,
+                                     blank=True, null=True)
+    url_name = models.URLField(blank=True, null=True)
+    image = models.ImageField(upload_to=get_doc_upload_path,
+                              blank=True,
+                              null=True)
 
     class Meta:
         db_table = 'testform_question'
@@ -95,10 +103,11 @@ class BaseTFQuestion(TFQuestionType):
     """
     Модель основного вопроса, наследована от TFQuestionType
     """
-    type_answer = models.CharField(max_length=10,
-                                   choices=ANSWER_TYPE,
-                                   default='text',
-                                   blank=True, null=True)
+    answer_type = ArrayField(models.CharField(max_length=10,
+                                              choices=ANSWER_TYPE,
+                                              blank=True),
+                             size=2,
+                             default=get_question_logo_default)
     max_time = models.PositiveIntegerField(default=120, null=True, blank=True)
 
 
@@ -106,7 +115,7 @@ class FinalTFQuestion(TFQuestionType):
     """
     Модель завершающего вопроса, наследована от TFQuestionType
     """
-    answer = models.CharField(max_length=250, null=True, blank=True)
+    button_name = models.CharField(max_length=250, null=True, blank=True, default=_('Новый ответ'))
 
 
 register(TestForm, permissions)

@@ -4,17 +4,19 @@ from enum import Enum
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
+from django.core.validators import URLValidator
 from graphql_jwt.decorators import login_required
 from graphql_utils.permissions import PermissionClass
 
 from testform.schema import types
 from testform.models import TestFormQuestion, TFQuestionType, TestForm
-from testform.schema.utils import EnumQuestion, EnumTypeAnswer, update_attrs, normalize_order
+from testform.schema.utils import EnumQuestion, EnumTypeAnswer, EnumTypeLogo, update_attrs, normalize_order
 from testform.serializers import TestFormSerializer
 
 UserModel = get_user_model()
 ChoiceTypeQuestion = graphene.Enum.from_enum(EnumQuestion)
 ChoiceTypeAnswer = graphene.Enum.from_enum(EnumTypeAnswer)
+ChoiceTypeLogo = graphene.Enum.from_enum(EnumTypeLogo)
 
 
 class CrtUpdTestForm(SerializerMutation):
@@ -69,9 +71,9 @@ class DeleteTestForm(graphene.Mutation):
 
 class QuestionData(graphene.InputObjectType):
     order_id = graphene.Int(required=False)
-    type_answer = ChoiceTypeAnswer(required=False)
+    answer_type = graphene.List(ChoiceTypeAnswer, required=False)
     max_time = graphene.Int(required=False)
-    answer = graphene.String(required=False)
+    button_name = graphene.String(required=False)
 
 
 class CrtTFQuestion(graphene.Mutation):
@@ -124,10 +126,12 @@ class UpdTFQuestion(graphene.Mutation):
         question_id = graphene.ID(required=True)
 
         caption = graphene.String(required=False)
-        question_type = ChoiceTypeQuestion(required=False)
+        question_type = ChoiceTypeQuestion()
         description = graphene.String(required=False)
         require = graphene.Boolean(required=False)
         question_data = QuestionData(required=False)
+        logo_question = ChoiceTypeLogo(required=False)
+        url_name = graphene.String(required=False)
 
     Output = types.TestFormQuestionType
 
@@ -143,6 +147,10 @@ class UpdTFQuestion(graphene.Mutation):
                 raise ValueError("You cant change type by Final Question")
             elif question_type_data.get('order_id'):
                 raise ValueError("You cant change order for Final Question")
+        # Валидация типа ответа
+        if question_type_data.get('answer_type') is not None and \
+                len(question_type_data['answer_type']) == 0:
+            raise ValueError("Answer type can't be null")
 
         if input:
             update_attrs(question, input)
