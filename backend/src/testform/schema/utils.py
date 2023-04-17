@@ -61,5 +61,5 @@ def normalize_order(query_set: QuerySet) -> None:
         v.save(update_fields=['order_id', ])
 
 
-def get_question_logo_default():
+def get_answer_type_default():
     return list(dict(ANSWER_TYPE).keys())

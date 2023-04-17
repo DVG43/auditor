@@ -5,7 +5,7 @@ from common.models import PpmDocModel, permissions
 from objectpermissions.registration import register
 from django.contrib.postgres.fields import ArrayField
 
-from testform.schema.utils import QTYPE, ANSWER_TYPE, LOGO_CHOICE, get_question_logo_default
+from testform.schema.utils import QTYPE, ANSWER_TYPE, LOGO_CHOICE, get_answer_type_default
 from utils import get_doc_upload_path
 
 
@@ -107,7 +107,7 @@ class BaseTFQuestion(TFQuestionType):
                                               choices=ANSWER_TYPE,
                                               blank=True),
                              size=2,
-                             default=get_question_logo_default)
+                             default=get_answer_type_default)
     max_time = models.PositiveIntegerField(default=120, null=True, blank=True)
 
 
