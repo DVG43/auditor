@@ -85,7 +85,6 @@ class CreatePoll(SerializerMutation):
         qstn_models.CheckQuestion.objects.create(caption="Чек бокс", order_id=4, **data)
         qstn_models.ManyFromListQuestion.objects.create(caption="Выбор ответов", order_id=5,
                                                         item_set=item_sets[0],
-                                                        answer_mode=1,
                                                         **data)
 
 
