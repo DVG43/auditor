@@ -126,7 +126,7 @@ class UpdTFQuestion(graphene.Mutation):
         question_id = graphene.ID(required=True)
 
         caption = graphene.String(required=False)
-        question_type = ChoiceTypeQuestion()
+        question_type = ChoiceTypeQuestion(required=False)
         description = graphene.String(required=False)
         require = graphene.Boolean(required=False)
         question_data = QuestionData(required=False)
