@@ -10,7 +10,13 @@ from graphql_utils.permissions import PermissionClass
 
 from testform.schema import types
 from testform.models import TestFormQuestion, TFQuestionType, TestForm
-from testform.schema.utils import EnumQuestion, EnumTypeAnswer, EnumTypeLogo, update_attrs, normalize_order
+from testform.schema.utils import (
+    EnumQuestion,
+    EnumTypeAnswer,
+    EnumTypeLogo,
+    update_attrs,
+    normalize_order,
+)
 from testform.serializers import TestFormSerializer
 
 UserModel = get_user_model()
@@ -22,6 +28,10 @@ ChoiceTypeLogo = graphene.Enum.from_enum(EnumTypeLogo)
 class CrtUpdTestForm(SerializerMutation):
     """
     Создание шаблона теста
+
+    При создании нового теста автоматически создается
+    два вопроса к нему с дефолтными значениями:
+    Общий вопрос и Завершающий
     """
 
     class Meta:
@@ -118,6 +128,9 @@ class UpdTFQuestion(graphene.Mutation):
     - description - описание вопроса
     - require - статус вопроса(обязательный или нет)
     - questionData - в зависимости от типа вопроса, данные для обновления полей вопроса
+    - logoQuestion - тип лого вопроса по выбору: видео или фото
+    - urlName - ссылка на видео, указывать в случае если logo_question = video
+      Загрузка фото в разработке.
 
     На данный момент есть только общий(BaseTFQuiestion), который является значением по умолчанию,
     поэтому параметр questionType можно не использовать.
