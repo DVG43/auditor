@@ -14,33 +14,23 @@ do
         sleep 1
     fi
 done
-# if [ "$ENVIRONMENT" != "local" ];
-# then
-    mkdir -p share
-    mkdir -p share/auditor-v2_media
-    mkdir -p share/auditor-v2_media/images
-    mkdir -p share/auditor-v2_media/video
-    mkdir -p share/auditor-v2_media/audio
-    mkdir -p share/auditor-v2_statics
-    touch "${APP_API_LOG}"
-# fi
-counter=0
-until python3 ./manage.py showmigrations && python3 ./manage.py migrate
+    python3 ./manage.py showmigrations && python3 ./manage.py migrate
+
+until cd /app/backend/src/share
 do
-    echo "Waiting for db to be ready..."
-    if [ "$counter" -gt 5 ];
+    echo "Waiting for volume to be ready..."
+    if [ "$counter" -gt 3 ];
     then
         echo "Exiting loop!"
-        exit 2
+
+        exit 1
     else
         counter=$((counter+1))
         sleep 1
     fi
 done
-# if [ "$ENVIRONMENT" = "local" ]
-# then
-#   DEBUG=True python3 ./manage.py runserver 0.0.0.0:8000
-# else
+  mkdir -p auditor-v2_media auditor-v2_media/images auditor-v2_media/video auditor-v2_media/audio auditor-v2_statics
+  cd ..
   python3 ./manage.py collectstatic --noinput
 
   gunicorn asgi:application \

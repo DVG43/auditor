@@ -69,19 +69,44 @@ def update_order_free_answer_items(item_question_id: int, old_order_id: int, ord
 
 
 def update_questions_order(question, created=True):
-    poll = question.poll
-    questions = poll.get_questions(parent_id=question.parent_id)
-    if created:
-        question.order_id = max(questions, key=lambda x: x.order_id).order_id + 1
-        question.save()
+    if created and question.order_id:
+        return
     else:
-        questions.remove(question)
-        questions = sorted(questions, key=lambda x: x.order_id)
-        orders = [x.order_id for x in questions]
-        try:
-            position = orders.index(question.order_id)
-            for q in questions[position:]:
-                q.order_id += 1
-                q.save()
-        except ValueError:
-            return
+        poll = question.poll
+        questions = poll.get_questions(parent_id=question.parent_id)
+        if created:
+            question.order_id = max(questions, key=lambda x: x.order_id).order_id + 1
+            question.save()
+        else:
+            questions.remove(question)
+            questions = sorted(questions, key=lambda x: x.order_id)
+            orders = [x.order_id for x in questions]
+            try:
+                position = orders.index(question.order_id)
+                for q in questions[position:]:
+                    q.order_id += 1
+                    q.save()
+            except ValueError:
+                return
+
+
+def update_items_order(item, created=True):
+    if created and item.order_id:
+        return
+    else:
+        item_qset = list(item.item_set.itemquestion_set.all())
+        if created:
+            item.order_id = max(item_qset, key=lambda x: x.order_id).order_id + 1
+            item.save()
+        else:
+            # TODO: bulk update
+            item_qset.remove(item)
+            items = sorted(item_qset, key=lambda x: x.order_id)
+            orders = [x.order_id for x in items]
+            try:
+                position = orders.index(item.order_id)
+                for i in items[position:]:
+                    i.order_id += 1
+                    i.save()
+            except ValueError:
+                return
