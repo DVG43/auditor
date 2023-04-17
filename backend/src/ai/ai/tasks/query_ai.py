@@ -9,12 +9,19 @@ ENGINE_CONFIG = {
     'temperature': 0.7,
 }
 
+ENGINE_CONFIG_STREAM = {
+    'max_tokens': 2000,
+
+    # Set to `0` during development for determined answers from GPT
+    'temperature': 0.7,
+}
+
 
 def generate(
-        user_query: str,
-        context: str = "",
-        include_debug: bool = False,
-    ) -> dict:
+    user_query: str,
+    context: str = "",
+    include_debug: bool = False,
+) -> dict:
     """
     user_query: "напиши про собаку"
     context: None
@@ -45,4 +52,23 @@ def generate(
         include_debug=include_debug)
 
     return response
+
+
+def generate_stream(
+    user_query: str,
+    context: str = "",
+    include_debug: bool = False,
+) -> dict:
+    if context:
+        prompts = [context, user_query]
+    else:
+        prompts = user_query
+
+    streaming_response = engine.complete_stream(
+        prompts,
+        config=ENGINE_CONFIG_STREAM,
+        include_debug=include_debug,
+    )
+
+    return streaming_response
 
