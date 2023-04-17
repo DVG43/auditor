@@ -34,7 +34,8 @@ def get_host_id_model(obj):
                                          'Poll',
                                          'Folder',
                                          'DefaultTableModel',
-                                         'TestForm']:
+                                         'TestForm',
+                                         'TFQuestionType', ]:
         return [obj.id, obj.__class__.__name__.lower()]
 
 

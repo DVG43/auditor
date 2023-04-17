@@ -14,6 +14,11 @@ ANSWER_TYPE = (
     ('video', 'video'),
 )
 
+LOGO_CHOICE = (
+    ("image", _("photo")),
+    ("url", _("video")),
+)
+
 enum_fields = [
     'type_answer',
     'question_type',
@@ -29,6 +34,9 @@ class EnumTypeAnswer(Enum):
     Video = 'video'
 
 
+class EnumTypeLogo(Enum):
+    Photo = 'image'
+    URL = 'url'
 
 
 def _normalize_enum_value(value: str | Enum) -> str:
@@ -51,3 +59,7 @@ def normalize_order(query_set: QuerySet) -> None:
     for i, v in enumerate(query_set, start=1):
         v.order_id = i
         v.save(update_fields=['order_id', ])
+
+
+def get_answer_type_default():
+    return list(dict(ANSWER_TYPE).keys())
