@@ -2,13 +2,14 @@ from json import loads
 from accounts.permissions import IsActivated
 from common.permissions import IsOwner, IsOwnerOrIsInvited
 from django.shortcuts import get_object_or_404
-from document.models import Document
+from document.models import Document, ReadConfirmation
 from document.serializers import (
     DocumentLogoSerializer,
     ProjectSerializer,
     DocumentSerializer,
     ImageGenerationSerializer,
     AudioGenerationSerializer,
+    ReadConfirmationSerializer,
 )
 from rest_framework import generics, viewsets
 from rest_framework.exceptions import PermissionDenied
@@ -128,3 +129,62 @@ class Text2Speech(views.APIView):
         fname = utils.text2speech(text, lang, voice, speed)
         answer = f"https://{request.META['HTTP_HOST']}{MEDIA_URL}audio/{fname}"
         return Response(answer)
+
+
+class EnableReadingAPIView(views.APIView):
+    """Функция задает/отменяет обязательность прочтения документа\n
+        ------------
+        parameters:\n
+            pk - id документа.\n
+        method:\n
+           get - Получение информации о необходимости прочтения документа. True - подтверждение чтения включено.
+                                                                           False - подтверждение чтения выключено.\n
+           post - Подтверждение прочтения документа. Записывает в базу данных информацию о прочитавшем пользователе.
+    """
+
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
+    serializer_class = DocumentSerializer
+
+
+    def get(self, request, pk):
+        document = Document.objects.get(id=str(pk))
+        return Response({'enable_reading_confirmation': document.enable_reading_confirmation})
+
+
+    def patch(self, request, pk):
+        document = Document.objects.get(id=str(pk))
+        if document.enable_reading_confirmation:
+            document.enable_reading_confirmation = False
+        else:
+            document.enable_reading_confirmation = True
+        document.save()
+        enable_reading = self.serializer_class(document)
+        return Response(enable_reading.data)
+
+
+class ReadConfirmationAPIView(views.APIView):
+    """Функция подтверждения прочтения документа.
+        parameters:\n
+            pk - id документа.\n
+        method:\n
+           get - Получение информации о прочитавших документ пользователях.\n
+           post - Подтверждение прочтения документа. Записывает в базу данных информацию о прочитавшем пользователе
+    """
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
+    serializer_class = DocumentSerializer
+
+
+    def get(self, request, pk):
+        document = Document.objects.get(id=str(pk))
+        read_confirmation = document.read_confirmations.all()
+        serializer = ReadConfirmationSerializer(read_confirmation, many=True)
+        return Response({'read_confirmation': serializer.data})
+
+
+    def post(self, request, pk):
+        document = Document.objects.get(id=str(pk))
+        if not ReadConfirmation.objects.filter(document_id=document, user_id=request.user):
+            familiar_user = ReadConfirmation(document_id=document, user_id=request.user)
+            familiar_user.save()
+        enable_reading = self.serializer_class(document)
+        return Response(enable_reading.data)
