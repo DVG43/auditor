@@ -43,9 +43,8 @@ class TextContinueSerializer(serializers.Serializer):
 
 class QueryAiSerializer(serializers.Serializer):
     """ Ввод произвольного запроса к AI с опциональным контекстом """
-    source = serializers.CharField()
-    context = serializers.CharField(required=False)
-
+    source = serializers.CharField(allow_blank=True)
+    context = serializers.CharField(required=False, allow_blank=True)
 
 
 class StandardGenerationSerializer(serializers.Serializer):
