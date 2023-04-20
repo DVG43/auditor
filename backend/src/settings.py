@@ -13,7 +13,7 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(",")
 
 if DEBUG:
    CORS_ALLOW_ALL_ORIGINS = True
-   CSRF_TRUSTED_ORIGINS=*
+   CSRF_TRUSTED_ORIGINS='*'
 else:
    CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(',')
    CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(',')
