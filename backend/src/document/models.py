@@ -39,6 +39,7 @@ class Document(PpmDocModel):
         models.UUIDField(null=True), blank=True,
         default=list, verbose_name=_('Document order'))
     content = models.TextField(verbose_name=_("Контент"), default="")
+    enable_reading_confirmation = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -51,6 +52,7 @@ class Document(PpmDocModel):
     class Meta:
         db_table = 'ppm_documents'
         ordering = ['created_at']
+
 
 class Element(models.Model):
     document_id = models.ForeignKey(Document, related_name="element", on_delete=models.CASCADE)
@@ -75,6 +77,18 @@ class TagForDocument(models.Model):
         db_table = 'ppm_documents_tags'
 
 
+class ReadConfirmation(models.Model):
+    document_id = models.ForeignKey(Document, related_name="read_confirmations", on_delete=models.CASCADE)
+    user_id = models.ForeignKey('accounts.User', related_name="read_confirmations", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.document_id)
+
+    class Meta:
+        db_table = 'ppm_documents_confirmations'
+
+
 register(Document, permissions)
 register(Element, permissions)
 register(TagForDocument, permissions)
+register(ReadConfirmation, permissions)
