@@ -1,10 +1,11 @@
 from pathlib import Path
 from django.http import HttpResponse
+from django.conf import settings
 from django.urls import path
 from . import views
 
-TEST_EVENTSOURCE_PAGE_HTML = Path('test_eventsource.html').read_text()
-TEST_FETCH_PAGE_HTML = Path('test_fetch.html').read_text()
+TEST_EVENTSOURCE_PAGE_HTML = (settings.BASE_DIR / 'ai/test_eventsource.html').read_text()
+TEST_FETCH_PAGE_HTML = (settings.BASE_DIR / 'ai/test_fetch.html').read_text()
 
 def get_test_eventsource_page(request):
     return HttpResponse(TEST_EVENTSOURCE_PAGE_HTML)
