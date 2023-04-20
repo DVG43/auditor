@@ -135,6 +135,7 @@
             </div>
             
           </button>
+          {% if instances|length > 1 %}
           <button class="navigate__btn navigate__btn-next btn-resert flex">
             <div class="navigate__btn-descr navigate__btn-next-descr flex">
               <span class="navigate__btn-text"> Далее </span>
@@ -158,6 +159,7 @@
               </svg>
             </span>
           </button>
+          {% endif %}
         </div>
       </section>
     </div>
