@@ -41,7 +41,8 @@ class QType(graphene.Union):
 class TestFormQuestionType(DjangoObjectType):
     class Meta:
         model = TestFormQuestion
-        fields = ('question_id', 'testform', 'caption', 'description', 'require', 'question_type')
+        fields = ('question_id', 'testform', 'caption', 'description',
+                  'require', 'question_type', 'url_name', 'logo_question', 'image')
 
     question_data = QType()
 
