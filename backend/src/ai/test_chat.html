@@ -35,29 +35,9 @@
       overflow: auto;
       white-space: pre-wrap;
     }
-
-    .login-screen {
-      position: absolute;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      width: 100vw;
-      height: 100vh;
-      backdrop-filter: blur(2px);
-      text-align: center;
-      font-size: 20vh;
-      font-family: monospace;
-    }
-
-    .hidden {
-      display: none;
-    }
   </style>
 </head>
 <body>
-  <div id="loginScreen" class="login-screen">
-      <div><a href="/login">login</a></div>
-  </div>
   <div class="central-column">
     <pre id="output"></pre>
     <textarea id="txtBody" placeholder="Input message" rows="7"></textarea>
@@ -70,15 +50,19 @@
   <script>
 
     function readAccessToken() {
-      return localStorage.JWT ? JSON.parse(localStorage.JWT).access : null;
+      try {
+        return JSON.parse(localStorage.JWT).access;
+      } catch {
+        console.error("JWT not found in local storage or invalid")
+        return null;
+      }
     }
 
-    // Login
+    // Redirect to login page
 
     document.addEventListener("DOMContentLoaded", () => {
-      if (readAccessToken()) {
-        const el = document.getElementById('loginScreen');
-        el.classList.toggle("hidden");
+      if (readAccessToken() === null) {
+        window.location.href = '/login';
       }
     });
     
@@ -96,7 +80,7 @@
 
     btnSend.addEventListener('click', async () => {
       output.innerHTML += "\n\nUSER:\n\n" + txtBody.value;
-      output.innerHTML += "\n\nAI:\n\n";
+      output.innerHTML += "\n\nASSISTANT:\n\n";
       txtBody.value = "";
       output.scrollTop = output.scrollHeight;
 
