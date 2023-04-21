@@ -1,17 +1,23 @@
 from django.shortcuts import render
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import filters
+from rest_framework.response import Response
 
 # Create your views here.
 from .models import Template, CategoryForTemplate
 from rest_framework.viewsets import ModelViewSet
-from .serializers import CategoryForTemplateSerializer, TemplateSerializer #, CreateTemplateSerializer
+from .serializers import CategoryForTemplateSerializer, \
+    TemplateSerializer  # , CreateTemplateSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from rest_framework.pagination import PageNumberPagination
+
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 1000
+
 
 class CategoryForTemplateViewSet(ModelViewSet):
     queryset = CategoryForTemplate.objects.prefetch_related(
@@ -23,7 +29,8 @@ class CategoryForTemplateViewSet(ModelViewSet):
     #serializer_class = CreateTemplateSerializer
 
     def get_queryset(self):
-        instance = CategoryForTemplate.objects.filter(templates__pk=self.kwargs.get('catalog_template_pk'))
+        instance = CategoryForTemplate.objects.filter(
+            templates__pk=self.kwargs.get('catalog_template_pk'))
         return instance
 
 
@@ -39,45 +46,63 @@ class TemplateViewSet(ModelViewSet):
             request.data['favourite'] = ''
         return super().create(request, *args, **kwargs)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='name', description='Filter by name',
+                             required=False, type=str),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(self, request, *args, **kwargs)
+
     def get_queryset(self):
         user = self.request.user
-        self.queryset = Template.objects.filter(Q(owner=user) | Q(is_common=True))\
+        self.queryset = Template.objects.filter(
+            Q(owner=user) | Q(is_common=True)) \
             .prefetch_related('categories').select_related('owner')
-
+        if name := self.request.query_params.get('name'):
+            self.queryset = self.queryset.filter(Q(name__icontains=name))
         return self.queryset
 
     def perform_create(self, serializer):
         save_kw = {}
         # получаем связанные категории
         if self.request.data.get("categories_input"):
-            categories = CategoryForTemplate.objects.filter(pk__in=self.request.data.get("categories_input"))
+            categories = CategoryForTemplate.objects.filter(
+                pk__in=self.request.data.get("categories_input"))
             save_kw.update({"categories": categories})
         else:
             pass
 
         # добавляем в избранные
-        if self.request.data.get("favourite") == True or self.request.data.get("favourite") == 'true':
+        if self.request.data.get("favourite") == True or self.request.data.get(
+            "favourite") == 'true':
             favourite = [self.request.user]
             save_kw.update({"favourite": favourite})
         else:
             pass
-        save_kw.update({"last_modified_user": self.request.user.email, "owner": self.request.user})
+        save_kw.update({"last_modified_user": self.request.user.email,
+                        "owner": self.request.user})
         serializer.save(**save_kw)
 
     def perform_update(self, serializer):
         save_kw = {}
         # получаем связанные категории
         if self.request.data.get("categories_input"):
-            categories = CategoryForTemplate.objects.filter(pk__in=self.request.data.get("categories_input"))
+            categories = CategoryForTemplate.objects.filter(
+                pk__in=self.request.data.get("categories_input"))
             save_kw.update({"categories": categories})
         else:
             pass
 
         # проевряем есть ли в избранных и добавляем в словарь
-        if self.request.data.get("favourite") == True or self.request.data.get("favourite") == 'true':
+        if self.request.data.get("favourite") == True or self.request.data.get(
+            "favourite") == 'true':
             favourite = [self.request.user]
             save_kw.update({"favourite": favourite})
-        elif self.request.data.get("favourite") == False or self.request.data.get("favourite") == 'false':
+        elif self.request.data.get(
+            "favourite") == False or self.request.data.get(
+            "favourite") == 'false':
             save_kw.update({"favourite": []})
         else:
             pass
@@ -86,4 +111,3 @@ class TemplateViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         return TemplateSerializer
-
