@@ -41,11 +41,16 @@ class FolderType(DjangoObjectType):
 
 class PollType(DjangoObjectType):
     folder = graphene.Field(FolderType)
+    template_url = graphene.String()
 
     class Meta:
         model = poll_models.Poll
         fields = '__all__'
 
+    def resolve_template_url(self, info):
+        if self.template_uuid:
+            template_url = info.context.META['HTTP_HOST'] + "/api/v1/poll/poll_templates/" + str(self.template_uuid)
+            return template_url
 
 class PollSettingsType(DjangoObjectType):
     class Meta:

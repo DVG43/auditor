@@ -167,7 +167,7 @@ class ManyFromListQuestionAttachedTypeSerializer(serializers.ModelSerializer):
 
 
 class ManyFromListQuestionSerializer(BaseQuestionSerializer):
-    item_set_id = serializers.IntegerField(required=False)
+    item_set = serializers.IntegerField(required=False)
     multiple_choices = serializers.BooleanField(required=False)
     comment = serializers.CharField(max_length=512, required=False)
     poll = serializers.IntegerField()
@@ -328,7 +328,8 @@ class NumberQuestionSerializer(BaseQuestionSerializer):
 
 
 class DateQuestionSerializer(BaseQuestionSerializer):
-    date = serializers.DateTimeField(required=False)
+    date = serializers.DateField(required=False)
+    time = serializers.TimeField(required=False)
     poll = serializers.IntegerField()
 
     def create(self, validated_data):
@@ -337,6 +338,7 @@ class DateQuestionSerializer(BaseQuestionSerializer):
     def update(self, instance, validated_data):
         super(DateQuestionSerializer, self).update(instance, validated_data)
         instance.date = validated_data.get('date', instance.date)
+        instance.time = validated_data.get('date', instance.date)
         instance.save()
         return instance
 
