@@ -39,6 +39,8 @@ class TemplateSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
+        if "categories_input" in validated_data:
+            validated_data.pop("categories_input")
         instance = super().create(validated_data)
         if hasattr(instance, "perms"):
             instance.owner.grant_object_perm(instance, 'own')
@@ -72,7 +74,9 @@ class TemplateSerializer(serializers.ModelSerializer):
         return ret
 
     def to_internal_value(self, data):
-        data['categories_input'] = data['categories_input'].split(',') if data.get('categories_input') else []
+        if data.get('categories_input'):
+            if isinstance(data.get('categories_input'), str):
+                data['categories_input'] = data['categories_input'].split(',') if data.get('categories_input') else []
         return self.super_to_internal_value(data)
 
 

@@ -35,7 +35,7 @@ class TemplateViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def create(self, request, *args, **kwargs):
-        if request.data.get("favourite") == 'false':
+        if request.data.get("favourite") == 'false' or request.data.get("favourite") == False:
             request.data['favourite'] = ''
         return super().create(request, *args, **kwargs)
 
