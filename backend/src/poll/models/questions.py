@@ -1,3 +1,4 @@
+import datetime
 import uuid
 
 from django.core.validators import MaxValueValidator
@@ -436,7 +437,8 @@ class DateQuestion(Question):
     """
     Just Date
     """
-    date = models.DateTimeField(blank=True, null=True)
+    date = models.DateField(default=datetime.date.today, blank=True, null=True)
+    time = models.TimeField(default=timezone.now, blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
         super(DateQuestion, self).__init__(*args, **kwargs)
