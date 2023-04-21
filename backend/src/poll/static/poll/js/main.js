@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+  localStorage.clear();
+
   const headerAccordionText = document.querySelector('.header-accordion__text');
   const countBlock = document.querySelector('.header__count-block');
   const countText = document.querySelector('.header__count');
@@ -45,6 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
           questionContainer.classList.add('question-container-obligatory');
         };
       };
+
+      localStorage.setItem(`${checkbox.name + checkbox.id}`, checkbox.checked);
     });
   });
 
@@ -61,6 +65,11 @@ document.addEventListener("DOMContentLoaded", () => {
         };
       };
     });
+
+    input.addEventListener('change', () => {
+      localStorage.setItem(`${input.name + input.id}`, input.value);
+    })
+
   });  
 
   answersLists.forEach((answersList) => {
@@ -81,9 +90,10 @@ document.addEventListener("DOMContentLoaded", () => {
           questionContainer.classList.remove('question-container-obligatory');
         }
         
+        localStorage.setItem(`${answersList.title + answersList.id}`, answersBtn.innerHTML);
       });
     });
-  })
+  });
 
   const noteBtns = document.querySelectorAll('.question-action-list__item-note-btn');
 
@@ -122,9 +132,18 @@ document.addEventListener("DOMContentLoaded", () => {
         fileBlock.classList.add('question-file__img-block');
         const fileImg = document.createElement('img');
         fileImg.classList.add('question-file__img');
-        fileImg.src = "https://mobimg.b-cdn.net/v3/fetch/f2/f2689a880e15cbb49bd267f84689111a.jpeg?w=1470&r=0.5625";
-        console.log(this.files);
-        fileBlock.append(fileImg);
+
+        const file = this.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function() {
+          fileImg.src = reader.result;
+        };
+        reader.onerror = function() {
+          console.log(reader.error);
+        };
+
+        fileBlock.append(fileImg);    
       } else{
         const fileText = document.createElement('p');
         fileBlock.classList.add('question-file__text-block');
@@ -200,6 +219,8 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   });
 
+
+
   function select() {
     const selectHeader = document.querySelectorAll('.select__header');
     const selectItem = document.querySelectorAll('.select__item');
@@ -236,9 +257,13 @@ document.addEventListener("DOMContentLoaded", () => {
       selectIcon.classList.remove('rotate');
 
       const questionContainer = this.closest('.question-container-obligatory');
-        if (questionContainer){
-          questionContainer.classList.remove('question-container-obligatory');
-        }
+      if (questionContainer){
+        questionContainer.classList.remove('question-container-obligatory');
+      };
+
+      if(select.classList.contains('question-select')){
+        localStorage.setItem(`${select.title + select.id}`, text);
+      }
     }
   
   };
