@@ -3,11 +3,10 @@ from pathlib import Path
 from django.http import HttpResponse
 from django.conf import settings
 from django.urls import path
-from settings import BASE_DIR
 
 from . import views
 
-BASE_DIR = Path(BASE_DIR)
+BASE_DIR = Path(settings.BASE_DIR)
 
 TEST_CHAT_PAGE_HTML = (BASE_DIR / 'ai/test_chat.html').read_text()
 TEST_EVENTSOURCE_PAGE_HTML = (BASE_DIR / 'ai/test_eventsource.html').read_text()
