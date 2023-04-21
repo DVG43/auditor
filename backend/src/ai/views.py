@@ -1,3 +1,5 @@
+import json
+
 from accounts.permissions import IsActivated
 from common.permissions import IsOwner, IsOwnerOrIsInvited
 
@@ -262,7 +264,10 @@ class QueryAiStream(views.APIView):
 
         streaming_result = ai.query_ai_stream(source, context,
             include_debug=DEBUG)
-        return StreamingHttpResponse(streaming_result)
+
+        json_lines = lambda obj: json.dumps(obj) + '\n'
+        streaming_json = map(json_lines, streaming_result)
+        return StreamingHttpResponse(streaming_json)
 
 
 class StandardGenerationStream(views.APIView):
@@ -288,4 +293,7 @@ class StandardGenerationStream(views.APIView):
 
         streaming_result = ai.standard_generation_stream(command,
             context, include_debug=DEBUG)
-        return StreamingHttpResponse(streaming_result)
+
+        json_lines = lambda obj: json.dumps(obj) + '\n'
+        streaming_json = map(json_lines, streaming_result)
+        return StreamingHttpResponse(streaming_json)

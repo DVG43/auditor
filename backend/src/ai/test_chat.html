@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ChatGPT</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    button {
+      min-width: 150px;
+    }
+
+    .central-column {
+      max-width: 750px;
+      margin: 0 auto;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding-bottom: 16px;
+    }
+
+    #txtBody {
+      resize: none;
+    }
+
+    #output {
+      flex: 1;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+
+    .login-screen {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 100vw;
+      height: 100vh;
+      backdrop-filter: blur(2px);
+      text-align: center;
+      font-size: 20vh;
+      font-family: monospace;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="loginScreen" class="login-screen">
+      <div><a href="/login">login</a></div>
+  </div>
+  <div class="central-column">
+    <pre id="output"></pre>
+    <textarea id="txtBody" placeholder="Input message" rows="7"></textarea>
+    <div>
+      <button id="btnSend">Send</button>
+      <button id="btnStop">Stop</button>
+    </div>
+  </div>
+
+  <script>
+
+    function readAccessToken() {
+      return localStorage.JWT ? JSON.parse(localStorage.JWT).access : null;
+    }
+
+    // Login
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (readAccessToken()) {
+        const el = document.getElementById('loginScreen');
+        el.classList.toggle("hidden");
+      }
+    });
+    
+    // Chat
+
+    const output = document.getElementById('output');
+    const txtBody = document.getElementById('txtBody');
+    const btnSend = document.getElementById('btnSend');
+    const btnStop = document.getElementById('btnStop');
+
+    const textDecoder = new TextDecoder();
+
+    let context = "";
+    let reader;
+
+    btnSend.addEventListener('click', async () => {
+      output.innerHTML += "\n\nUSER:\n\n" + txtBody.value;
+      output.innerHTML += "\n\nAI:\n\n";
+      txtBody.value = "";
+      output.scrollTop = output.scrollHeight;
+
+      const response = await fetch('/api/v1/stream/ai/query_ai/', {
+        method: "POST",
+        credentials: 'include',
+        cache: "no-cache",
+        keepalive: true,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "text/event-stream",
+          "Authorization": "Bearer " + readAccessToken(),
+        },
+        body: JSON.stringify({
+          source: output.innerHTML.slice(-2000),
+          context: context,
+        }),
+      });
+
+      reader = response.body.getReader();
+      let partialChunk = "";
+      
+      while (true) {
+        const {value, done} = await reader.read();
+        if (done) break;
+
+        // Uint8Array -> string
+        let text = textDecoder.decode(value);
+
+        // Most of the time results in: [chunkJson, ""]
+        let lines = text.split('\n');
+
+        lines[0] = partialChunk + lines[0];
+        partialChunk = lines.pop();  // empty string most of the time
+
+        let reply;
+        
+        for (let line of lines) {
+          try {
+            reply = JSON.parse(line);
+            if (reply.payload.delta !== null) {
+              output.innerHTML += reply.payload.delta;
+            }
+          } catch (e) {
+            console.error('BAD CHUNK :::' + line + '::: ERROR :::' + e);
+          }
+        }
+        output.scrollTop = output.scrollHeight;
+      }
+    });
+    
+    
+    btnStop.addEventListener('click', () => {
+      reader.cancel();
+    });
+
+  </script>
+</body>
+</html>
