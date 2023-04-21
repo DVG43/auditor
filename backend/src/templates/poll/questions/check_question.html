@@ -1,8 +1,8 @@
 {% load static %}
                 <label class="question-checkbox">
-                  <input type="checkbox" class="question-checkbox__input" />
+                  <input id="{{instance.question_id}}" type="checkbox" class="question-checkbox__input" name="{{instance.question_type}}"/>
                   <span class="question-checkbox__text">
-                    {{instance.description}}
+                    {{instance.caption}}
                   </span>
                   <span class="question-checkbox__sign"></span>
                 </label>

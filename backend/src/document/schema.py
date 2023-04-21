@@ -4,6 +4,7 @@ import channels_graphql_ws
 import graphene
 from accounts.models import User
 from django.contrib.auth import get_user_model
+from django.core.exceptions import BadRequest
 from django.db.models import Q, F
 from django.utils import timezone
 from graphene import relay
@@ -14,6 +15,8 @@ from graphql_utils.utils_graphql import \
     download_logo
 from projects.models import Project
 import datetime
+
+
 
 from .models import Document
 from .permissions import PermissionClass
@@ -44,7 +47,8 @@ class DocumentsType(DjangoObjectType):
 
     @staticmethod
     def resolve_last_modified_user(self, info):
-        user = User.objects.filter(email=self.last_modified_user).values('first_name', 'last_name').first()
+        user = User.objects.filter(email=self.last_modified_user).values(
+            'first_name', 'last_name').first()
         return f"{user.get('first_name')} {user.get('last_name')}"
 
     @staticmethod
@@ -72,6 +76,7 @@ class ProjectForDocumentType(DjangoObjectType):
     class Meta:
         model = Project
 
+
 class FolderForDocumentType(DjangoObjectType):
     class Meta:
         model = Folder
@@ -84,12 +89,23 @@ class Query(graphene.ObjectType):
     @login_required
     def resolve_document_document(self, info, **kwargs):
         """"возвращает документа по id документа"""
+
+        def is_deleted(obj):
+            if obj:
+                if obj.deleted_id is not None:
+                    return True
+                if obj.parent:
+                    return is_deleted(obj.parent)
+            return False
+
         doc_id = kwargs.get('doc_id')
         PermissionClass.has_permission(info)
         PermissionClass.has_query_object_permission(info, doc_id)
-        if id is not None:
-            return Document.objects.get(pk=doc_id)
-        return None
+
+        if doc_instance := Document.objects.get(pk=doc_id):
+            if is_deleted(doc_instance):
+                raise BadRequest('Document was removed to trash by the owner')
+            return doc_instance
 
     @login_required
     def resolve_document_documents(self, info, **kwargs):
@@ -97,7 +113,8 @@ class Query(graphene.ObjectType):
         folder_id = kwargs.get('folder_id')
         PermissionClassFolder.has_permission(info)
         PermissionClassFolder.has_query_object_permission(info, folder_id)
-        return Document.objects.filter(Q(folder__pk=folder_id) & Q(deleted_id__isnull=True))
+        return Document.objects.filter(
+            Q(folder__pk=folder_id) & Q(deleted_id__isnull=True))
 
 
 # Create Input Objects Type
@@ -138,7 +155,8 @@ class CreateDocumen(graphene.Mutation):
             name=input.name, doc_uuid=None,
             owner=get_user_model().objects.get(pk=info.context.user.pk),
             last_modified_user=info.context.user.email,
-            host_project=Project.objects.get(pk=input.project_id) if input.project_id else None,
+            host_project=Project.objects.get(
+                pk=input.project_id) if input.project_id else None,
             content=input.content if input.content else default_content,
             folder=folder
         )
@@ -149,7 +167,8 @@ class CreateDocumen(graphene.Mutation):
         if input.parent:
             document_instance.parent = Document.objects.get(pk=input.parent)
             # добавляем orderId в список для сортировки в родит-ий докум-т
-            document_instance.parent.doc_order.append(document_instance.order_id)
+            document_instance.parent.doc_order.append(
+                document_instance.order_id)
             document_instance.parent.save()
         else:
             children_document_instance = Document.objects.create(
@@ -161,7 +180,8 @@ class CreateDocumen(graphene.Mutation):
                 owner=get_user_model().objects.get(pk=info.context.user.pk)
             )
             if hasattr(children_document_instance, "perms"):
-                children_document_instance.owner.grant_object_perm(children_document_instance, 'own')
+                children_document_instance.owner.grant_object_perm(
+                    children_document_instance, 'own')
             children_document_instance.refresh_from_db()
             document_instance.doc_order = [children_document_instance.order_id]
         document_instance.save()
@@ -199,7 +219,8 @@ class UpdateDocumen(graphene.Mutation):
             if input.name:
                 document_instance.name = input.name
             if input.project_id:
-                document_instance.host_project = Project.objects.get(pk=input.project_id)
+                document_instance.host_project = Project.objects.get(
+                    pk=input.project_id)
             document_instance.last_modified_user = info.context.user.email
             if input.data_row_order:
                 document_instance.data_row_order = input.data_row_order
@@ -292,7 +313,8 @@ class CopyDocumen(graphene.Mutation):
             document_instance.name = document_instance.name + " копия"
             document_instance.save()
             if hasattr(document_instance, "perms"):
-                document_instance.owner.grant_object_perm(document_instance, 'own')
+                document_instance.owner.grant_object_perm(document_instance,
+                                                          'own')
             ok = True
             return CopyDocumen(ok=ok, document=document_instance)
 
@@ -395,4 +417,5 @@ class Subscription(graphene.ObjectType):
     subscribe_for_notifications = OnNewChatMessage.Field()
 
 
-schema = graphene.Schema(query=Query, mutation=Mutation, subscription=Subscription)
+schema = graphene.Schema(query=Query, mutation=Mutation,
+                         subscription=Subscription)

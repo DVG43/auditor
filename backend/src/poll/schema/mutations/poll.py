@@ -66,10 +66,26 @@ class CreatePoll(SerializerMutation):
             "parent_id": base_page.page_id
         }
 
+        item_sets = []
+
+        item_texts_set = (("Да", "Нет", "Н/Д"), ("Хороший", "Плохой", "Н/Д"), ("Удача", "Неудача", "Н/Д"),
+                          ("Соответствует", "Не соответствует", "Н/Д"))
+        default_colors = ("#46875E", "#C50056", "#6A6A6A")
+
+        for item_texts in item_texts_set:
+            set_obj = qstn_models.ItemSet.objects.create(poll=poll)
+            item_sets.append(set_obj)
+            for i, text in enumerate(item_texts):
+                qstn_models.ItemQuestion.objects.create(item_set=set_obj, text=text, order_id=i + 1,
+                                                        hex_color=default_colors[i])
+
         qstn_models.DateQuestion.objects.create(caption="Дата и время", order_id=1, **data)
         qstn_models.TextQuestion.objects.create(caption="Введите вопрос", order_id=2, **data)
         qstn_models.NumberQuestion.objects.create(caption="Число", order_id=3, **data)
         qstn_models.CheckQuestion.objects.create(caption="Чек бокс", order_id=4, **data)
+        qstn_models.ManyFromListQuestion.objects.create(caption="Выбор ответов", order_id=5,
+                                                        item_set=item_sets[0],
+                                                        **data)
 
 
 class UpdatePollInput(graphene.InputObjectType):

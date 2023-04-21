@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from django.http import HttpResponse
+from django.conf import settings
 from django.urls import path
 from settings import BASE_DIR
 

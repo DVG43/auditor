@@ -5,14 +5,19 @@ from pathlib import Path
 
 # from firebase_admin import initialize_app, credentials
 
-DEBUG = os.environ.get("DEBUG", True)
+DEBUG = os.environ.get("DEBUG", False) in ('True', 'true')
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "local")
 BASE_DIR = Path(__file__).parent
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(",")
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(',')
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(',')
-# CORS_ALLOW_ALL_ORIGINS = True
+
+if DEBUG:
+   CORS_ALLOW_ALL_ORIGINS = True
+   CSRF_TRUSTED_ORIGINS='*'
+else:
+   CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(',')
+   CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(',')
+   
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")

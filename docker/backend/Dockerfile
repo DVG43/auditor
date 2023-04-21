@@ -21,13 +21,7 @@ RUN apk update \
     && apk del build-deps
 WORKDIR /app/
 COPY . /app/
-RUN mkdir -p ./backend/src/share \
-    && mkdir -p ./backend/src/share/auditor-v2_media \
-    && mkdir -p ./backend/src/share/auditor-v2_media/images \
-    && mkdir -p ./backend/src/share/auditor-v2_media/video \
-    && mkdir -p ./backend/src/share/auditor-v2_media/audio \
-    && mkdir -p ./backend/src/share/auditor-v2_statics
-    # && touch "${APP_API_LOG}"
+# RUN 
 RUN addgroup app && adduser -S app -G app \
     && chown -R app:app /app/backend/
 

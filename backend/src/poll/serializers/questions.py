@@ -3,7 +3,7 @@ from rest_framework import serializers
 from poll.models.questions import DivisionQuestion, ItemQuestion, ManyFromListQuestion, YesNoQuestion, \
     RatingQuestion, MediaFile, MediaQuestion, TextQuestion, MediaItemQuestion, MediaAttachedType, FinalQuestion, \
     YesNoAnswers, YesNoAttachedType, HeadingQuestion, FreeAnswer, ItemsFreeAnswer, FreeAnswerAttachedType, \
-    TagsFreeAnswer, ItemTagsFreeAnswer, ManyFromListAttachedType, PageQuestion, SectionQuestion
+    TagsFreeAnswer, ItemTagsFreeAnswer, ManyFromListAttachedType, PageQuestion, SectionQuestion, ItemSet
 
 
 def max_min_validator(value):
@@ -19,8 +19,8 @@ class BaseQuestionSerializer(serializers.Serializer):
     question_id = serializers.IntegerField(read_only=True)
     question_type = serializers.CharField(read_only=True, max_length=100, default='Question')
     order_id = serializers.IntegerField(default=0)
-    description = serializers.CharField(max_length=512)
-    caption = serializers.CharField(max_length=512)
+    description = serializers.CharField(max_length=512, required=False)
+    caption = serializers.CharField(max_length=512, required=False)
     parent_id = serializers.UUIDField(required=False)
 
     require = serializers.BooleanField(required=False)
@@ -53,17 +53,28 @@ class DivisionQuestionSerializer(serializers.ModelSerializer):
 
 
 class ItemQuestionSerializer(serializers.ModelSerializer):
+    item_set = serializers.IntegerField(required=True)
+
     class Meta:
         model = ItemQuestion
         fields = [
-            'item_question_id', 'order_id', 'text',
-            'checked', 'photo_path', 'points', 'selected',
+            'item_question_id', 'item_set', 'order_id', 'text',
+            'checked', 'photo_path', 'points', 'hex_color', 'selected',
             'userAnswer', 'userAnswerText'
         ]
 
     def create(self, validated_data):
         instance = super(ItemQuestionSerializer, self).create(validated_data)
         return instance
+
+
+class ItemSetQuestionSerializer(serializers.ModelSerializer):
+    item_set_id = serializers.IntegerField(required=False)
+    poll = serializers.IntegerField(required=True)
+
+    class Meta:
+        model = ItemSet
+        fields = ['item_set_id', 'poll']
 
 
 class MediaAttachedTypeSerializer(serializers.ModelSerializer):
@@ -156,8 +167,10 @@ class ManyFromListQuestionAttachedTypeSerializer(serializers.ModelSerializer):
 
 
 class ManyFromListQuestionSerializer(BaseQuestionSerializer):
-    comment = serializers.CharField(max_length=512)
-    poll = serializers.CharField(max_length=64)
+    item_set_id = serializers.IntegerField(required=False)
+    multiple_choices = serializers.BooleanField(required=False)
+    comment = serializers.CharField(max_length=512, required=False)
+    poll = serializers.IntegerField()
     answer_time = serializers.IntegerField(default=0, required=False)
     description_mode = serializers.BooleanField(required=False)
     count_of_answer = serializers.IntegerField(required=False)
@@ -165,7 +178,6 @@ class ManyFromListQuestionSerializer(BaseQuestionSerializer):
     answer_from = serializers.IntegerField(required=False)
     answer_to = serializers.IntegerField(required=False)
     attached_type = ManyFromListQuestionAttachedTypeSerializer(many=True, required=False)
-    items = ItemQuestionSerializer(many=True, required=False)
 
     class Meta:
         model = ManyFromListQuestion
@@ -254,7 +266,7 @@ class MediaQuestionSerializer(serializers.ModelSerializer):
 
 class RatingQuestionSerializer(BaseQuestionSerializer):
     rating = serializers.IntegerField()
-    poll = serializers.CharField(max_length=64)
+    poll = serializers.IntegerField()
 
     def create(self, validated_data):
         return RatingQuestion.objects.create(**validated_data)
@@ -273,8 +285,8 @@ class MediaFileSerializer(serializers.ModelSerializer):
 
 
 class TextQuestionSerializer(BaseQuestionSerializer):
-    text = serializers.CharField(max_length=1024)
-    poll = serializers.CharField(max_length=64)
+    text = serializers.CharField(max_length=1024, required=False)
+    poll = serializers.IntegerField()
 
     def create(self, validated_data):
         return TextQuestion.objects.create(**validated_data)
@@ -287,8 +299,9 @@ class TextQuestionSerializer(BaseQuestionSerializer):
 
 
 class CheckQuestionSerializer(BaseQuestionSerializer):
-    checked = serializers.BooleanField()
-    poll = serializers.CharField(max_length=64)
+    poll = serializers.IntegerField()
+    checked = serializers.BooleanField(required=False)
+    points = serializers.IntegerField(required=False)
 
     def create(self, validated_data):
         return TextQuestion.objects.create(**validated_data)
@@ -301,8 +314,8 @@ class CheckQuestionSerializer(BaseQuestionSerializer):
 
 
 class NumberQuestionSerializer(BaseQuestionSerializer):
-    number = serializers.FloatField()
-    poll = serializers.CharField(max_length=64)
+    number = serializers.FloatField(required=False)
+    poll = serializers.IntegerField()
 
     def create(self, validated_data):
         return TextQuestion.objects.create(**validated_data)
@@ -315,8 +328,8 @@ class NumberQuestionSerializer(BaseQuestionSerializer):
 
 
 class DateQuestionSerializer(BaseQuestionSerializer):
-    date = serializers.DateTimeField()
-    poll = serializers.CharField(max_length=64)
+    date = serializers.DateTimeField(required=False)
+    poll = serializers.IntegerField()
 
     def create(self, validated_data):
         return TextQuestion.objects.create(**validated_data)
@@ -382,7 +395,7 @@ class FinalQuestionSerializer(BaseQuestionSerializer):
 
 
 class HeadingQuestionSerializer(serializers.ModelSerializer):
-    poll = serializers.CharField(max_length=64)
+    poll = serializers.IntegerField()
 
     class Meta:
         model = HeadingQuestion
@@ -397,7 +410,7 @@ class HeadingQuestionSerializer(serializers.ModelSerializer):
 
 
 class PageQuestionSerializer(serializers.ModelSerializer):
-    poll = serializers.CharField(max_length=64)
+    poll = serializers.IntegerField()
 
     class Meta:
         model = PageQuestion
@@ -413,7 +426,7 @@ class PageQuestionSerializer(serializers.ModelSerializer):
 
 
 class SectionQuestionSerializer(serializers.ModelSerializer):
-    poll = serializers.CharField(max_length=64)
+    poll = serializers.IntegerField()
 
     class Meta:
         model = SectionQuestion
@@ -505,7 +518,7 @@ class FreeAnswerSerializer(BaseQuestionSerializer):
     attached_type = FreeAnswerAttachedTypeSerializer(many=True, required=False)
     items = ItemsFreeAnswerSerializer(many=True, required=False)
     tagsAnswerFree = TagsFreeAnswerSerializer(many=True, required=False, source='tags')
-    poll = serializers.CharField(max_length=64)
+    poll = serializers.IntegerField()
 
     class Meta:
         model = FreeAnswer

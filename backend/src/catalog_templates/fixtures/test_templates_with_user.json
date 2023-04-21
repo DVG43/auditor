@@ -1,0 +1,89 @@
+[
+  {
+    "model": "accounts.user",
+    "pk": 11,
+    "fields": {
+      "password": "pbkdf2_sha256$260000$SgSXNNxMEcuAkkDw3PO4Xv$LgLSywhqkRI7j2expGkmgsmMijpf+Smg9VyPlB7K364=",
+      "last_login": "2023-04-20T15:38:25.262Z",
+      "id": "a44d51d5-2b8f-498d-ab81-afc83f93d939",
+      "email": "test@test.com",
+      "first_name": "test",
+      "last_name": "test@test.com",
+      "phone": null,
+      "birthday": null,
+      "code": null,
+      "is_verified": true,
+      "created_at": "2023-04-14T07:13:13.093Z",
+      "avatar": "",
+      "is_active": true,
+      "is_staff": true,
+      "is_superuser": true,
+      "changed_password_date": "2023-04-14T07:13:13.093Z",
+      "user_language": "ru",
+      "b24_contact_id": null,
+      "b24_deal_id": null,
+      "document_like": false,
+      "document": null,
+      "is_invited": true,
+      "disk_space": 0,
+      "contacts_order": "[]"
+    }
+  },
+  {
+    "model": "catalog_templates.template",
+    "pk": 1,
+    "fields": {
+      "owner": 11,
+      "name": "test123",
+      "description": "",
+      "created_at": "2023-04-20T09:21:20.325Z",
+      "last_modified_user": "test@test.com",
+      "last_modified_date": "2023-04-20T09:21:20.325Z",
+      "deleted_id": null,
+      "deleted_since": null,
+      "template_text": "",
+      "example": "",
+      "result": "",
+      "is_common": false,
+      "favourite": []
+    }
+  },
+  {
+    "model": "catalog_templates.template",
+    "pk": 4,
+    "fields": {
+      "owner": 11,
+      "name": "tes321",
+      "description": "",
+      "created_at": "2023-04-20T09:21:20.325Z",
+      "last_modified_user": "test@test.com",
+      "last_modified_date": "2023-04-20T09:21:20.325Z",
+      "deleted_id": null,
+      "deleted_since": null,
+      "template_text": "",
+      "example": "",
+      "result": "",
+      "is_common": false,
+      "favourite": []
+    }
+  },
+  {
+    "model": "catalog_templates.template",
+    "pk": 11,
+    "fields": {
+      "owner": 11,
+      "name": "not_my",
+      "description": "",
+      "created_at": "2023-04-20T09:21:20.325Z",
+      "last_modified_user": "test@test.com",
+      "last_modified_date": "2023-04-20T09:21:20.325Z",
+      "deleted_id": null,
+      "deleted_since": null,
+      "template_text": "",
+      "example": "",
+      "result": "",
+      "is_common": false,
+      "favourite": []
+    }
+  }
+]
