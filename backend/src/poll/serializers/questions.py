@@ -167,7 +167,7 @@ class ManyFromListQuestionAttachedTypeSerializer(serializers.ModelSerializer):
 
 
 class ManyFromListQuestionSerializer(BaseQuestionSerializer):
-    item_set_id = serializers.IntegerField(required=False)
+    item_set = serializers.IntegerField(required=False)
     multiple_choices = serializers.BooleanField(required=False)
     comment = serializers.CharField(max_length=512, required=False)
     poll = serializers.IntegerField()
