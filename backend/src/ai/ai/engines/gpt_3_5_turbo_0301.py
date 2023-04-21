@@ -245,11 +245,17 @@ def complete_stream(
     except Exception as e:
         openai_error = e
 
+    chunk_id = 0
+
     if openai_error:
         result = {
+            'chunk_id': chunk_id,
             'payload': None,
             'error': 'AI engine error',
         }
+
+        chunk_id += 1
+
         if include_debug:
             result.update({
                 'debug_info': {
@@ -265,7 +271,7 @@ def complete_stream(
         time_0 = time_prev = time.time()
         is_first_reply = True
 
-        for chunk_count, chunk in enumerate(openai_response_stream, start=1):
+        for raw_chunks_total, chunk in enumerate(openai_response_stream, start=1):
 
             payload = chunk.choices[0]
             content = payload.delta.get('content')
@@ -275,6 +281,7 @@ def complete_stream(
                 continue
 
             result = {
+                'chunk_id': chunk_id,
                 'payload': {
                     'delta': content,
                     'finish_reason': finish_reason,
@@ -282,23 +289,26 @@ def complete_stream(
                 'error': None,
             }
 
+            chunk_id += 1
+
             if include_debug:
                 time_now = time.time()
                 debug_info = {
                     'delta_time_ms': _to_ms(time_now - time_prev),
                     'total_time_ms': _to_ms(time_now - time_0),
-                    'chunk_count': chunk_count,
+                    'raw_chunks_total': raw_chunks_total,
                     'response': chunk.to_dict_recursive(),
                 }
                 time_prev = time_now
 
                 if is_first_reply:
-                    debug_info.update({
+                    debug_info = {
+                        **debug_info,
                         'messages': messages,
                         'config': config,
                         'error_details': openai_error_to_dict(openai_error),
-                    })
+                    }
                     is_first_reply = False
 
-                result.update(debug_info)
+                result.update({'debug_info': debug_info})
             yield result
