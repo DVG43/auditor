@@ -1,6 +1,5 @@
 from json import loads
 from accounts.permissions import IsActivated
-from drf_spectacular.utils import extend_schema, extend_schema_view
 from common.permissions import IsOwner, IsOwnerOrIsInvited
 from django.shortcuts import get_object_or_404
 from document.models import Document, ReadConfirmation
@@ -142,7 +141,10 @@ class EnableReadingAPIView(views.APIView):
         method:\n
            get - Получение информации о необходимости прочтения документа. True - подтверждение чтения включено.
                                                                            False - подтверждение чтения выключено.\n
-           patch - Подтверждение прочтения документа. Записывает в базу данных информацию о прочитавшем пользователе.
+           patch - Изменение информации о необходимости подтверждения прочтения документа. Изменяет в базе данных
+           поле enable_reading_confirmation (нужно ли подтверждать прочтение документа).
+           True - подтверждение чтения включено.
+           False - подтверждение чтения выключено.
     """
 
     permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
@@ -168,11 +170,13 @@ class EnableReadingAPIView(views.APIView):
 
 
     def patch(self, request, pk):
-        """Функция подтверждения прочтения документа\n
+        """Функция изменения информации о необходимости подтверждения прочтения документа\n
             parameters:\n
                 pk - id документа.\n
             method:\n
-               patch - Подтверждение прочтения документа. Записывает в базу данных информацию о прочитавшем пользователе.
+               patch - Изменение необходимости подтверждения прочтения документа. Записывает в базу данных информацию о
+                        необходимости прочтения документа. True - подтверждение чтения включено.
+                        False - подтверждение чтения выключено.\n
         Пример ответа:\n
             200:\n
         {\n
