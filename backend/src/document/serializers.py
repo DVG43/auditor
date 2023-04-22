@@ -52,25 +52,25 @@ class FolderSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Сериализация пользователя """
+    """Сериализация данных о пользователе """
 
     class Meta:
        model = User
-       fields = ['id', 'email', 'first_name', 'last_name', 'phone']
+       fields = ['id', 'email', 'first_name', 'last_name']
 
 
 class ReadConfirmationSerializer(serializers.ModelSerializer):
-    """Вывод информации о документе"""
+    """Сериализация данных о документе и прочитавших его пользователях"""
 
     user_id = UserSerializer()
 
     class Meta:
         model = ReadConfirmation
-        fields = ['id', 'user_id']
+        fields = ['id', 'document_id', 'user_id']
 
 
 class ReadConfirmationFildSerializer(serializers.Field):
-    """Вывод рекурсивно children"""
+    """Создание поля read_confirmation и заполнение его данными о документе и прочитавших его пользователях"""
 
     def to_representation(self, value):
         value = value.read_confirmations.all()
