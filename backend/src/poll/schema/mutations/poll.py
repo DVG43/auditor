@@ -265,14 +265,17 @@ class OpenAccessPollTemplate(graphene.Mutation):
         PermissionClass.has_permission(info)
         if poll:
             PermissionClass.has_mutate_object_permission(info, poll)
-
-            poll.template_uuid = uuid.uuid4()
-            poll.save()
-            print(info.context.META['HTTP_HOST'])
+            url_uuid = ""
+            if poll.template_uuid:
+                url_uuid = poll.template_uuid
+            else:
+                url_uuid = uuid.uuid4()
+                poll.template_uuid = url_uuid
+                poll.save()
 
             return OpenAccessPollTemplate(ok=True,
                                           url=info.context.META['HTTP_HOST'] + "/api/v1/poll/poll_templates/" + str(
-                                              poll.template_uuid))
+                                              url_uuid))
         else:
             return OpenAccessPollTemplate(ok=False, url=None)
 
