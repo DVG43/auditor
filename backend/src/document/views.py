@@ -146,9 +146,7 @@ class EnableReadingAPIView(views.APIView):
            True - подтверждение чтения включено.
            False - подтверждение чтения выключено.
     """
-
-    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
-
+    permission_classes = [IsAuthenticated, IsOwner]
 
     def get(self, request, pk):
         """Функция возвращает информацию о необходимости прочтения документа\n
@@ -160,13 +158,16 @@ class EnableReadingAPIView(views.APIView):
                                                                            False - подтверждение чтения выключено.\n
         Пример ответа:\n
         200:\n
-        {\n
-            "enableReadingConfirmation": false\n
-        }\n
-        """
+            {\n
+                "documentId": 12,\n
+                "enableReadingConfirmation": true\n
+            }"""
+        document = get_object_or_404(Document, pk=pk)
 
-        document = Document.objects.get(id=str(pk))
-        return Response({'enable_reading_confirmation': document.enable_reading_confirmation})
+        return Response(
+            {'document_id': document.id,
+             'enable_reading_confirmation': document.enable_reading_confirmation}
+        )
 
 
     def patch(self, request, pk):
@@ -177,47 +178,27 @@ class EnableReadingAPIView(views.APIView):
                patch - Изменение необходимости подтверждения прочтения документа. Записывает в базу данных информацию о
                         необходимости прочтения документа. True - подтверждение чтения включено.
                         False - подтверждение чтения выключено.\n
-        Пример ответа:\n
-            200:\n
-        {\n
-            "id": 17,\n
-            "name": "uuioi",\n
-            "children": [],\n
-            "docUuid": null,\n
-            "documentLogo": null,\n
-            "perm": [],\n
-            "orderId": "185694d5-b58a-4fc8-99c0-7a6be6c37e38",\n
-            "dataRowOrder": [\n
-                1\n
-            ],\n
-            "folder": null,\n
-            "hostProject": 8,\n
-            "content": "44",\n
-            "docOrder": [\n
-                "3b84b443-7c7a-46a3-90a6-d9b22871b960"\n
-            ],\n
-            "enableReadingConfirmation": false,\n
-            "readConfirmation": [\n
-                {\n
-                    "id": 1,\n
-                    "documentId": 12,\n
-                    "userId": {\n
-                        "id": "3b84b443-7c7a-46a3-90a6-d9b22871b959",\n
-                        "email": "semen@mail.ru",\n
-                        "firstName": "Максимijoi",\n
-                        "lastName": "Вавпара"\n
-                    }\n
-                }\n
-            ]\n
-        }"""
-        document = Document.objects.get(id=str(pk))
-        if document.enable_reading_confirmation:
-            document.enable_reading_confirmation = False
-        else:
-            document.enable_reading_confirmation = True
-        document.save()
-        enable_reading = DocumentSerializer(document)
-        return Response(enable_reading.data)
+        Примеры ответа:\n
+        Если пользователь является владельцем документа:\n
+            {\n
+                "documentId": 12,\n
+                "enableReadingConfirmation": true\n
+            }\n
+        Если пользователь НЕ является владельцем документа:\n
+                {'answer': 'Нет прав на изменение параметра.'}\n
+            """
+        document = get_object_or_404(Document, pk=pk)
+        if document.owner == request.user:
+            if document.enable_reading_confirmation:
+                document.enable_reading_confirmation = False
+            else:
+                document.enable_reading_confirmation = True
+            document.save()
+            return Response(
+                {'document_id': document.id,
+                 'enable_reading_confirmation': document.enable_reading_confirmation}
+            )
+        return Response({'answer': 'Нет прав на изменение параметра.'})
 
 
 class ReadConfirmationAPIView(views.APIView):
@@ -237,7 +218,7 @@ class ReadConfirmationAPIView(views.APIView):
         method:\n
            get\n
         Пример ответа:\n
-        200:\n
+        Если пользователь является владельцем документа:\n
         {\n
             "readConfirmation": [\n
                 {\n
@@ -252,11 +233,16 @@ class ReadConfirmationAPIView(views.APIView):
                     }\n
                 }\n
             ]\n
-        }"""
-        document = Document.objects.get(id=str(pk))
-        read_confirmation = document.read_confirmations.all()
-        serializer = ReadConfirmationSerializer(read_confirmation, many=True)
-        return Response({'read_confirmation': serializer.data})
+        }\n
+        Если пользователь НЕ является владельцем документа:\n
+                {'answer': 'У Вас нет прав на просмотр ознакомившихся с документами.'}\n
+        """
+        document = get_object_or_404(Document, pk=pk)
+        if document.owner == request.user:
+            read_confirmation = document.read_confirmations.all()
+            serializer = ReadConfirmationSerializer(read_confirmation, many=True)
+            return Response({'read_confirmation': serializer.data})
+        return Response({'answer': 'У Вас нет прав на просмотр ознакомившихся с документами.'})
 
 
     def post(self, request, pk):
@@ -266,7 +252,7 @@ class ReadConfirmationAPIView(views.APIView):
         method:\n
            post - Подтверждение прочтения документа. Записывает в базу данных информацию о прочитавшем пользователе\n
         Пример ответа:\n
-        200:\n
+        Если параметр enable_reading_confirmation==True:\n
         {\n
             "id": 17,\n
             "name": "uuioi",\n
@@ -297,10 +283,15 @@ class ReadConfirmationAPIView(views.APIView):
                     }\n
                 }\n
             ]\n
-        }"""
-        document = Document.objects.get(id=str(pk))
-        if not ReadConfirmation.objects.filter(document_id=document, user_id=request.user):
-            familiar_user = ReadConfirmation(document_id=document, user_id=request.user)
-            familiar_user.save()
-        enable_reading = DocumentSerializer(document)
-        return Response(enable_reading.data)
+        }\n
+        Если параметр enable_reading_confirmation==False:\n
+            {'answer': 'Подтверждение прочтения выключено.'}\n
+        """
+        document = get_object_or_404(Document, pk=pk)
+        if document.enable_reading_confirmation:
+            if not ReadConfirmation.objects.filter(document_id=document, user_id=request.user):
+                familiar_user = ReadConfirmation(document_id=document, user_id=request.user)
+                familiar_user.save()
+            enable_reading = DocumentSerializer(document)
+            return Response(enable_reading.data)
+        return Response({'answer': 'Подтверждение прочтения выключено.'})
