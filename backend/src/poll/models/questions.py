@@ -435,10 +435,13 @@ class NumberQuestion(Question):
 
 class DateQuestion(Question):
     """
-    Just Date
+    Just date and time question
     """
-    date = models.DateField(default=datetime.date.today, blank=True, null=True)
-    time = models.TimeField(default=timezone.now, blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+    time = models.TimeField(blank=True, null=True)
+
+    date_answer_mode = models.BooleanField(default=True, blank=True, null=True)
+    time_answer_mode = models.BooleanField(default=True, blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
         super(DateQuestion, self).__init__(*args, **kwargs)
