@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+
   const headerAccordionText = document.querySelector('.header-accordion__text');
   const countBlock = document.querySelector('.header__count-block');
   const countText = document.querySelector('.header__count');
@@ -33,9 +34,10 @@ document.addEventListener("DOMContentLoaded", () => {
     countBlock.classList.add('passive');
   };
 
-  const checkboxes = document.querySelectorAll('.question-checkbox__input');
+  const checkboxes = document.querySelectorAll('.checkbox-input');
 
   checkboxes.forEach((checkbox) => {
+    checkbox.checked = localStorage.getItem(`${checkbox.name + checkbox.id}`);
     checkbox.addEventListener('click', () => {
       const questionContainer = checkbox.closest('.question-container');
       if(questionContainer.querySelector('.question__star-obligatory')){
@@ -45,6 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
           questionContainer.classList.add('question-container-obligatory');
         };
       };
+
+      localStorage.setItem(`${checkbox.name + checkbox.id}`, checkbox.checked);
     });
   });
 
@@ -61,6 +65,13 @@ document.addEventListener("DOMContentLoaded", () => {
         };
       };
     });
+
+    input.addEventListener('change', () => {
+      localStorage.setItem(`${input.name + input.id}`, input.value);
+    });
+
+    input.value = localStorage.getItem(`${input.name + input.id}`);
+
   });  
 
   answersLists.forEach((answersList) => {
@@ -81,9 +92,14 @@ document.addEventListener("DOMContentLoaded", () => {
           questionContainer.classList.remove('question-container-obligatory');
         }
         
+        localStorage.setItem(`${answersList.title + answersList.id}`, answersBtn.innerHTML);
       });
+
+      if(localStorage.getItem(`${answersList.title + answersList.id}`) === answersBtn.innerHTML){
+        answersBtn.classList.add('question-answers-list__item-btn-active');
+      }
     });
-  })
+  });
 
   const noteBtns = document.querySelectorAll('.question-action-list__item-note-btn');
 
@@ -122,9 +138,18 @@ document.addEventListener("DOMContentLoaded", () => {
         fileBlock.classList.add('question-file__img-block');
         const fileImg = document.createElement('img');
         fileImg.classList.add('question-file__img');
-        fileImg.src = "https://mobimg.b-cdn.net/v3/fetch/f2/f2689a880e15cbb49bd267f84689111a.jpeg?w=1470&r=0.5625";
-        console.log(this.files);
-        fileBlock.append(fileImg);
+
+        const file = this.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function() {
+          fileImg.src = reader.result;
+        };
+        reader.onerror = function() {
+          console.log(reader.error);
+        };
+
+        fileBlock.append(fileImg);    
       } else{
         const fileText = document.createElement('p');
         fileBlock.classList.add('question-file__text-block');
@@ -200,45 +225,103 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   });
 
+  const questionSelects = document.querySelectorAll('.question-select');
+
+  questionSelects.forEach((questionSelect) => {
+    const selectCheckboxes = questionSelect.querySelectorAll('.question-checkbox__input');
+    const selectText = localStorage.getItem(`${questionSelect.title + questionSelect.id}`);
+
+    if(selectText){
+      questionSelect.querySelector('.select__current').innerHTML = selectText;
+      for(let i=0; i<selectCheckboxes.length; i++){
+        if(selectCheckboxes[i].nextElementSibling.innerHTML === selectText){
+          selectCheckboxes[i].checked = true;
+        };
+      };
+    };
+  });
+
   function select() {
     const selectHeader = document.querySelectorAll('.select__header');
     const selectItem = document.querySelectorAll('.select__item');
+    const selectBtn = document.querySelectorAll('.select__btn');
   
     selectHeader.forEach(item => {
-      item.addEventListener('click', selectToggle)
+      item.addEventListener('click', selectToggle);
     });
   
     selectItem.forEach(item => {
-      item.addEventListener('click', selectChoose)
+      item.addEventListener('click', selectChoose);
+    });
+
+    selectBtn.forEach(item => {
+      item.addEventListener('click', selectClose);
     });
   
     function selectToggle() {
       this.parentElement.classList.toggle('is-active');
       this.querySelector('.select__icon').classList.toggle('rotate');
-    }
+    };
+
+    function selectClose() {
+      const select = this.closest('.select');
+      const selectCheckboxes = select.querySelectorAll('.question-checkbox__input');
+      const selectIcon = this.closest('.select').querySelector('.select__icon');
+      const currentText = select.querySelector('.select__current');
+      let text;
+
+      for(let i=0; i<selectCheckboxes.length; i++){
+        if(selectCheckboxes[i].checked){
+          text = selectCheckboxes[i].nextElementSibling.innerHTML;
+        };
+      };
+
+      select.classList.remove('is-active');
+      selectIcon.classList.remove('rotate');
+
+      if(text){
+        currentText.innerText = text;
+        localStorage.setItem(`${select.title + select.id}`, text);
+
+        const questionContainer = this.closest('.question-container-obligatory');
+        if (questionContainer){
+          questionContainer.classList.remove('question-container-obligatory');
+        };
+      };
+      
+    };
   
     function selectChoose() {
       const text = this.innerText;
       const select = this.closest('.select');
       const selectIcon = this.closest('.select').querySelector('.select__icon');
       const currentText = select.querySelector('.select__current');
+
       if(this.classList.contains('header-select__item')){
         if (window.screen.availWidth >= 600){
           currentText.innerText = text;
         } else{
           currentText.innerText = text + ' -' + currentText.innerHTML.split('-')[1];
         };
+        select.classList.remove('is-active');
+        selectIcon.classList.remove('rotate');
       } else{
-        currentText.innerText = text;
-      }
+        const selectCheckboxes = select.querySelectorAll('.question-checkbox__input');
+        selectCheckboxes.forEach((selectCheckbox) => {
+          selectCheckbox.addEventListener('click', (event) => {
+            for(let i=0; i<selectCheckboxes.length; i++){
+              if(event.currentTarget !== selectCheckboxes[i]){
+                selectCheckboxes[i].checked = false;
+              };
+            };
+          });
+        });
+      };
       
-      select.classList.remove('is-active');
-      selectIcon.classList.remove('rotate');
+      //select.classList.remove('is-active');
+      //selectIcon.classList.remove('rotate');
 
-      const questionContainer = this.closest('.question-container-obligatory');
-        if (questionContainer){
-          questionContainer.classList.remove('question-container-obligatory');
-        }
+      
     }
   
   };

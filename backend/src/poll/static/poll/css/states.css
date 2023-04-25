@@ -1,0 +1,12 @@
+.input-resert:focus{
+  outline: none;
+  border: 1px solid #4BBDEA;
+}
+
+.input-resert:hover{
+  border: 1px solid #4BBDEA;
+}
+
+.input-resert:active{
+  border: 1px solid #4BBDEA;
+}

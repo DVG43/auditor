@@ -360,12 +360,76 @@ body {
 	margin-bottom: 3px;
 }
 
+.question-select__body{
+  left: -16px;
+  right: -16px;
+  padding: 16px;
+  border-radius: 8px;
+}
+
 .question-select__item {
-	padding: 8px 12px;
+  margin-bottom: 16px;
 	font-size: 14px;
   line-height: 24px;
   color: #fff;
 }
+
+.select-search{
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding-right: 8px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background: #36393F;
+}
+
+.select-search__input{
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  padding: 12px 8px;
+  border: none;
+  background: transparent;
+  color:#FFF;
+}
+
+.select-search__input::placeholder{
+  font-size: 14px;
+  line-height: 24px;
+  color: #95999E;
+}
+
+.select-checkbox {
+  display: block;
+  padding-left: 12px;
+}
+
+.select-checkbox__text {
+  font-size: 14px;
+  line-height: 16px;
+  color: #95999E;
+}
+
+.select-checkbox__sign {
+  top: 3px;
+  border: 2px solid #95999E;
+}
+
+.select__btn{
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #FBC333;
+  font-size: 14px;
+  line-height: 24px;
+  color: #2B2D32;
+}
+
+
+
 
 .question-note__input{
   width: 100%;
