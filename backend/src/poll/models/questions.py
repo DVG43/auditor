@@ -237,6 +237,7 @@ class ManyFromListQuestion(Question):
     item_set = models.ForeignKey(ItemSet, on_delete=models.CASCADE, null=True)
     attached_type = models.ManyToManyField(ManyFromListAttachedType)
     multiple_choices = models.BooleanField(default=False)
+    use_points = models.BooleanField(default=False)
 
     # Необязательные поля
     description_mode = models.BooleanField(default=False)
