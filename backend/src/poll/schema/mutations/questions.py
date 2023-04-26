@@ -5,6 +5,7 @@ from graphql_jwt.decorators import login_required
 from graphene_django.rest_framework.mutation import SerializerMutation
 
 from graphql_utils.permissions import PermissionClass
+from poll.schema.types import ItemSetQuestionType
 from poll.utils import ITEM_MODELS, QUESTION_MODELS
 from poll.models import (
     poll as poll_models,
@@ -486,6 +487,8 @@ class CrtUpdManyFromListQuestion(SerializerMutation):
         lookup_field = 'question_id'
         model_class = qstn_models.ManyFromListQuestion
 
+    item_set = graphene.Field(ItemSetQuestionType)
+
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, **input):
@@ -494,11 +497,10 @@ class CrtUpdManyFromListQuestion(SerializerMutation):
         PermissionClass.has_mutate_object_permission(info, poll)
 
         question_id = input.get('question_id', None)
-        item_set_id = input.get('item_set_id', None)
 
-        item_set = qstn_models.ItemSet.objects.get(item_set_id=item_set_id) if item_set_id else None
-
-        input.update({"item_set": item_set})
+        if 'item_set' in input.keys():
+            item_set = qstn_models.ItemSet.objects.get(item_set_id=input.get('item_set'))
+            input.update({'item_set': item_set})
 
         question_obj, created = qstn_models.ManyFromListQuestion.objects.update_or_create(poll=poll,
                                                                                           question_id=question_id,
@@ -561,8 +563,8 @@ class DeleteItemSet(graphene.Mutation):
     def mutate(cls, root, item_set_id):
         PermissionClass.has_permission(root)
         item_set = qstn_models.ItemSet.objects.filter(
-                pk=item_set_id
-            ).first()
+            pk=item_set_id
+        ).first()
         if item_set:
             item_set.delete()
             return DeleteItemQuestions(ok=True)

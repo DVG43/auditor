@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fetch API Test</title>
+</head>
+<body>
+  <h1>Fetch API Test</h1>
+  Body:<br>
+  <textarea id="bodyArea" cols="40" rows="5">{
+  "source": "Hello, GPT!",
+  "context": ""
+}</textarea><br>
+  API path:<br>
+  <input id="urlInp" value="stream/ai/test/"></input><br>
+  Token (optional):<br>
+  <input id="tokenInp" value=""></input><br>
+
+  <button id="startBtn">Start</button>
+  <button id="stopBtn">Stop</button>
+  <button id="clearBtn">Clear</button>
+  <div id="output"></div>
+
+  <script>
+    const output = document.getElementById('output');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const urlInp = document.getElementById('urlInp');
+    const bodyArea = document.getElementById('bodyArea');
+    const tokenInp = document.getElementById('tokenInp');
+    const textDecoder = new TextDecoder();
+    let reader;
+
+    startBtn.addEventListener('click', async () => {
+      const headers = {
+        "Content-Type": "application/json",
+        "Accept": "text/event-stream",
+      };
+
+      if (tokenInp.value !== "") {
+        headers['Authorization'] = 'Bearer ' + tokenInp.value;
+      }
+
+      const response = await fetch(urlInp.value, {
+        method: "POST",
+        credentials: 'include',
+        cache: "no-cache",
+        keepalive: true,
+        headers: headers,
+        body: bodyArea.value,
+      });
+
+      reader = response.body.getReader();
+
+      while (true) {
+        const {value, done} = await reader.read();
+        if (done) break;
+
+        // Uint8Array -> string
+        let text = textDecoder.decode(value);
+        output.innerHTML += text + '<br>';
+      }
+    });
+    
+    
+    clearBtn.addEventListener('click', () => {
+      output.innerHTML = '';
+    });
+
+    stopBtn.addEventListener('click', () => {
+      reader.cancel();
+    });
+
+  </script>
+</body>
+</html>

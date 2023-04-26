@@ -1,9 +1,11 @@
 from common.serializers import PpmDocSerializer
-from document.models import Document
+from document.models import Document, ReadConfirmation
 from rest_framework import serializers
 from settings import MEDIA_URL
 from projects.models import Project
 from folders.models import Folder
+
+from accounts.models import User
 
 
 class DocumentLogoSerializer(serializers.ModelSerializer):
@@ -40,6 +42,7 @@ class RecursiveSerializer(serializers.Serializer):
         serializer = self.parent.parent.__class__(value, context=self.context)
         return serializer.data
 
+
 class FolderSerializer(serializers.ModelSerializer):
     """Вывод папок"""
 
@@ -47,12 +50,43 @@ class FolderSerializer(serializers.ModelSerializer):
         model = Folder
         fields = ("id", "name")
 
+
+class UserSerializer(serializers.ModelSerializer):
+    """Сериализация данных о пользователе """
+
+    class Meta:
+       model = User
+       fields = ['id', 'email', 'first_name', 'last_name']
+
+
+class ReadConfirmationSerializer(serializers.ModelSerializer):
+    """Сериализация данных о документе и прочитавших его пользователях"""
+
+    user_id = UserSerializer()
+
+    class Meta:
+        model = ReadConfirmation
+        fields = ['id', 'document_id', 'user_id']
+
+
+class ReadConfirmationFildSerializer(serializers.Field):
+    """Создание поля read_confirmation и заполнение его данными о документе и прочитавших его пользователях"""
+
+    def to_representation(self, value):
+        value = value.read_confirmations.all()
+        if value:
+            serializer = ReadConfirmationSerializer(value, many=True)
+            return serializer.data
+        return []
+
+
 class DocumentSerializer(serializers.ModelSerializer):
     """Вывод документа"""
     children = RecursiveSerializer(many=True)
     perm = serializers.SerializerMethodField()
     document_logo = serializers.SerializerMethodField()
     folder = FolderSerializer()
+    read_confirmation = ReadConfirmationFildSerializer(source='*')
 
     class Meta:
         list_serializer_class = FilterReviewListSerializer
@@ -70,11 +104,16 @@ class DocumentSerializer(serializers.ModelSerializer):
             'host_project',
             'content',
             'doc_order',
+            'enable_reading_confirmation',
+            'read_confirmation',
         )
 
     def get_perm(self, obj):
-        user = self.context['request'].user
-        perms = user.get_object_perm_as_str_list(obj)
+        if self.context.get('request'):
+            user = self.context['request'].user
+            perms = user.get_object_perm_as_str_list(obj)
+        else:
+            perms = []
         return perms[0] if len(perms) == 1 else perms
 
     def get_document_logo(self, obj):

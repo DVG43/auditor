@@ -1,6 +1,8 @@
-from typing import Union, List
-
+import time
 import openai
+
+from typing import Union, List, Generator
+
 
 
 CONFIG_DEFAULT_CHAT = {
@@ -27,7 +29,7 @@ CONFIG_DEFAULT_CHAT = {
     #     - https://www.youtube.com/watch?v=x8uwwLNxqis
     #     - Stream Responses from OpenAI API with Python: A Step-by-Step Guide
     #     - Using `requests` and `sseclient`
-    'stream': False,
+    #'stream': False,
 
     # str, array or None : None
     #     Stop sequence. Example:
@@ -109,12 +111,32 @@ def openai_error_to_dict(e: Union[Exception, None]) -> dict:
     return error_details
 
 
+def format_messages(
+    user_prompts: Union[str, List[str]],
+    system_prompt: str = None,
+) -> list:
+    def chat_role(role, content):
+        return dict(role=role, content=content)
+
+    messages = []
+    if system_prompt:
+        messages.append(chat_role(CHAT_ROLE_SYSTEM, system_prompt))
+
+    if type(user_prompts) is str:
+        user_prompts = [user_prompts]
+
+    for user_prompt in user_prompts:
+        messages.append(chat_role(CHAT_ROLE_USER, user_prompt))
+
+    return messages
+
+
 def complete(
-        user_prompts: Union[str, List[str]],
-        system_prompt: str = None,
-        config: dict = {},
-        include_debug: bool = False,
-    ) -> dict:
+    user_prompts: Union[str, List[str]],
+    system_prompt: str = None,
+    config: dict = {},
+    include_debug: bool = False,
+) -> dict:
     '''
     >>> complete('Good day!', config=TaskChatConfig.THEME_TO_TEXT,
     ...     include_debug=True)
@@ -173,42 +195,19 @@ def complete(
                     'code': 'invalid_api_key'}}}}
     }
     '''
-    def chat_role(role, content):
-        return dict(role=role, content=content)
-
     config = {**CONFIG_DEFAULT_CHAT, **config}
-
-    config_stop = config['stop']
-    if type(config_stop) is str:
-        if '\n' in config_stop and config_stop.strip('\n') == '':
-            raise ValueError(
-                f"`stop` can't contain newline characters only"
-                f" (openai bug 2023-03-03), got: {config_stop!r}")
-    else:
-        if config_stop == [] or config_stop == ():
-            raise ValueError(
-                f"`stop` can't be an empty sequence"
-                f" (openai bug 2023-03-03), got: {config_stop}")
-
-    messages = []
-    if system_prompt:
-        messages.append(chat_role(CHAT_ROLE_SYSTEM, system_prompt))
-
-    if type(user_prompts) is str:
-        user_prompts = [user_prompts]
-
-    for user_prompt in user_prompts:
-        messages.append(chat_role(CHAT_ROLE_USER, user_prompt))
+    messages = format_messages(user_prompts, system_prompt)
 
     payload = response = openai_error = None
     try:
-        openai_response = openai.ChatCompletion.create(messages=messages, **config)
+        openai_response = openai.ChatCompletion.create(messages=messages,
+            **config, stream=False)
     except Exception as e:
         openai_error = e
     else:
         response = openai_response.to_dict_recursive()
         response['response_ms'] = openai_response.response_ms
-        # May need to check for unexpected response, like `choices != []`
+        # May need to check for unexpected response, like `choices == []`
         payload = response['choices'][0]['message']['content']
 
     result = {
@@ -227,3 +226,89 @@ def complete(
     return result
 
 
+def complete_stream(
+    user_prompts: Union[str, List[str]],
+    system_prompt: str = None,
+    config: dict = {},
+    include_debug: bool = False,
+) -> Generator:
+    def _to_ms(sec: float) -> int:
+        return round(sec * 1000)
+
+    config = {**CONFIG_DEFAULT_CHAT, **config}
+    messages = format_messages(user_prompts, system_prompt)
+
+    openai_error = None
+    try:
+        openai_response_stream = openai.ChatCompletion.create(messages=messages,
+            **config, stream=True)
+    except Exception as e:
+        openai_error = e
+
+    chunk_id = 0
+
+    if openai_error:
+        result = {
+            'chunk_id': chunk_id,
+            'payload': None,
+            'error': 'AI engine error',
+        }
+
+        chunk_id += 1
+
+        if include_debug:
+            result.update({
+                'debug_info': {
+                    'messages': messages,
+                    'config': config,
+                    'response': None,
+                    'error_details': openai_error_to_dict(openai_error),
+                }
+            })
+        yield result
+
+    else:
+        time_0 = time_prev = time.time()
+        is_first_reply = True
+
+        for raw_chunks_total, chunk in enumerate(openai_response_stream, start=1):
+
+            payload = chunk.choices[0]
+            content = payload.delta.get('content')
+            finish_reason = payload.get('finish_reason')
+
+            if content is None and finish_reason is None:
+                continue
+
+            result = {
+                'chunk_id': chunk_id,
+                'payload': {
+                    'delta': content,
+                    'finish_reason': finish_reason,
+                },
+                'error': None,
+            }
+
+            chunk_id += 1
+
+            if include_debug:
+                time_now = time.time()
+                debug_info = {
+                    'delta_time_ms': _to_ms(time_now - time_prev),
+                    'total_time_ms': _to_ms(time_now - time_0),
+                    'raw_chunks_total': raw_chunks_total,
+                    'response': chunk.to_dict_recursive(),
+                }
+                time_prev = time_now
+
+                if is_first_reply:
+                    debug_info = {
+                        **debug_info,
+                        'messages': messages,
+                        'config': config,
+                        'error_details': openai_error_to_dict(openai_error),
+                    }
+                    is_first_reply = False
+
+                result.update({'debug_info': debug_info})
+            yield result

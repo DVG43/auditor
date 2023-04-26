@@ -1,9 +1,6 @@
 from rest_framework import serializers
 
-from poll.models.questions import DivisionQuestion, ItemQuestion, ManyFromListQuestion, YesNoQuestion, \
-    RatingQuestion, MediaFile, MediaQuestion, TextQuestion, MediaItemQuestion, MediaAttachedType, FinalQuestion, \
-    YesNoAnswers, YesNoAttachedType, HeadingQuestion, FreeAnswer, ItemsFreeAnswer, FreeAnswerAttachedType, \
-    TagsFreeAnswer, ItemTagsFreeAnswer, ManyFromListAttachedType, PageQuestion, SectionQuestion, ItemSet
+from poll.models import questions
 
 
 def max_min_validator(value):
@@ -48,7 +45,7 @@ class BaseQuestionSerializer(serializers.Serializer):
 
 class DivisionQuestionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DivisionQuestion
+        model = questions.DivisionQuestion
         fields = '__all__'
 
 
@@ -56,7 +53,7 @@ class ItemQuestionSerializer(serializers.ModelSerializer):
     item_set = serializers.IntegerField(required=True)
 
     class Meta:
-        model = ItemQuestion
+        model = questions.ItemQuestion
         fields = [
             'item_question_id', 'item_set', 'order_id', 'text',
             'checked', 'photo_path', 'points', 'hex_color', 'selected',
@@ -73,13 +70,13 @@ class ItemSetQuestionSerializer(serializers.ModelSerializer):
     poll = serializers.IntegerField(required=True)
 
     class Meta:
-        model = ItemSet
+        model = questions.ItemSet
         fields = ['item_set_id', 'poll']
 
 
 class MediaAttachedTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = MediaAttachedType
+        model = questions.MediaAttachedType
         fields = '__all__'
 
 
@@ -87,19 +84,19 @@ class MediaItemQuestionSerializer(serializers.ModelSerializer):
     item_question_id = serializers.IntegerField(source='media_question_id', read_only=True)
 
     class Meta:
-        model = MediaItemQuestion
+        model = questions.MediaItemQuestion
         fields = ['item_question_id', 'points']
 
 
 class YesNoAnswersSerializer(serializers.ModelSerializer):
     class Meta:
-        model = YesNoAnswers
+        model = questions.YesNoAnswers
         fields = '__all__'
 
 
 class YesNoAttachedTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = YesNoAttachedType
+        model = questions.YesNoAttachedType
         fields = ['attached_id', 'type', 'active', 'count', 'duration', 'symbols', 'size']
 
 
@@ -109,7 +106,7 @@ class YesNoQuestionSerializer(serializers.ModelSerializer):
     attached_type = YesNoAttachedTypeSerializer(many=True, required=False)
 
     class Meta:
-        model = YesNoQuestion
+        model = questions.YesNoQuestion
         fields = '__all__'
 
     @staticmethod
@@ -118,16 +115,16 @@ class YesNoQuestionSerializer(serializers.ModelSerializer):
         attached_types = validated_data.pop('attached_type', [])
         yes_no_answers = validated_data.pop('yes_no_answers', [])
 
-        yes_no_question = YesNoQuestion.objects.create(**validated_data)
+        yes_no_question = questions.YesNoQuestion.objects.create(**validated_data)
 
         for question_item in question_items:
-            yes_no_question.items.add(ItemQuestion.objects.create(**question_item))
+            yes_no_question.items.add(questions.ItemQuestion.objects.create(**question_item))
 
         for attached_type in attached_types:
-            yes_no_question.attached_type.add(YesNoAttachedType.objects.create(**attached_type))
+            yes_no_question.attached_type.add(questions.YesNoAttachedType.objects.create(**attached_type))
 
         for yes_no_answer in yes_no_answers:
-            yes_no_question.yes_no_answers.add(YesNoAnswers.objects.create(**yes_no_answer))
+            yes_no_question.yes_no_answers.add(questions.YesNoAnswers.objects.create(**yes_no_answer))
 
         validated_data['items'] = ItemQuestionSerializer(yes_no_question.items.all(), many=True).data
         validated_data['yes_no_answers'] = YesNoAnswersSerializer(yes_no_question.yes_no_answers.all(), many=True).data
@@ -160,14 +157,14 @@ class YesNoQuestionSerializer(serializers.ModelSerializer):
 
 class ManyFromListQuestionAttachedTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ManyFromListAttachedType
+        model = questions.ManyFromListAttachedType
         fields = [
             'attached_id', 'type', 'active'
         ]
 
 
 class ManyFromListQuestionSerializer(BaseQuestionSerializer):
-    item_set_id = serializers.IntegerField(required=False)
+    item_set = serializers.IntegerField(required=False)
     multiple_choices = serializers.BooleanField(required=False)
     comment = serializers.CharField(max_length=512, required=False)
     poll = serializers.IntegerField()
@@ -180,17 +177,18 @@ class ManyFromListQuestionSerializer(BaseQuestionSerializer):
     attached_type = ManyFromListQuestionAttachedTypeSerializer(many=True, required=False)
 
     class Meta:
-        model = ManyFromListQuestion
+        model = questions.ManyFromListQuestion
         fields = '__all__'
 
     def create(self, validated_data):
         question_items = validated_data.pop('items', [])
         attached_types = validated_data.pop('attached_type', [])
-        many_from_list_question = ManyFromListQuestion.objects.create(**validated_data)
+        many_from_list_question = questions.ManyFromListQuestion.objects.create(**validated_data)
         for question_item in question_items:
-            many_from_list_question.items.add(ItemQuestion.objects.create(**question_item))
+            many_from_list_question.items.add(questions.ItemQuestion.objects.create(**question_item))
         for attached_type in attached_types:
-            many_from_list_question.attached_type.add(ManyFromListAttachedType.objects.create(**attached_type))
+            many_from_list_question.attached_type.add(
+                questions.ManyFromListAttachedType.objects.create(**attached_type))
         validated_data['items'] = ItemQuestionSerializer(many_from_list_question.items.all(), many=True).data
         validated_data['attached_type'] = ManyFromListQuestionAttachedTypeSerializer(
             many_from_list_question.attached_type.all(),
@@ -213,7 +211,7 @@ class ManyFromListQuestionSerializer(BaseQuestionSerializer):
         if _items:
             instance.items.clear()
             for question_item in _items:
-                instance.items.add(ItemQuestion.objects.create(**question_item))
+                instance.items.add(questions.ItemQuestion.objects.create(**question_item))
         instance.save()
         return instance
 
@@ -223,21 +221,21 @@ class MediaQuestionSerializer(serializers.ModelSerializer):
     items = MediaItemQuestionSerializer(many=True, read_only=True)
 
     class Meta:
-        model = MediaQuestion
+        model = questions.MediaQuestion
         fields = '__all__'
 
     def create(self, validated_data):
         question_items = validated_data.pop('items', [])
         attached_types = validated_data.pop('attached_type', [])
 
-        media_question = MediaQuestion.objects.create(**validated_data)
+        media_question = questions.MediaQuestion.objects.create(**validated_data)
 
         for question_item in question_items:
             max_min_validator(int(question_item['points']))
-            media_question.items.add(MediaItemQuestion.objects.create(**question_item))
+            media_question.items.add(questions.MediaItemQuestion.objects.create(**question_item))
 
         for attached_type in attached_types:
-            media_question.attached_type.add(MediaAttachedType.objects.create(**attached_type))
+            media_question.attached_type.add(questions.MediaAttachedType.objects.create(**attached_type))
 
         validated_data['items'] = MediaItemQuestionSerializer(media_question.items.all(), many=True).data
         validated_data['attached_type'] = MediaAttachedTypeSerializer(media_question.attached_type.all(),
@@ -254,12 +252,12 @@ class MediaQuestionSerializer(serializers.ModelSerializer):
             instance.items.clear()
             for question_item in _items:
                 max_min_validator(int(question_item['points']))
-                instance.items.add(MediaItemQuestion.objects.create(**question_item))
+                instance.items.add(questions.MediaItemQuestion.objects.create(**question_item))
 
         if _attached_type:
             instance.attached_type.clear()
             for attached in _attached_type:
-                instance.attached_type.add(MediaAttachedType.objects.create(**attached))
+                instance.attached_type.add(questions.MediaAttachedType.objects.create(**attached))
         instance.save()
         return instance
 
@@ -269,7 +267,7 @@ class RatingQuestionSerializer(BaseQuestionSerializer):
     poll = serializers.IntegerField()
 
     def create(self, validated_data):
-        return RatingQuestion.objects.create(**validated_data)
+        return questions.RatingQuestion.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         super(RatingQuestionSerializer, self).update(instance, validated_data)
@@ -280,7 +278,7 @@ class RatingQuestionSerializer(BaseQuestionSerializer):
 
 class MediaFileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = MediaFile
+        model = questions.MediaFile
         fields = ['file_id', 'path_to_file']
 
 
@@ -289,7 +287,7 @@ class TextQuestionSerializer(BaseQuestionSerializer):
     poll = serializers.IntegerField()
 
     def create(self, validated_data):
-        return TextQuestion.objects.create(**validated_data)
+        return questions.TextQuestion.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         super(TextQuestionSerializer, self).update(instance, validated_data)
@@ -304,7 +302,7 @@ class CheckQuestionSerializer(BaseQuestionSerializer):
     points = serializers.IntegerField(required=False)
 
     def create(self, validated_data):
-        return TextQuestion.objects.create(**validated_data)
+        return questions.CheckQuestion.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         super(CheckQuestionSerializer, self).update(instance, validated_data)
@@ -318,7 +316,7 @@ class NumberQuestionSerializer(BaseQuestionSerializer):
     poll = serializers.IntegerField()
 
     def create(self, validated_data):
-        return TextQuestion.objects.create(**validated_data)
+        return questions.NumberQuestion.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         super(NumberQuestionSerializer, self).update(instance, validated_data)
@@ -328,15 +326,21 @@ class NumberQuestionSerializer(BaseQuestionSerializer):
 
 
 class DateQuestionSerializer(BaseQuestionSerializer):
-    date = serializers.DateTimeField(required=False)
+    date = serializers.DateField(required=False)
+    time = serializers.TimeField(required=False)
+    date_answer_mode = serializers.BooleanField(required=False)
+    time_answer_mode = serializers.BooleanField(required=False)
     poll = serializers.IntegerField()
 
     def create(self, validated_data):
-        return TextQuestion.objects.create(**validated_data)
+        return questions.DateQuestion.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         super(DateQuestionSerializer, self).update(instance, validated_data)
         instance.date = validated_data.get('date', instance.date)
+        instance.time = validated_data.get('date', instance.time)
+        instance.date_answer_mode = validated_data.get('date_answer_mode', instance.date_answer_mode)
+        instance.time_answer_mode = validated_data.get('time_answer_mode', instance.time_answer_mode)
         instance.save()
         return instance
 
@@ -358,15 +362,15 @@ class FinalQuestionSerializer(BaseQuestionSerializer):
     poll = serializers.CharField(required=True)
 
     class Meta:
-        model = FinalQuestion
+        model = questions.FinalQuestion
         fields = '__all__'
 
     def create(self, validated_data):
         question_items = validated_data.pop('items', [])
 
-        final_question = FinalQuestion.objects.create(**validated_data)
+        final_question = questions.FinalQuestion.objects.create(**validated_data)
         for question_item in question_items:
-            final_question.items.add(ItemQuestion.objects.create(**question_item))
+            final_question.items.add(questions.ItemQuestion.objects.create(**question_item))
         validated_data['items'] = question_items
         return final_question
 
@@ -376,7 +380,7 @@ class FinalQuestionSerializer(BaseQuestionSerializer):
         if _items:
             instance.items.clear()
             for question_item in _items:
-                instance.items.add(ItemQuestion.objects.create(**question_item))
+                instance.items.add(questions.ItemQuestion.objects.create(**question_item))
 
         instance.description_mode = validated_data.get('description_mode', instance.description_mode)
         instance.max_video_duration = validated_data.get('max_video_duration', instance.max_video_duration)
@@ -398,7 +402,7 @@ class HeadingQuestionSerializer(serializers.ModelSerializer):
     poll = serializers.IntegerField()
 
     class Meta:
-        model = HeadingQuestion
+        model = questions.HeadingQuestion
         fields = [
             'caption',
             'question_id',
@@ -413,7 +417,7 @@ class PageQuestionSerializer(serializers.ModelSerializer):
     poll = serializers.IntegerField()
 
     class Meta:
-        model = PageQuestion
+        model = questions.PageQuestion
         fields = [
             'caption',
             'question_id',
@@ -429,7 +433,7 @@ class SectionQuestionSerializer(serializers.ModelSerializer):
     poll = serializers.IntegerField()
 
     class Meta:
-        model = SectionQuestion
+        model = questions.SectionQuestion
         fields = [
             'caption',
             'question_id',
@@ -443,7 +447,7 @@ class SectionQuestionSerializer(serializers.ModelSerializer):
 
 class ItemTagsFreeAnswerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ItemTagsFreeAnswer
+        model = questions.ItemTagsFreeAnswer
         fields = ['id', 'tag']
 
     def create(self, validated_data):
@@ -452,10 +456,10 @@ class ItemTagsFreeAnswerSerializer(serializers.ModelSerializer):
         if item:
             tag = item.tags.filter(tag=tag_name).first()
             if not tag:
-                tag = ItemTagsFreeAnswer.objects.create(tag=tag_name)
+                tag = questions.ItemTagsFreeAnswer.objects.create(tag=tag_name)
                 item.tags.add(tag)
         else:
-            tag = ItemTagsFreeAnswer.objects.create(tag=tag_name)
+            tag = questions.ItemTagsFreeAnswer.objects.create(tag=tag_name)
         return tag
 
 
@@ -464,7 +468,7 @@ class ItemsFreeAnswerSerializer(serializers.ModelSerializer):
     typeAnswerRow = serializers.CharField(source='type_answer_row', required=False)
 
     class Meta:
-        model = ItemsFreeAnswer
+        model = questions.ItemsFreeAnswer
         fields = [
             'item_question_id', 'order_id', 'text',
             'checked', 'photo_path', 'selected', 'points',
@@ -473,10 +477,10 @@ class ItemsFreeAnswerSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tags = validated_data.pop('tagsAnswerFreeItem', [])
-        item = ItemsFreeAnswer.objects.create(**validated_data)
+        item = questions.ItemsFreeAnswer.objects.create(**validated_data)
 
         for tag in tags:
-            item.tags.add(ItemTagsFreeAnswer.objects.create(**tag))
+            item.tags.add(questions.ItemTagsFreeAnswer.objects.create(**tag))
         item.save()
         validated_data['tags'] = TagsFreeAnswerSerializer(item.tags.all(), many=True).data
         return item
@@ -490,7 +494,7 @@ class ItemsFreeAnswerSerializer(serializers.ModelSerializer):
 
 class FreeAnswerAttachedTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = FreeAnswerAttachedType
+        model = questions.FreeAnswerAttachedType
         fields = [
             'attached_id', 'type', 'active'
         ]
@@ -498,7 +502,7 @@ class FreeAnswerAttachedTypeSerializer(serializers.ModelSerializer):
 
 class TagsFreeAnswerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TagsFreeAnswer
+        model = questions.TagsFreeAnswer
         fields = ['id', 'tag']
 
     def create(self, validated_data):
@@ -507,7 +511,7 @@ class TagsFreeAnswerSerializer(serializers.ModelSerializer):
 
         tag = question.tags.filter(tag=tag_name).first()
         if not tag:
-            tag = TagsFreeAnswer.objects.create(tag=tag_name)
+            tag = questions.TagsFreeAnswer.objects.create(tag=tag_name)
             question.tags.add(tag)
         return tag
 
@@ -521,7 +525,7 @@ class FreeAnswerSerializer(BaseQuestionSerializer):
     poll = serializers.IntegerField()
 
     class Meta:
-        model = FreeAnswer
+        model = questions.FreeAnswer
         fields = [
             'question_type', 'order_id', 'description', 'poll', 'caption',
             'require', 'mix_answers', 'time_for_answer', 'type_for_show', 'title_image', 'resize_image', 'test_mode',
@@ -533,16 +537,16 @@ class FreeAnswerSerializer(BaseQuestionSerializer):
         question_attached_type = validated_data.pop('attached_type', [])
         tags = validated_data.pop('tagsAnswerFree', [])
 
-        free_answer = FreeAnswer.objects.create(**validated_data)
+        free_answer = questions.FreeAnswer.objects.create(**validated_data)
         for question_item in question_items.copy():
             question_item['type_answer_row'] = question_item.pop('typeAnswerRow', '')
-            free_answer.items.add(ItemsFreeAnswer.objects.create(**question_item))
+            free_answer.items.add(questions.ItemsFreeAnswer.objects.create(**question_item))
 
         for attached_type in question_attached_type:
-            free_answer.attached_type.add(FreeAnswerAttachedType.objects.create(**attached_type))
+            free_answer.attached_type.add(questions.FreeAnswerAttachedType.objects.create(**attached_type))
 
         for tag in tags:
-            free_answer.tags.add(TagsFreeAnswer.objects.create(**tag))
+            free_answer.tags.add(questions.TagsFreeAnswer.objects.create(**tag))
 
         validated_data['items'] = ItemsFreeAnswerSerializer(free_answer.items.all(), many=True).data
         validated_data['attached_type'] = FreeAnswerAttachedTypeSerializer(free_answer.attached_type.all(),

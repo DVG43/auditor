@@ -8,6 +8,8 @@ from document.views import (
     ProjectViewSet,
     ImageGeneration,
     Text2Speech,
+    EnableReadingAPIView,
+    ReadConfirmationAPIView,
 )
 
 
@@ -15,6 +17,8 @@ urlpatterns = [
     path('folders/document/<int:pk>/', DicumentViewSet.as_view({'get': 'retrieve'})),
     path('folders/<int:pk>/document/', ProjectViewSet.as_view({'get': 'retrieve'})),
     path('projects/document-logo/<int:doc_pk>/', ChangeDocumentLogoView.as_view()),
+    path('document/confirm-reading/enabled/<int:pk>/', EnableReadingAPIView.as_view()),
+    path('document/confirm-reading/users/<int:pk>/', ReadConfirmationAPIView.as_view()),
 
     ## Image generation
     path('projects/document/image_generator/', ImageGeneration.as_view()),

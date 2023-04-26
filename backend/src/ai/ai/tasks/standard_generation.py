@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Generator
 
 from . import query_ai
 
@@ -19,10 +19,10 @@ COMMANDS = {
 }
 
 def generate(
-        command: str,
-        context: Union[str, None] = None,
-        include_debug: bool = False,
-    ) -> dict:
+    command: str,
+    context: Union[str, None] = None,
+    include_debug: bool = False,
+) -> dict:
 
     if command not in COMMANDS:
         response = {
@@ -32,5 +32,21 @@ def generate(
     else:
         user_query = COMMANDS[command]
         response = query_ai.generate(user_query, context, include_debug)
+
+    return response
+
+
+def generate_stream(
+    command: str,
+    context: Union[str, None] = None,
+    include_debug: bool = False,
+) -> Generator:
+
+    if command not in COMMANDS:
+        raise ValueError(f'Command is not supported: "{command}"')
+
+    user_query = COMMANDS[command]
+    response = query_ai.generate_stream(user_query, context,
+        include_debug)
 
     return response

@@ -1,3 +1,5 @@
+import json
+
 from accounts.permissions import IsActivated
 from common.permissions import IsOwner, IsOwnerOrIsInvited
 
@@ -12,125 +14,6 @@ from settings import DEBUG
 
 from . import serializers
 from . import ai
-
-
-class ThemeToText(views.APIView):
-    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
-    serializer_class = serializers.ThemeToTextSerializer
-
-    def post(self, request, *args, **kwargs):
-        """
-        Генерирует абзац текста согласно теме.
-
-        Пример ответа:
-        ```json
-        {
-            "payload": "... сгенерированный текст ...",
-            "error": null
-        }
-        ```
-
-        - В случае успешной генерации `payload` содержит результат, а `error=null`.
-        - В случае ошибки `payload=null`, а `error` содержит описание ошибки без подробностей, которое можно безопасно показать пользователю.
-        """
-        # 1. Проверка валидности полей
-        if request.data.get('tone') == "null":
-            request.data['tone'] = None
-        serializer = serializers.ThemeToTextSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        # 2. Извлечение значений переменных из HTTP запроса
-        source = request.data.get('source')
-        language = request.data.get('language')
-        tone = request.data.get('tone')
-        keywords = request.data.get('keywords')
-
-        # 3. Получение ответа от AI
-        result = ai.theme_to_text(theme=source, tone=tone, lang=language,
-            keywords=keywords, include_debug=DEBUG)
-
-        return Response(result, status=200)
-
-
-class TextRephrase(views.APIView):
-    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
-    serializer_class = serializers.TextRephraseSerializer
-
-    def post(self, request, *args, **kwargs):
-        """
-        Возвращает несколько вариантов такого же по смыслу текста, но другими словами.
-
-        Пример ответа:
-        ```json
-        {
-            "payload": [
-                "Вариант первый",
-                "Вариант второй",
-                ...
-            ],
-            "error": null
-        }
-        ```
-        """
-        # 1. Проверка валидности полей
-        serializer = serializers.TextRephraseSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        # 2. Извлечение значений переменных из HTTP запроса
-        source = request.data.get('source')
-
-        # 3. Получение ответа от AI
-        result = ai.text_rephrase(source, include_debug=DEBUG)
-
-        return Response(result, status=200)
-
-
-class TextShorter(views.APIView):
-    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
-    serializer_class = serializers.TextShorterSerializer
-
-    def post(self, request, *args, **kwargs):
-        """
-        Делает текст короче, не меняя смысл.
-
-        Пример ответа:
-        ```json
-        {
-            "payload": "... сгенерированный текст ...",
-            "error": null
-        }
-        ```
-        """
-        serializer = serializers.TextShorterSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        source = request.data.get('source')
-
-        result = ai.text_shorter(source, include_debug=DEBUG)
-        return Response(result, status=200)
-
-
-class TextContinue(views.APIView):
-    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
-    serializer_class = serializers.TextContinueSerializer
-
-    def post(self, request, *args, **kwargs):
-        """
-        Генерирует продолжение для заданного текста.
-
-        Пример ответа:
-        ```json
-        {
-            "payload": "... сгенерированный текст ...",
-            "error": null
-        }
-        ```
-        """
-        serializer = serializers.TextContinueSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        source = request.data.get('source')
-
-        result = ai.text_continue(source, include_debug=DEBUG)
-        return Response(result, status=200)
 
 
 class QueryAi(views.APIView):
@@ -157,7 +40,6 @@ class QueryAi(views.APIView):
 
         result = ai.query_ai(source, context, include_debug=DEBUG)
         return Response(result, status=200)
-
 
 
 class StandardGeneration(views.APIView):
@@ -197,7 +79,8 @@ class StreamTest(views.APIView):
             import time
             time_0 = time.time()
             yield f'data: {{"payload": "{time.time() - time_0:.3f}s"}}\n\n'
-            for i in range(111):
+            for i in range(20):
+                print('stream', i)
                 time.sleep(0.5)
                 yield f'data: {{"payload": "{time.time() - time_0:.3f}s"}}\n\n'
         return StreamingHttpResponse(generate_stream(), content_type='text/event-stream')
@@ -211,7 +94,6 @@ class StreamTest(views.APIView):
         serializer.is_valid(raise_exception=True)
         source = request.data.get('source')
         context = request.data.get('context')
-        stream = request.data.get('stream')
 
         def generate_stream():
             import json
@@ -222,18 +104,77 @@ class StreamTest(views.APIView):
                 'payload': f'{time.time() - time_0:.3f}s',
                 'source': source,
                 'context': context,
-                'stream': stream,})
+            })
             yield f"data: {data}"
 
-            for i in range(7):
+            for i in range(20):
+                print('stream', i)
                 time.sleep(0.5)
                 data = json.dumps({
                     'payload': f'+{time.time() - time_0:.3f}s',
                     'source': source,
                     'context': context,
-                    'stream': stream,
                 })
                 yield f"data: {data}"
 
         return StreamingHttpResponse(
             generate_stream(), content_type='text/event-stream')
+
+
+class QueryAiStream(views.APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
+    serializer_class = serializers.QueryAiSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Генерирует текст согласно запросу пользователя. Можно
+        использовать дополнительный контекст.
+
+        Пример ответа:
+        ```json
+        {
+            "payload": "... ответ ИИ ...",
+            "error": null
+        }
+        ```
+        """
+        serializer = serializers.QueryAiSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        source = request.data.get('source')
+        context = request.data.get('context')
+
+        streaming_result = ai.query_ai_stream(source, context,
+            include_debug=DEBUG)
+
+        json_lines = lambda obj: json.dumps(obj) + '\n'
+        streaming_json = map(json_lines, streaming_result)
+        return StreamingHttpResponse(streaming_json)
+
+
+class StandardGenerationStream(views.APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrIsInvited]
+    serializer_class = serializers.StandardGenerationSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Генерирует текст согласно одной из стандартного набора команд.
+
+        Пример ответа:
+        ```json
+        {
+            "payload": "... ответ ИИ ...",
+            "error": null
+        }
+        ```
+        """
+        serializer = serializers.StandardGenerationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        context = request.data.get('context')
+        command = request.data.get('command')
+
+        streaming_result = ai.standard_generation_stream(command,
+            context, include_debug=DEBUG)
+
+        json_lines = lambda obj: json.dumps(obj) + '\n'
+        streaming_json = map(json_lines, streaming_result)
+        return StreamingHttpResponse(streaming_json)

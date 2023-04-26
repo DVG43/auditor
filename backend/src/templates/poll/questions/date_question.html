@@ -1,7 +1,8 @@
 {% load static %}
-                <h2 class="question__title">{{instance.description}}</h2>
+                <h2 class="question__title">{{instance.caption}}</h2>
                 <input
-                  id="123"
+                  id="{{instance.question_id}}"
                   type="datetime-local"
                   class="question__input input-resert"
+                  name="{{instance.question_type}}"
                 />

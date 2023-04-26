@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='basetfquestion',
             name='answer_type',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, choices=[('text', 'text'), ('video', 'video')], max_length=10), default=testform.schema.utils.get_question_logo_default, size=2),
+            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, choices=[('text', 'text'), ('video', 'video')], max_length=10), default=testform.schema.utils.get_answer_type_default, size=2),
         ),
         migrations.AddField(
             model_name='finaltfquestion',

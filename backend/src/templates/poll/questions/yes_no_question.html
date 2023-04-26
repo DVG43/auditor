@@ -1,6 +1,6 @@
 {% load static %}
-                <h2 class="question__title">{{instance.description}}</h2>
-                <ul class="question-answers-list list-resert flex">
+                <h2 class="question__title">{{instance.caption}}</h2>
+                <ul id="{{instance.question_id}}" class="question-answers-list list-resert flex" title="{{instance.question_type}}">
                   <li class="question-answers-list__item">
                     <button class="question-answers-list__item-btn yes-btn btn-resert">
                       Да
