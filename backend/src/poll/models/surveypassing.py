@@ -6,18 +6,12 @@ from poll.models.poll import Poll
 from accounts.models import User # , SecretGuestProfile
 from jsonfield import JSONField
 
+
 class SurveyPassing(models.Model):
     id = models.AutoField(primary_key=True)
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    sex = models.CharField(max_length=6, default=None, blank=True, null=True)
-    platform = models.CharField(max_length=100, default=None, blank=True, null=True)
-    age = models.PositiveIntegerField(default=None, blank=True, null=True)
     created_at = models.DateTimeField(default=None, blank=True, null=True)
-    user_name = models.CharField(max_length=100, default='Anonymous')
-    survey_title = models.CharField(max_length=255, default='Untitled')
-    status = models.CharField(max_length=10, default='new')
-    questions = JSONField(default=None, blank=True, null=True)
+    answers = JSONField(default=None, blank=True, null=True)
 
     class Meta:
         db_table = 'poll_surveypassing'
