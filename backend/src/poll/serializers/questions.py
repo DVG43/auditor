@@ -68,10 +68,11 @@ class ItemQuestionSerializer(serializers.ModelSerializer):
 class ItemSetQuestionSerializer(serializers.ModelSerializer):
     item_set_id = serializers.IntegerField(required=False)
     poll = serializers.IntegerField(required=True)
+    use_points = serializers.BooleanField(required=False)
 
     class Meta:
         model = questions.ItemSet
-        fields = ['item_set_id', 'poll']
+        fields = ['item_set_id', 'poll', 'use_points']
 
 
 class MediaAttachedTypeSerializer(serializers.ModelSerializer):
@@ -175,7 +176,6 @@ class ManyFromListQuestionSerializer(BaseQuestionSerializer):
     answer_from = serializers.IntegerField(required=False)
     answer_to = serializers.IntegerField(required=False)
     attached_type = ManyFromListQuestionAttachedTypeSerializer(many=True, required=False)
-    use_points = serializers.BooleanField(required=False)
 
     class Meta:
         model = questions.ManyFromListQuestion
