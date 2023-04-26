@@ -29,3 +29,10 @@ def get_items_many_list(item_set=None):
     ManyFromListQuestion_instance = questions_models.ItemQuestion.objects.filter(item_set=item_set).values()
     instances = list(ManyFromListQuestion_instance)
     return {"instances": instances}
+
+@register.inclusion_tag(
+    'poll/questions/items_multiple_choices.html')  # тэг который возр-ет шаблон items_many_list.html с передачей в нее параметров "question_id"
+def get_items_multiple_choices(item_set=None):
+    ManyFromListQuestion_instance = questions_models.ItemQuestion.objects.filter(item_set=item_set).values()
+    instances = list(ManyFromListQuestion_instance)
+    return {"instances": instances}

@@ -1,0 +1,8 @@
+{% load static %}{% load poll_tags %}
+        {% for instance in instances %}
+                  <li class="question-answers-list__item">
+                    <button class="question-answers-list__item-btn yes-btn btn-resert">
+                      {{instance.text}}
+                    </button>
+                  </li>
+        {% endfor %}
