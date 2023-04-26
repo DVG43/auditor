@@ -79,9 +79,8 @@ class StreamTest(views.APIView):
             import time
             time_0 = time.time()
             yield f'data: {{"payload": "{time.time() - time_0:.3f}s"}}\n\n'
-            for i in range(20):
-                print('stream', i)
-                time.sleep(0.5)
+            for i in range(6000):
+                time.sleep(0.01)
                 yield f'data: {{"payload": "{time.time() - time_0:.3f}s"}}\n\n'
         return StreamingHttpResponse(generate_stream(), content_type='text/event-stream')
 
