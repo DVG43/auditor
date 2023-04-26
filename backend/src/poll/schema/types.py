@@ -215,7 +215,7 @@ class SectionQuestionType(DjangoObjectType):
         ret.extend(questions_models.YesNoQuestion.objects.filter(parent_id=self.section_id))
         ret.extend(questions_models.ManyFromListQuestion.objects.filter(parent_id=self.section_id))
 
-        return ret
+        return sorted(ret, key=lambda x: x.order_id)
 
 
 class PageQuestionType(DjangoObjectType):
@@ -243,7 +243,7 @@ class PageQuestionType(DjangoObjectType):
         ret.extend(questions_models.YesNoQuestion.objects.filter(parent_id=self.page_id))
         ret.extend(questions_models.ManyFromListQuestion.objects.filter(parent_id=self.page_id))
 
-        return ret
+        return sorted(ret, key=lambda x: x.order_id)
 
     @login_required
     def resolve_item_sets(self, info):
