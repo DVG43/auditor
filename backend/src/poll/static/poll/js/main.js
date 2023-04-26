@@ -81,9 +81,9 @@ document.addEventListener("DOMContentLoaded", () => {
       answersBtn.addEventListener('click', (event) => {
         for(let i=0; i<answersBtns.length; i++){
           if(event.currentTarget === answersBtns[i]){
-            answersBtns[i].classList.add('question-answers-list__item-btn-active');
+            answersBtns[i].style.background = answersBtns[i].attributes.fill.value;
           } else{
-            answersBtns[i].classList.remove('question-answers-list__item-btn-active');
+            answersBtns[i].style.background = '#40444b'; 
           };
         };
         accordionTextGenerator(5, 5, 5);
