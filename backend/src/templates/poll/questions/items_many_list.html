@@ -1,4 +1,8 @@
 {% load static %}{% load poll_tags %}
         {% for instance in instances %}
-          <div class="question-select__item select__item">{{instance.text}}</div>
+          <label class="question-select__item select__item question-checkbox select-checkbox">
+            <input type="checkbox" class="question-checkbox__input"/>
+            <span class="question-checkbox__text select-checkbox__text">{{instance.text}}</span>
+            <span class="question-checkbox__sign select-checkbox__sign"></span>
+          </label>
         {% endfor %}

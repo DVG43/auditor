@@ -89,14 +89,6 @@
     margin-bottom: 16px;
   }
 
-  .question-container {
-    padding: 16px 24px;
-  }
-
-  /*.question-answers-list__item-btn {
-    border-radius: 8px;
-  }*/
-
   .question-answers-list {
     flex-direction: row;
   }
