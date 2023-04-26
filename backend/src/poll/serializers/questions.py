@@ -175,6 +175,7 @@ class ManyFromListQuestionSerializer(BaseQuestionSerializer):
     answer_from = serializers.IntegerField(required=False)
     answer_to = serializers.IntegerField(required=False)
     attached_type = ManyFromListQuestionAttachedTypeSerializer(many=True, required=False)
+    use_points = serializers.BooleanField(required=False)
 
     class Meta:
         model = questions.ManyFromListQuestion
