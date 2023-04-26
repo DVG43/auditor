@@ -1,0 +1,5 @@
+{% load static %}{% load poll_tags %}
+                <h2 class="question__title">{{instance.caption}}</h2>
+                <ul id="{{instance.question_id}}" class="question-answers-list list-resert flex" title="{{instance.question_type}}">
+                  {% get_items_multiple_choices instance.item_set_id%}
+                </ul>

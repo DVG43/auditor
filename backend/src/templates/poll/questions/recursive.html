@@ -9,7 +9,11 @@
                               {% if instance.question_type == "DateQuestion" %}
                                 {% include 'poll/questions/date_question.html' with instance=instance %}
                               {% elif instance.question_type == "ManyFromListQuestion" %}
-                                {% include 'poll/questions/many_from_list_question.html' with instance=instance %}
+                                {% if instance.multiple_choices %}
+                                    {% include 'poll/questions/multiple_choices_question.html' with instance=instance %}
+                                {% else %}
+                                    {% include 'poll/questions/many_from_list_question.html' with instance=instance %}
+                                {% endif %}
                               {% elif instance.question_type == "TextQuestion" %}
                                 {% include 'poll/questions/text_question.html' with instance=instance %}
                               {% elif instance.question_type == "NumberQuestion" %}
