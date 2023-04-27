@@ -132,6 +132,7 @@ class DivisionQuestion(Question):
 class ItemSet(models.Model):
     item_set_id = models.AutoField(primary_key=True)
     poll = models.ForeignKey('Poll', on_delete=models.CASCADE)
+    use_points = models.BooleanField(default=False)
 
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(default=timezone.now)
@@ -237,7 +238,6 @@ class ManyFromListQuestion(Question):
     item_set = models.ForeignKey(ItemSet, on_delete=models.CASCADE, null=True)
     attached_type = models.ManyToManyField(ManyFromListAttachedType)
     multiple_choices = models.BooleanField(default=False)
-    use_points = models.BooleanField(default=False)
 
     # Необязательные поля
     description_mode = models.BooleanField(default=False)

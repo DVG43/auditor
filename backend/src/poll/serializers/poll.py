@@ -107,6 +107,7 @@ class PollSerializer(serializers.ModelSerializer):
             'setting': setting,
             'new_survey_passing': instance.new_survey_passing(),
             'last_open': instance.last_open,
+            'use_points': instance.use_points
             # 'telegram_integration': instance.telegram_integration_is_active(),
             # 'googlesheet_integration': instance.googlesheet_integration_is_active()
         }
@@ -156,6 +157,7 @@ class PollSerializer(serializers.ModelSerializer):
         poll.test_mode_global = validated_data.get('test_mode_global', False) in ['true', 'True', True]
         poll.host_project = validated_data.get('host_project')
         poll.folder = validated_data.get('folder')
+        poll.use_points = validated_data.get('use_points')
         poll.last_modified_user = validated_data.get('last_modified_user')
         poll.save()
         tags = validated_data.get('tags', [])

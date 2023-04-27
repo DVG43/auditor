@@ -90,6 +90,7 @@ class CreatePoll(SerializerMutation):
 
 class UpdatePollInput(graphene.InputObjectType):
     name = graphene.String(required=False)
+    use_points = graphene.Boolean(required=False)
     description = graphene.String(required=False)
     folder = graphene.ID(required=False)
     image = graphene.String(required=False)
