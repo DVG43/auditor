@@ -1,6 +1,6 @@
 from poll.query import get_or_none
 from poll.models.answer import UserAnswerQuestion
-from poll.models.questions import YesNoQuestion, FreeAnswer
+from poll.models.questions import YesNoQuestion, FreeAnswer, ItemQuestion
 from poll.utils import QUESTION_SERIALIZERS_V1
 
 
@@ -69,18 +69,13 @@ def update_order_free_answer_items(item_question_id: int, old_order_id: int, ord
 
 
 def update_questions_order(question, created=True):
-    if created and question.order_id:
-        return
-    else:
-        poll = question.poll
-        questions = poll.get_questions(parent_id=question.parent_id)
-        if created:
-            question.order_id = max(questions, key=lambda x: x.order_id).order_id + 1
-            question.save()
-        else:
-            questions.remove(question)
-            questions = sorted(questions, key=lambda x: x.order_id)
-            orders = [x.order_id for x in questions]
+    poll = question.poll
+    questions = poll.get_questions(parent_id=question.parent_id)
+    if question.order_id:
+        questions.remove(question)
+        questions = sorted(questions, key=lambda x: x.order_id)
+        orders = [x.order_id for x in questions]
+        if question.order_id in orders:
             try:
                 position = orders.index(question.order_id)
                 for q in questions[position:]:
@@ -88,25 +83,27 @@ def update_questions_order(question, created=True):
                     q.save()
             except ValueError:
                 return
+    else:
+        question.order_id = max(questions, key=lambda x: x.order_id).order_id + 1
+        question.save()
 
 
 def update_items_order(item, created=True):
-    if created and item.order_id:
-        return
-    else:
-        item_qset = list(item.item_set.itemquestion_set.all())
-        if created:
-            item.order_id = max(item_qset, key=lambda x: x.order_id).order_id + 1
-            item.save()
-        else:
-            # TODO: bulk update
-            item_qset.remove(item)
-            items = sorted(item_qset, key=lambda x: x.order_id)
-            orders = [x.order_id for x in items]
+    item_qset = list(item.item_set.itemquestion_set.all())
+    if item.order_id:
+        item_qset.remove(item)
+        items = sorted(item_qset, key=lambda x: x.order_id)
+        orders = [x.order_id for x in items]
+        if item.order_id in orders:
             try:
                 position = orders.index(item.order_id)
+                update_queries = []
                 for i in items[position:]:
                     i.order_id += 1
-                    i.save()
+                    update_queries.append(i)
+                ItemQuestion.objects.bulk_update(update_queries, ['order_id'])
             except ValueError:
                 return
+    else:
+        item.order_id = max(item_qset, key=lambda x: x.order_id).order_id + 1
+        item.save()

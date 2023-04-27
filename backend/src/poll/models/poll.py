@@ -31,6 +31,7 @@ class Poll(PpmDocModel):
     count_answers = models.PositiveIntegerField(default=0)
     tags_list = models.ManyToManyField(PollTags)
     last_open = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    use_points = models.BooleanField(default=False)
     folder = models.ForeignKey(
         'folders.Folder',
         on_delete=models.CASCADE,
