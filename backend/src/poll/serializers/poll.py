@@ -157,7 +157,7 @@ class PollSerializer(serializers.ModelSerializer):
         poll.test_mode_global = validated_data.get('test_mode_global', False) in ['true', 'True', True]
         poll.host_project = validated_data.get('host_project')
         poll.folder = validated_data.get('folder')
-        poll.use_points = validated_data.get('use_points')
+        poll.use_points = validated_data.get('use_points', False)
         poll.last_modified_user = validated_data.get('last_modified_user')
         poll.save()
         tags = validated_data.get('tags', [])
