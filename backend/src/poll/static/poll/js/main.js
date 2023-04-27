@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if(localStorage.getItem(`${answersList.title + answersList.id}`) === answersBtn.innerHTML){
-        answersBtn.classList.add('question-answers-list__item-btn-active');
+        answersBtn.style.background = answersBtn.attributes.fill.value;
       }
     });
   });
