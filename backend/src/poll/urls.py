@@ -14,7 +14,7 @@ from poll.views.poll import PollCollection, DuplicatePoll, \
 from poll.views.questions import QuestionCollection, YesNoAnswersView, \
     ManyFromListQuestionCaptionView, YesNoAnswersCreateAPIView, TagFreeAnswer, ItemTagFreeAnswer
 from poll.views.surveypassing import SurveyPassingCollectionSet, \
-    SurveyIdPassingCollectionSet, SurveyPassingMultipleDelete
+    SurveyIdPassingCollectionSet, SurveyPassingMultipleDelete, SurveyPassingCreate
 from poll.views.user_access import UserAccessView, TransferAccess
 from poll.views.polltheme import PollThemeViewSet, PollThemeListView, PollThemeActiveRetrieveView, \
     PollThemeActiveListView
@@ -72,6 +72,10 @@ poll_endpoints = [
     path('sp/<int:pk>/', SurveyPassingCollectionSet.as_view()),
     path('sp/survey/<int:pk>/', SurveyIdPassingCollectionSet.as_view()),
     path('sp/multiple-delete/', SurveyPassingMultipleDelete.as_view()),
+
+    # Survey passing
+
+    path('surveypassing/', SurveyPassingCreate.as_view()),
 
     # YesNoAnswersView
     path('questions/YesNoAnswers/', YesNoAnswersCreateAPIView.as_view()),
