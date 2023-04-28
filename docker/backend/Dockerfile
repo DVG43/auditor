@@ -21,7 +21,7 @@ RUN apk update \
     && apk del build-deps
 WORKDIR /app/
 COPY . /app/
-# RUN 
+
 RUN addgroup app && adduser -S app -G app \
     && chown -R app:app /app/backend/
 

@@ -4,7 +4,7 @@ backend/src/share/
 logs
 *.log
 .idea
-*.env
+*.env.
 .env.local
 npm-debug.log*
 yarn-debug.log*
