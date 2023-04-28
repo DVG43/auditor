@@ -59,7 +59,7 @@ class CreatePoll(SerializerMutation):
         Creates base page and section with possible questions
         """
 
-        base_page = qstn_models.PageQuestion.objects.create(poll=poll, caption="Заглавная страница")
+        base_page = qstn_models.PageQuestion.objects.create(poll=poll, order_id=1, caption="Заглавная страница")
 
         data = {
             "poll": poll,
