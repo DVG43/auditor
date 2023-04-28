@@ -61,7 +61,7 @@ class FilterQuerySetMixin(viewsets.ReadOnlyModelViewSet):
             queryset = get_model(base).objects.all()
         # queryset = get_model(base).objects.filter(owner=user)
         if self.request.user.is_invited:
-            queryset = get_model(base).objects.filter(doc_uuid=self.request.user.document)
+            queryset = get_model(base).objects.filter(pk=self.request.user.document)
         if base in ['project', 'storyboard',
                     'file', 'link', 'text', 'document', 'folder']:
             queryset = queryset.filter(deleted_id__isnull=True).filter(owner__is_active=True)
