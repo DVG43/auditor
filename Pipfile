@@ -54,6 +54,7 @@ graphene-file-upload = "*"
 speechkit = "==2.1.0"
 pyopenssl = "*"
 pyasn1 = "*"
+sentry-sdk = {extras = ["django"], version = "*"}
 
 [dev-packages]
 
