@@ -241,6 +241,7 @@ class ManyFromListQuestion(Question):
 
     # Необязательные поля
     description_mode = models.BooleanField(default=False)
+    checked = models.BooleanField(blank=True, null=True, default=False)
     count_of_answer = models.IntegerField(default=0)
     current_number_value = models.IntegerField(default=None, blank=True, null=True)
     answer_from = models.IntegerField(default=None, blank=True, null=True)
