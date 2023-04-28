@@ -8,22 +8,24 @@ from poll.models.answer import UserAnswerQuestion
 
 
 class PollAnaliticsModelAdmin(admin.ModelAdmin):
-	list_display = ('id', 'poll_id', 'avarage_age', 'men_total',
-	                'women_total', 'women_before_18', 'men_before_18',
-	                'women_in_18_24', 'men_in_18_24', 'women_in_25_35',
-	                'men_in_25_35', 'women_in_36_45', 'men_in_36_45', 
-	                'women_older_46', 'men_older_46', 'from_desktop',
-	                'from_mobile', 'from_other')
-	list_display_links = ('id', )
-	class Meta:
-		model = PollAnalitics
+    list_display = ('id', 'poll_id', 'avarage_age', 'men_total',
+                    'women_total', 'women_before_18', 'men_before_18',
+                    'women_in_18_24', 'men_in_18_24', 'women_in_25_35',
+                    'men_in_25_35', 'women_in_36_45', 'men_in_36_45',
+                    'women_older_46', 'men_older_46', 'from_desktop',
+                    'from_mobile', 'from_other')
+    list_display_links = ('id',)
+
+    class Meta:
+        model = PollAnalitics
 
 
-class SurveyPassingModelAdmin(admin.ModelAdmin):
-	list_display = ('id', 'poll', 'user', 'sex', 'platform', 'age')
-	list_display_links = ('id', )
-	class Meta:
-		model = SurveyPassing
+# class SurveyPassingModelAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'poll', 'user', 'sex', 'platform', 'age')
+#     list_display_links = ('id',)
+#
+#     class Meta:
+#         model = SurveyPassing
 
 
 class PollAdmin(admin.ModelAdmin):
@@ -35,7 +37,7 @@ class PollTagsAdmin(admin.ModelAdmin):
 
 
 class ItemQuestionAdmin(admin.ModelAdmin):
-    list_display = ('item_question_id', )
+    list_display = ('item_question_id',)
 
 
 class UserAnswerQuestionAdmin(admin.ModelAdmin):
@@ -47,8 +49,7 @@ admin.site.register(ItemQuestion, ItemQuestionAdmin)
 admin.site.register(PollTags, PollTagsAdmin)
 admin.site.register(Poll, PollAdmin)
 admin.site.register(PollAnalitics, PollAnaliticsModelAdmin)
-admin.site.register(SurveyPassing, SurveyPassingModelAdmin)
-
+# admin.site.register(SurveyPassing, SurveyPassingModelAdmin)
 
 # """
 # Provide configuration for admin panel poll tables.

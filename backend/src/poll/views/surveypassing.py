@@ -3,9 +3,10 @@ from http import HTTPStatus
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import get_object_or_404, CreateAPIView
 from rest_framework import status
 
+from poll.models.poll import Poll
 from poll.models.surveypassing import SurveyPassing
 from poll.serializers.answer import UserAnswerSerializer
 from poll.serializers.surveypassing import SurveyPassingSerializer
@@ -110,3 +111,27 @@ class SurveyPassingMultipleDelete(APIView):
         for i in delete_ids.split(','):
             get_object_or_404(SurveyPassing, pk=int(i)).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SurveyPassingCreate(CreateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = SurveyPassingSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Create survey passing
+        ---
+        parameters:
+        - name: poll
+            description: poll_id
+            required: true
+            type: integer
+        - name: answers
+            required: true
+            type: json
+        """
+
+        super(SurveyPassingCreate, self).post(request, *args, **kwargs)
+
+        return Response({'result': 'Survey completed'},
+                        status=HTTPStatus.CREATED)

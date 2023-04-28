@@ -169,6 +169,7 @@ class ManyFromListQuestionSerializer(BaseQuestionSerializer):
     multiple_choices = serializers.BooleanField(required=False)
     comment = serializers.CharField(max_length=512, required=False)
     poll = serializers.IntegerField()
+    checked = serializers.BooleanField(required=False)
     answer_time = serializers.IntegerField(default=0, required=False)
     description_mode = serializers.BooleanField(required=False)
     count_of_answer = serializers.IntegerField(required=False)
