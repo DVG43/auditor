@@ -1,0 +1,102 @@
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+  font-weight: 400;
+}
+
+img {
+  max-width: 100%;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  background: #40444B;
+}
+
+.flex {
+  display: flex;
+}
+
+.container {
+  max-width: 796px;
+  padding: 0 20px;
+  margin: 0 auto;
+}
+
+.content{
+  padding-top: 450px;
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-size: 510px 397px;
+  background-image: url(../img/no-data.svg);
+}
+
+.title{
+  margin-bottom: 30px;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 55px;
+  color: #FFF;
+}
+
+.descr{
+  margin-bottom: 20px;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 27px;
+  color: #FFF;
+}
+
+@media (max-width: 767px){
+  .content{
+    padding-top: 250px;
+    background-size: 350px 250px;
+  }
+  
+  .title{
+    margin-bottom: 20px;
+    font-size: 30px;
+    line-height: 30px;
+  }
+  
+  .descr{
+    margin-bottom: 15px;
+    font-size: 15px;
+    line-height: 15px;
+  }
+}
+
+@media (max-width: 468px){
+  .content{
+    padding-top: 160px;
+    background-size: 290px 150px;
+  }
+  
+  .title{
+    margin-bottom: 15px;
+    font-size: 20px;
+    line-height: 30px;
+  }
+  
+  .descr{
+    margin-bottom: 10px;
+    font-size: 10px;
+    line-height: 15px;
+  }
+}

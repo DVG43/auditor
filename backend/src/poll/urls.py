@@ -23,7 +23,7 @@ from poll.views_v2.sub_question_view import ItemViewSet, ItemCreateViewSet, Atta
 from poll.views_v2.poll import PollViewSet
 from poll.views_v2.questions import QuestionViewSet, QuestionCreateView
 
-from poll.views.poll_templates import my_view
+from poll.views.poll_templates import template_view, stopper_view
 
 
 router = DefaultRouter()
@@ -93,7 +93,8 @@ poll_endpoints = [
     path('user/<int:pk>/poll_create/', PollCreate.as_view()),
 
     # templates
-    path('poll_templates/<uuid:templ_uuid>/', my_view, name='templates'),
+    path('poll_templates/<uuid:templ_uuid>/', template_view, name='templates'),
+    path('poll_templates/dont_exist/', stopper_view, name='templates_dont_exist'),
 
 ]
 
