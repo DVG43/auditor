@@ -14,7 +14,7 @@ services:
         APP_API_LOG: /app/backend/src/logs/apilog.log
     entrypoint: /app/docker/backend/wsgi-entrypoint.sh
     env_file:
-      - .env.local
+      - .env.local.local
     volumes:
       - .:/app/
     depends_on:
@@ -68,7 +68,7 @@ services:
         APP_API_LOG: /app/backend/src/logs/apilog.log
     entrypoint: /app/docker/backend/celery-entrypoint.sh
     env_file:
-      - .env.local
+      - .env.local.local
     volumes:
       - .:/app/
     depends_on:

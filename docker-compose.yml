@@ -24,7 +24,7 @@ services:
         APP_API_LOG: /app/backend/src/logs/apilog.log
     entrypoint: /app/docker/backend/wsgi-entrypoint.sh
     env_file:
-      - .env.local
+      - ./.env.local
     volumes:
       - .:/app/
       - shared_web_root:/app/backend/src/share/
@@ -84,7 +84,7 @@ services:
         APP_API_LOG: /app/backend/src/logs/apilog.log
     entrypoint: /app/docker/backend/celery-entrypoint.sh
     env_file:
-      - .env.local
+      - ./.env.local
     volumes:
       - .:/app/
       - shared_web_root:/app/backend/src/share/

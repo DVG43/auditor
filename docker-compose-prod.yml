@@ -13,7 +13,7 @@ services:
     hostname: "auditor-v2-api"
     restart: unless-stopped
     entrypoint: /app/docker/backend/wsgi-entrypoint.sh
-    env_file: .env
+    env_file: .env.local
     volumes:
       - shared_web_root:/app/backend/src/share/
     networks:
@@ -47,7 +47,7 @@ services:
      container_name: "auditor-v2-celery"
      restart: unless-stopped
      entrypoint: /app/docker/backend/celery-entrypoint.sh
-     env_file: .env
+     env_file: .env.local
      networks:
        - auditor_default
      depends_on:
